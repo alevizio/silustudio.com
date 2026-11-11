@@ -1,0 +1,47 @@
+<script lang="ts">
+	import facade from '#lib/assets/gallery/fachada.jpg?enhanced';
+	import SectionHeading from '#lib/components/section-heading.svelte';
+	import Seo from '#lib/components/seo.svelte';
+	import VisitDetails from '#lib/components/visit-details.svelte';
+	import { SITE } from '#lib/content/site.ts';
+	import { copyFor, type Lang } from '#lib/i18n/index.ts';
+
+	interface Props {
+		lang: Lang;
+	}
+
+	let { lang }: Props = $props();
+
+	const copy = $derived(copyFor(lang).visit);
+</script>
+
+<Seo {lang} page="visit" />
+
+<header class="mx-auto max-w-page px-gutter pt-6 pb-12 md:pt-12 md:pb-16">
+	<SectionHeading level={1} label={copy.label} title={copy.pageTitle} />
+</header>
+
+<div class="mx-auto max-w-page px-gutter">
+	<enhanced:img
+		src={facade}
+		alt={copy.facadeAlt}
+		sizes="(min-width: 1280px) 1216px, 100vw"
+		fetchpriority="high"
+		class="aspect-room size-full object-cover md:aspect-facade"
+	/>
+</div>
+
+<section
+	aria-label={copy.pageTitle}
+	class="mx-auto grid max-w-page gap-12 px-gutter py-section lg:grid-cols-12 lg:gap-x-16"
+>
+	<VisitDetails {lang} class="lg:col-span-5" />
+	<!-- The map is muted to grey so it sits quietly on the page. -->
+	<iframe
+		src={SITE.mapEmbedUrl}
+		title={copy.mapTitle}
+		loading="lazy"
+		referrerpolicy="no-referrer-when-downgrade"
+		class="aspect-map w-full bg-plate grayscale lg:col-span-7"
+	></iframe>
+</section>

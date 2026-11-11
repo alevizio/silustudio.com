@@ -1,0 +1,114 @@
+@import 'tailwindcss';
+
+@import '@fontsource/lato/300.css';
+@import '@fontsource/lato/400.css';
+@import '@fontsource/lato/700.css';
+@import '@fontsource-variable/newsreader/opsz.css';
+
+/*
+ * Design tokens. "La sala": the page is the gallery wall, the works supply the colour.
+ * Every colour, type size and layout measure used by the components comes from here.
+ */
+@theme {
+	/* Colour */
+	--color-wall: #f6f4ef; /* page background, the warm white of the gallery walls */
+	--color-plate: #edeae3; /* pale plate behind works and thumbnails */
+	--color-ink: #23211e; /* text */
+	--color-ink-soft: #5f5a52; /* secondary text, 6.2:1 on wall and 5.7:1 on plate */
+	--color-line: #d9d4ca; /* hairlines */
+	--color-sand: #b79a6d; /* decorative accent taken from the works */
+	--color-sand-deep: #7a5f37; /* accent that is safe for text and focus rings, 5.4:1 on wall */
+
+	/* Type families */
+	--font-sans: 'Lato', ui-sans-serif, system-ui, sans-serif;
+	--font-serif: 'Newsreader Variable', ui-serif, Georgia, serif;
+
+	/* Type scale */
+	--text-label: 0.8125rem;
+	--text-label--line-height: 1.45;
+	--text-label--letter-spacing: 0.14em;
+	--text-display: clamp(2.125rem, 1.35rem + 3.1vw, 3.5rem);
+	--text-display--line-height: 1.08;
+	--text-display--letter-spacing: -0.015em;
+	--text-title: clamp(1.625rem, 1.3rem + 1.4vw, 2.25rem);
+	--text-title--line-height: 1.16;
+	--text-title--letter-spacing: -0.01em;
+	--text-lead: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
+	--text-lead--line-height: 1.5;
+	--text-prose: 1.125rem;
+	--text-prose--line-height: 1.7;
+
+	/* Layout */
+	--spacing-section: clamp(4.5rem, 2.5rem + 8vw, 8.5rem);
+	--spacing-gutter: clamp(1.25rem, 0.5rem + 3.5vw, 3rem);
+	--spacing-thumb: 5rem;
+	--spacing-logo: 3.5rem;
+	--container-page: 76rem;
+	--container-prose: 40rem;
+	--aspect-thumb: 2 / 3;
+	--aspect-room: 3 / 2;
+	--aspect-facade: 5 / 2;
+	--aspect-map: 16 / 9;
+	--aspect-film: 9 / 16;
+}
+
+/* The works list: thumbnail, title, technique, size. One row per work from medium screens up. */
+@utility grid-cols-works-row {
+	grid-template-columns:
+		var(--spacing-thumb) minmax(0, 1fr) minmax(0, 1.5fr)
+		minmax(0, 13rem);
+}
+
+/* Home gallery: the photo column beside the film is one wide photo over two smaller ones. */
+@utility grid-rows-gallery {
+	grid-template-rows: 1.7fr 1fr;
+}
+
+@utility grid-cols-works-row-compact {
+	grid-template-columns: var(--spacing-thumb) minmax(0, 1fr);
+}
+
+@layer base {
+	html {
+		background-color: var(--color-wall);
+		color: var(--color-ink);
+		font-family: var(--font-sans);
+		-webkit-font-smoothing: antialiased;
+		text-rendering: optimizeLegibility;
+		scroll-behavior: smooth;
+		scroll-padding-top: var(--spacing-gutter);
+	}
+
+	body {
+		min-height: 100svh;
+	}
+
+	/*
+	 * Optimised photos are wrapped in a <picture>. Removing its box lets the <img> inside
+	 * be laid out directly by its grid or flex parent, so sizing classes go on the image.
+	 */
+	picture {
+		display: contents;
+	}
+
+	/* Without this the empty <source> tags would each take a cell in the parent grid. */
+	picture > source {
+		display: none;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-sand-deep);
+		outline-offset: 3px;
+	}
+
+	::selection {
+		background-color: var(--color-sand);
+		color: var(--color-ink);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+	}
+}
