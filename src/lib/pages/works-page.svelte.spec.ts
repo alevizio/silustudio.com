@@ -13,18 +13,20 @@ describe('works-page.svelte', () => {
 		expect(wall.getByRole('listitem').elements()).toHaveLength(PHOTOGRAPHED_WORKS.length);
 	});
 
-	it('lists the catalog works that only have small photos, under their own heading', async () => {
-		const { container } = render(WorksPage, { lang: 'es' });
+	it('hangs the catalog works that only have small photos under their own heading', async () => {
+		render(WorksPage, { lang: 'es' });
 		await expect
 			.element(page.getByRole('heading', { name: `${LISTED_WORKS.length} obras más del catálogo` }))
 			.toBeInTheDocument();
-		expect(container.querySelectorAll('ol > li')).toHaveLength(LISTED_WORKS.length);
+		const catalog = page.getByRole('list', { name: 'Catálogo' });
+		expect(catalog.getByRole('listitem').elements()).toHaveLength(LISTED_WORKS.length);
+		await expect.element(catalog).toHaveClass(/lg:grid-cols-3/);
 	});
 
 	it('shows every work exactly once', async () => {
 		const { container } = render(WorksPage, { lang: 'es' });
 		await expect.element(page.getByRole('heading', { level: 1 })).toBeVisible();
-		const links = [...container.querySelectorAll('ul[aria-label] a, ol a')].map((link) =>
+		const links = [...container.querySelectorAll('ul[aria-label] a')].map((link) =>
 			link.getAttribute('href')
 		);
 		expect(links).toHaveLength(WORKS.length);

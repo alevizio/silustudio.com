@@ -23,7 +23,8 @@ const PHONE = { width: 390, height: 844 };
 /** Every work on the site: the 34 of the catalog and the 50 photographed works not in it. */
 const WORKS = 84;
 const WALL = 'main ul[aria-label="Obras"]';
-const LIST = 'main ol';
+/** The catalog works that only have small photos hang in their own, smaller wall. */
+const CATALOG = 'main ul[aria-label="Catálogo"]';
 
 // The map and the film are third-party pages. The tests never call them: they get an empty
 // document instead.
@@ -83,13 +84,37 @@ test('the language switch keeps the visitor on the same page', async ({ page }) 
 	await expect(page).toHaveURL(/\/obras\/$/);
 });
 
-test('the works page shows every work once, on the wall or in the list', async ({ page }) => {
+test('the works page shows every work once, large or among the catalog works', async ({ page }) => {
 	await page.goto('/obras/#simbiosis');
-	const onWall = await page.locator(`${WALL} > li`).count();
-	const inList = await page.locator(`${LIST} > li`).count();
-	expect(onWall).toBeGreaterThan(inList);
-	expect(onWall + inList).toBe(WORKS);
+	const large = await page.locator(`${WALL} > li`).count();
+	const small = await page.locator(`${CATALOG} > li`).count();
+	expect(large).toBeGreaterThan(small);
+	expect(large + small).toBe(WORKS);
 	await expect(page.locator('#simbiosis')).toBeInViewport();
+});
+
+test('the catalog works hang three to a row, never larger than their photos really are', async ({
+	page
+}) => {
+	await page.goto('/obras/');
+	const photos = await page.locator(`${CATALOG} > li img`).evaluateAll((images) =>
+		images.map((image) => {
+			const box = image.getBoundingClientRect();
+			return {
+				left: box.left,
+				right: box.right,
+				bottom: box.bottom,
+				shown: box.width,
+				real: Number(image.getAttribute('width'))
+			};
+		})
+	);
+	const [first, second, third, fourth] = photos;
+	expect(second.left).toBeGreaterThan(first.right);
+	expect(third.left).toBeGreaterThan(second.right);
+	expect(Math.abs(first.bottom - third.bottom)).toBeLessThanOrEqual(1);
+	expect(fourth.bottom).toBeGreaterThan(first.bottom);
+	for (const { shown, real } of photos) expect(shown).toBeLessThanOrEqual(real);
 });
 
 test('the wall hangs two works to a row on a wide screen, on one baseline', async ({ page }) => {
@@ -115,11 +140,9 @@ test('a visitor opens a work from the wall and reads its label beside the photos
 	await expect(page.getByRole('heading', { level: 1 })).toBeInViewport();
 });
 
-test('a visitor opens a work from the list, moves to the next one and comes back', async ({
-	page
-}) => {
+test('a visitor opens a catalog work, moves to the next one and comes back', async ({ page }) => {
 	await page.goto('/obras/');
-	await page.locator(LIST).getByRole('link', { name: 'Duna bañada en peltre' }).click();
+	await page.locator(CATALOG).getByRole('link', { name: 'Duna bañada en peltre' }).click();
 	await expect(page).toHaveURL(/\/obras\/duna-banada-en-peltre\/$/);
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Duna bañada en peltre');
 	await expect(page.getByText(new RegExp(`^\\d{2} / ${WORKS}$`))).toBeVisible();
@@ -133,7 +156,7 @@ test('a visitor opens a work from the list, moves to the next one and comes back
 test('every work on the works page has its own page', async ({ page }) => {
 	await page.goto('/obras/');
 	const hrefs = await page
-		.locator(`${WALL} a, ${LIST} a`)
+		.locator(`${WALL} a, ${CATALOG} a`)
 		.evaluateAll((links) => links.map((link) => (link as HTMLAnchorElement).href));
 	expect(hrefs).toHaveLength(WORKS);
 	for (const href of hrefs) {

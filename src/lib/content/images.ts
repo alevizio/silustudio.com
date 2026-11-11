@@ -42,9 +42,6 @@ const FULL_SIZE = grouped(
 	folderName
 );
 
-/** The photo shown beside a work in the list: its whole view from the catalog. */
-export const thumbOf = (work: Work): Picture | undefined => CATALOG_PHOTOS.get(work.slug)?.[0];
-
 /** A work's full size photos, in file name order. Empty until the artists send them. */
 export const fullSizePhotosOf = (work: Work): Picture[] => FULL_SIZE[work.slug] ?? [];
 
@@ -59,12 +56,12 @@ const hasFullSizePhoto = (work: Work): boolean => fullSizePhotosOf(work).length 
 /** Works with at least one full size photo. They hang large on the works page. */
 export const PHOTOGRAPHED_WORKS: readonly Work[] = WORKS.filter(hasFullSizePhoto);
 
-/** Catalog works that only have the small catalog photos. They go in the list below the wall. */
+/** Catalog works that only have the small catalog photos. They hang smaller, below the wall. */
 export const LISTED_WORKS: readonly CatalogWork[] = CATALOG_WORKS.filter(
 	(work) => !hasFullSizePhoto(work)
 );
 
-/** The order a visitor meets the works in: the wall, then the list. */
+/** The order a visitor meets the works in: the wall, then the works with small photos. */
 export const ORDERED_WORKS: readonly Work[] = [...PHOTOGRAPHED_WORKS, ...LISTED_WORKS];
 
 /**

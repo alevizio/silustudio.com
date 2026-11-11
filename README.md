@@ -15,7 +15,7 @@ The layouts follow three references found on Mobbin: KOBU (two large photos per 
 | Spanish          | English             | What it is                                               |
 | ---------------- | ------------------- | -------------------------------------------------------- |
 | `/`              | `/en/`              | Home: the gallery, four works, the artists, the visit    |
-| `/obras/`        | `/en/works/`        | Works: the wall of photographed works, then the list     |
+| `/obras/`        | `/en/works/`        | Works: the wall of works, then the catalog-only works    |
 | `/estudio/`      | `/en/studio/`       | The artists' film, statement and biographies             |
 | `/visitar/`      | `/en/visit/`        | Address, contact, map                                    |
 | `/obras/<obra>/` | `/en/works/<obra>/` | One page per work: photos, title, size, material, status |
@@ -45,7 +45,7 @@ npm run test:e2e   # builds the site, then runs every page through Playwright an
 
 Every work has its own page (`/obras/guijarro/`, `/en/works/guijarro/`) with its photos, title, size, material and, once confirmed, its status.
 
-**Where a work shows.** A work with at least one full size photo hangs on the wall at the top of the works page. A catalog work with only the small catalog photos goes in the list below the wall. Adding full size photos moves it up by itself.
+**Where a work shows.** A work with at least one full size photo hangs on the wall at the top of the works page, two to a row. A catalog work with only the small catalog photos hangs below it, three to a row, at the real size of its photo (about 300 pixels wide, which is all the PDF catalog gives). Adding full size photos moves it up by itself.
 
 **Photos.** Put them in `src/lib/assets/works/<slug>/`, named in the order they should show (`01.jpg`, `02.jpg`, `03.jpg`, `04.jpg`). The slug is the last part of the work's address and is listed in `src/lib/content/works.ts`. No code change is needed.
 

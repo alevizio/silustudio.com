@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fullSizePhotosOf } from '#lib/content/images.ts';
+	import { photosOf } from '#lib/content/images.ts';
 	import type { Work } from '#lib/content/works.ts';
 	import { workHref } from '#lib/i18n/href.ts';
 	import { copyFor, nameOf, type Lang } from '#lib/i18n/index.ts';
@@ -7,23 +7,38 @@
 	import WorkStatus from './work-status.svelte';
 
 	interface Props {
-		/** Works that have a full size photo. A work without one is left out. */
+		/** Each work hangs with its first photo. A work with no photo at all is left out. */
 		works: readonly Work[];
 		lang: Lang;
 		/** Name of the list, for screen readers. */
 		label: string;
+		/**
+		 * Works to a row on a wide screen. Two for full size photos. Three for the small photos
+		 * from the catalog, which is as large as they go without being stretched.
+		 */
+		columns?: 2 | 3;
+		/** Set when the wall opens the page: its first row is then on screen and loads at once. */
+		opensPage?: boolean;
 		class?: string;
 	}
 
-	let { works, lang, label, class: className }: Props = $props();
+	let { works, lang, label, columns = 2, opensPage = false, class: className }: Props = $props();
 
-	/** The first row is on screen when the page opens, so its photos load at once. */
-	const FIRST_ROW = 2;
-	const SIZES = '(min-width: 1280px) 35rem, (min-width: 768px) 45vw, 92vw';
+	const LAYOUTS = {
+		2: {
+			grid: 'md:grid-cols-2',
+			sizes: '(min-width: 1280px) 35rem, (min-width: 768px) 45vw, 92vw'
+		},
+		3: {
+			grid: 'sm:grid-cols-2 lg:grid-cols-3',
+			sizes: '(min-width: 1280px) 22rem, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw'
+		}
+	};
 
+	const layout = $derived(LAYOUTS[columns]);
 	const hung = $derived(
 		works.flatMap((work) => {
-			const photo = fullSizePhotosOf(work)[0];
+			const photo = photosOf(work)[0];
 			return photo ? [{ work, photo, name: nameOf(work, lang) }] : [];
 		})
 	);
@@ -31,18 +46,19 @@
 </script>
 
 <!--
-	The wall of works, two to a row. Each photo keeps its own shape and is never cropped.
-	A tile spans two rows of the list's grid, photo then label, so the photos of a row share
-	one baseline and their labels start on one line. The whole tile opens the work's page.
+	A wall of works. Each photo keeps its own shape, is never cropped and never shown larger
+	than its own pixels. A tile spans two rows of the list's grid, photo then label, so the
+	photos of a row share one baseline and their labels start on one line. The whole tile
+	opens the work's page, and its id lets a link point at it (/obras/#simbiosis).
 -->
-<ul aria-label={label} class={cn('grid gap-x-gutter md:grid-cols-2', className)}>
+<ul aria-label={label} class={cn('grid gap-x-gutter', layout.grid, className)}>
 	{#each hung as { work, photo, name }, index (work.slug)}
-		<li class="relative row-span-2 grid grid-rows-subgrid gap-y-5 pb-16 md:pb-24">
+		<li id={work.slug} class="relative row-span-2 grid grid-rows-subgrid gap-y-5 pb-16 md:pb-24">
 			<enhanced:img
 				src={photo}
 				alt={photoAlt(name, work.medium?.[lang])}
-				sizes={SIZES}
-				loading={index < FIRST_ROW ? 'eager' : 'lazy'}
+				sizes={layout.sizes}
+				loading={opensPage && index < columns ? 'eager' : 'lazy'}
 				class="max-h-hang max-w-full self-end justify-self-center object-contain"
 			/>
 			<div class="flex flex-col items-center gap-1.5 text-center">

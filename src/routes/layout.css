@@ -42,34 +42,21 @@
 	/* Layout */
 	--spacing-section: clamp(4.5rem, 2.5rem + 8vw, 8.5rem);
 	--spacing-gutter: clamp(1.25rem, 0.5rem + 3.5vw, 3rem);
-	--spacing-thumb: 5rem;
 	--spacing-logo: 3.5rem;
 	--spacing-hang: 34rem; /* tallest a work hangs on the wall of works */
 	--spacing-photo: 85svh; /* tallest a photo shows on a page, so it always fits the screen */
 	--spacing-hero: 60svh; /* tallest the home page's opening photo gets, so the way there stays in view */
 	--container-page: 76rem;
 	--container-prose: 40rem;
-	--aspect-thumb: 2 / 3;
 	--aspect-room: 3 / 2;
 	--aspect-facade: 5 / 2;
 	--aspect-map: 16 / 9;
 	--aspect-film: 9 / 16;
 }
 
-/* The works list: thumbnail, title, technique, size. One row per work from medium screens up. */
-@utility grid-cols-works-row {
-	grid-template-columns:
-		var(--spacing-thumb) minmax(0, 1fr) minmax(0, 1.5fr)
-		minmax(0, 13rem);
-}
-
 /* Home gallery: the photo column beside the film is one wide photo over two smaller ones. */
 @utility grid-rows-gallery {
 	grid-template-rows: 1.7fr 1fr;
-}
-
-@utility grid-cols-works-row-compact {
-	grid-template-columns: var(--spacing-thumb) minmax(0, 1fr);
 }
 
 @layer base {

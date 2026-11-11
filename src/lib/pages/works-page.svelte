@@ -2,7 +2,6 @@
 	import LinkButton from '#lib/components/link-button.svelte';
 	import SectionHeading from '#lib/components/section-heading.svelte';
 	import Seo from '#lib/components/seo.svelte';
-	import WorksIndex from '#lib/components/works-index.svelte';
 	import WorksWall from '#lib/components/works-wall.svelte';
 	import { LISTED_WORKS, PHOTOGRAPHED_WORKS, UNTITLED_PHOTOS } from '#lib/content/images.ts';
 	import { SITE } from '#lib/content/site.ts';
@@ -29,6 +28,7 @@
 	works={PHOTOGRAPHED_WORKS}
 	{lang}
 	label={copy.title}
+	opensPage
 	class="mx-auto max-w-page px-gutter pb-10 md:pb-14"
 />
 
@@ -56,7 +56,8 @@
 		/>
 		<LinkButton href={SITE.catalogUrl} external variant="text">{copy.catalog.pdf}</LinkButton>
 	</div>
-	<WorksIndex works={LISTED_WORKS} {lang} />
+	<!-- The catalog's own photos are small, so these hang three to a row at their real size. -->
+	<WorksWall works={LISTED_WORKS} {lang} label={copy.catalog.label} columns={3} />
 </section>
 
 <section
