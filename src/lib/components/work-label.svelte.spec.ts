@@ -24,6 +24,24 @@ describe('work-label.svelte', () => {
 		await expect.element(page.getByText('3 pieces · 100 × 185 × 22 cm')).toBeVisible();
 	});
 
+	it('shows no status until one is confirmed for the work', async () => {
+		render(WorkLabel, { work: duna, lang: 'es' });
+		await expect.element(page.getByRole('heading', { level: 3 })).toBeVisible();
+		await expect.element(page.getByText(/Disponible|Reservada|Vendida/)).not.toBeInTheDocument();
+	});
+
+	it('shows the status once the work has one', async () => {
+		render(WorkLabel, { work: { ...duna, status: 'sold' }, lang: 'es' });
+		await expect.element(page.getByText('Vendida')).toBeVisible();
+	});
+
+	it('links the title to the work when given an address', async () => {
+		render(WorkLabel, { work: duna, lang: 'es', href: '/obras/duna-banada-en-peltre/' });
+		await expect
+			.element(page.getByRole('link', { name: 'Duna bañada en peltre' }))
+			.toHaveAttribute('href', '/obras/duna-banada-en-peltre/');
+	});
+
 	it('accepts extra classes', async () => {
 		const { container } = render(WorkLabel, { work: duna, lang: 'es', class: 'pt-4' });
 		expect(container.firstElementChild?.classList.contains('pt-4')).toBe(true);

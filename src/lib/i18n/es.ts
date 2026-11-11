@@ -87,7 +87,23 @@ export const es = {
 			whatsapp: 'Escribir por WhatsApp',
 			email: 'Enviar un correo'
 		},
-		photoAlt: (title: string, medium: string) => `${title}. ${medium}.`
+		photoAlt: (title: string, medium: string) => `${title}. ${medium}.`,
+		status: { label: 'Estado', available: 'Disponible', reserved: 'Reservada', sold: 'Vendida' },
+		detail: {
+			material: 'Material',
+			dimensions: 'Medidas',
+			enquire: 'Consultar por WhatsApp',
+			email: 'Enviar un correo',
+			whatsappText: (title: string) => `Hola, quiero consultar por la obra «${title}».`,
+			emailSubject: (title: string) => `Consulta por la obra «${title}»`,
+			navLabel: 'Otras obras',
+			photos: 'Fotos de la obra',
+			photoAlt: (title: string, n: number, total: number) => `${title}, foto ${n} de ${total}.`,
+			showPhoto: (n: number) => `Ver la foto ${n}`,
+			metaTitle: (title: string) => `${title} · Silu`,
+			metaDescription: (title: string, medium: string, dimensions: string) =>
+				`${title}. ${medium}. ${dimensions}. Obra de Silvestre Jacobi y Lucila Dickinson, Silu.`
+		}
 	},
 	studio: {
 		label: 'Estudio',

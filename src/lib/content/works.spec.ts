@@ -1,10 +1,10 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { PHOTOGRAPHED_WORKS, UNTITLED_PHOTOS, WORKS } from './works.ts';
+import { WORKS, catalogNumber, findWork } from './works.ts';
 
 const CATALOG_SIZE = 34;
-const SITE_PHOTOS = 15;
-const pad = (n: number): string => String(n).padStart(2, '0');
+const ASSETS = 'src/lib/assets';
+const STATUSES = ['available', 'reserved', 'sold'];
 
 describe('WORKS', () => {
 	it('lists the whole catalog in order', () => {
@@ -14,7 +14,7 @@ describe('WORKS', () => {
 		);
 	});
 
-	it('gives every work a unique anchor that is safe in a URL', () => {
+	it('gives every work a unique slug that is safe in a URL', () => {
 		const slugs = WORKS.map((work) => work.slug);
 		expect(new Set(slugs).size).toBe(CATALOG_SIZE);
 		for (const slug of slugs) expect(slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
@@ -30,28 +30,46 @@ describe('WORKS', () => {
 		}
 	});
 
-	it('has a catalog thumbnail on disk for every work', () => {
-		for (const work of WORKS) {
-			expect(existsSync(`src/lib/assets/catalog/${pad(work.n)}.jpg`)).toBe(true);
-		}
+	it('only uses the three known statuses, and only where one was confirmed', () => {
+		const unknown = WORKS.filter(
+			(work) => work.status !== undefined && !STATUSES.includes(work.status)
+		);
+		expect(unknown).toEqual([]);
 	});
 });
 
-describe('work photos', () => {
-	it('points every matched photo at a file that exists', () => {
-		expect(PHOTOGRAPHED_WORKS.length).toBeGreaterThan(0);
-		for (const work of PHOTOGRAPHED_WORKS) {
-			expect(existsSync(`src/lib/assets/works/${work.photo}.png`)).toBe(true);
+describe('findWork', () => {
+	it('finds a work by its slug', () => {
+		expect(findWork('duna-banada-en-peltre')?.n).toBe(7);
+	});
+
+	it('returns nothing for a slug that is not in the catalog', () => {
+		expect(findWork('no-existe')).toBeUndefined();
+	});
+});
+
+describe('catalogNumber', () => {
+	it('pads the number to two digits', () => {
+		expect(catalogNumber(7)).toBe('07');
+		expect(catalogNumber(34)).toBe('34');
+	});
+});
+
+describe('photos on disk', () => {
+	it('has the whole view from the catalog for every work', () => {
+		for (const work of WORKS) {
+			expect(existsSync(`${ASSETS}/catalog/${catalogNumber(work.n)}-1.jpg`)).toBe(true);
 		}
 	});
 
-	it('uses each of the site photos exactly once, titled or untitled', () => {
-		const titled = PHOTOGRAPHED_WORKS.map((work) => work.photo);
-		const all = [...titled, ...UNTITLED_PHOTOS];
-		expect(all).toHaveLength(SITE_PHOTOS);
-		expect(new Set(all).size).toBe(SITE_PHOTOS);
-		for (const key of UNTITLED_PHOTOS) {
-			expect(existsSync(`src/lib/assets/works/${key}.png`)).toBe(true);
+	it('keeps full size photos in folders named after a work', () => {
+		const folders = readdirSync(`${ASSETS}/works`, { withFileTypes: true })
+			.filter((entry) => entry.isDirectory())
+			.map((entry) => entry.name);
+		expect(folders.length).toBeGreaterThan(0);
+		for (const folder of folders) {
+			expect(findWork(folder), `works/${folder} does not match any work`).toBeDefined();
+			expect(readdirSync(`${ASSETS}/works/${folder}`).length).toBeGreaterThan(0);
 		}
 	});
 });

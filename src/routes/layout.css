@@ -18,6 +18,7 @@
 	--color-line: #d9d4ca; /* hairlines */
 	--color-sand: #b79a6d; /* decorative accent taken from the works */
 	--color-sand-deep: #7a5f37; /* accent that is safe for text and focus rings, 5.4:1 on wall */
+	--color-sold: #a5402d; /* the red dot galleries put on a sold work, 5.7:1 on wall */
 
 	/* Type families */
 	--font-sans: 'Lato', ui-sans-serif, system-ui, sans-serif;

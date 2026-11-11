@@ -4,9 +4,9 @@
 	import Seo from '#lib/components/seo.svelte';
 	import WorkPlate from '#lib/components/work-plate.svelte';
 	import WorksIndex from '#lib/components/works-index.svelte';
-	import { WORK_PHOTOS } from '#lib/content/images.ts';
+	import { PHOTOGRAPHED_WORKS, UNTITLED_PHOTOS } from '#lib/content/images.ts';
 	import { SITE } from '#lib/content/site.ts';
-	import { PHOTOGRAPHED_WORKS, UNTITLED_PHOTOS, WORKS } from '#lib/content/works.ts';
+	import { WORKS } from '#lib/content/works.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
 
 	interface Props {
@@ -48,17 +48,14 @@
 <section aria-labelledby="works-details" class="mx-auto max-w-page px-gutter pb-section">
 	<h2 id="works-details" class="pb-6 text-label text-ink-soft uppercase">{copy.details.title}</h2>
 	<div class="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
-		{#each UNTITLED_PHOTOS as key (key)}
-			{@const picture = WORK_PHOTOS[key]}
-			{#if picture}
-				<enhanced:img
-					src={picture}
-					alt={copy.details.alt}
-					sizes="(min-width: 768px) 18vw, 46vw"
-					loading="lazy"
-					class="h-auto w-full bg-plate"
-				/>
-			{/if}
+		{#each UNTITLED_PHOTOS as picture, index (index)}
+			<enhanced:img
+				src={picture}
+				alt={copy.details.alt}
+				sizes="(min-width: 768px) 18vw, 46vw"
+				loading="lazy"
+				class="h-auto w-full bg-plate"
+			/>
 		{/each}
 	</div>
 </section>

@@ -1,5 +1,13 @@
 import { resolve } from '$app/paths';
-import { ROUTES, alternatePath, type Lang, type PageKey } from './index.ts';
+import {
+	ROUTES,
+	langFromPath,
+	otherLang,
+	pageFromPath,
+	workSlugFromPath,
+	type Lang,
+	type PageKey
+} from './index.ts';
 
 type SitePath = (typeof ROUTES)[Lang][PageKey];
 
@@ -22,5 +30,13 @@ const RESOLVERS: Record<SitePath, () => string> = {
 /** Link to one of the site's pages in the given language. */
 export const pageHref = (lang: Lang, page: PageKey): string => RESOLVERS[ROUTES[lang][page]]();
 
-/** Link to the page being shown, in the other language. */
-export const alternateHref = (pathname: string): string => RESOLVERS[alternatePath(pathname)]();
+/** Link to a work's own page in the given language. */
+export const workHref = (lang: Lang, slug: string): string =>
+	lang === 'es' ? resolve(`obras/${slug}/`) : resolve(`en/works/${slug}/`);
+
+/** Link to the page being shown, in the other language. Unknown paths go to the other home. */
+export const alternateHref = (pathname: string): string => {
+	const other = otherLang(langFromPath(pathname));
+	const slug = workSlugFromPath(pathname);
+	return slug ? workHref(other, slug) : pageHref(other, pageFromPath(pathname) ?? 'home');
+};

@@ -10,7 +10,8 @@
 	import Seo from '#lib/components/seo.svelte';
 	import WorkPlate from '#lib/components/work-plate.svelte';
 	import { SITE } from '#lib/content/site.ts';
-	import { PHOTOGRAPHED_WORKS, WORKS } from '#lib/content/works.ts';
+	import { PHOTOGRAPHED_WORKS } from '#lib/content/images.ts';
+	import { WORKS } from '#lib/content/works.ts';
 	import { pageHref } from '#lib/i18n/href.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
 

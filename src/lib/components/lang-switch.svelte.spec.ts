@@ -19,6 +19,13 @@ describe('lang-switch.svelte', () => {
 		await expect.element(spanish).toHaveAttribute('href', expect.stringMatching(/\/visitar\/$/));
 	});
 
+	it('stays on the same work when the page is a work', async () => {
+		render(LangSwitch, { lang: 'es', pathname: '/obras/guijarro/' });
+		await expect
+			.element(page.getByRole('link', { name: 'English' }))
+			.toHaveAttribute('href', expect.stringMatching(/\/en\/works\/guijarro\/?$/));
+	});
+
 	it('accepts extra classes', async () => {
 		render(LangSwitch, { lang: 'es', pathname: '/', class: 'ml-auto' });
 		await expect.element(page.getByRole('navigation', { name: 'Idioma' })).toHaveClass(/ml-auto/);

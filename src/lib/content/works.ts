@@ -2,17 +2,19 @@ import type { Lang } from '#lib/i18n/index.ts';
 
 export type Localized = Record<Lang, string>;
 
+export type WorkStatus = 'available' | 'reserved' | 'sold';
+
 export interface Work {
 	/** Position in the artists' printed catalog, 1 to 34. */
 	n: number;
-	/** Anchor id on the works page. */
+	/** Last part of the work's address, and the name of its photo folder in assets/works. */
 	slug: string;
 	/** Titles are the works' names, so they stay in Spanish in both languages. */
 	title: string;
 	medium: Localized;
 	dimensions: Localized;
-	/** File name in assets/works of a full size photo, set only when the match is certain. */
-	photo?: string;
+	/** Left out until the artists confirm it. A work with no status shows none. */
+	status?: WorkStatus;
 }
 
 /*
@@ -70,8 +72,7 @@ export const WORKS: readonly Work[] = [
 		slug: 'guijarro',
 		title: 'Guijarro',
 		medium: { es: 'Madera tallada revestida en arena', en: 'Carved wood coated in sand' },
-		dimensions: { es: 'Tamaños varios', en: 'Various sizes' },
-		photo: 'foto-07'
+		dimensions: { es: 'Tamaños varios', en: 'Various sizes' }
 	},
 	{
 		n: 2,
@@ -85,8 +86,7 @@ export const WORKS: readonly Work[] = [
 		slug: 'impronta-humana',
 		title: 'Impronta humana',
 		medium: LIMESTONE,
-		dimensions: cm(30, 25, 5),
-		photo: 'foto-02'
+		dimensions: cm(30, 25, 5)
 	},
 	{
 		n: 4,
@@ -118,8 +118,7 @@ export const WORKS: readonly Work[] = [
 			'revestido con monolítico liviano',
 			'coated in lightweight monolithic render'
 		),
-		dimensions: cm(220, 90, 22),
-		photo: 'foto-15'
+		dimensions: cm(220, 90, 22)
 	},
 	{
 		n: 7,
@@ -230,8 +229,7 @@ export const WORKS: readonly Work[] = [
 		slug: 'mismo-origen',
 		title: 'Mismo origen',
 		medium: finished(METAL, 'revestido en cuarzo molido', 'coated in ground quartz'),
-		dimensions: round(100, 9),
-		photo: 'foto-12'
+		dimensions: round(100, 9)
 	},
 	{
 		n: 20,
@@ -325,8 +323,7 @@ export const WORKS: readonly Work[] = [
 		slug: 'dar-es-recibir',
 		title: 'Dar es recibir',
 		medium: finished(RELIEF, 'revestido con arena', 'coated in sand'),
-		dimensions: pieces(2, cm(165, 80, 12)),
-		photo: 'foto-14'
+		dimensions: pieces(2, cm(165, 80, 12))
 	},
 	{
 		n: 30,
@@ -375,22 +372,6 @@ export const WORKS: readonly Work[] = [
 /** The catalog number as printed on labels and used for thumbnail files: 7 becomes '07'. */
 export const catalogNumber = (n: number): string => String(n).padStart(2, '0');
 
-/** Works that have a full size photo, in catalog order. */
-export const PHOTOGRAPHED_WORKS: readonly Work[] = WORKS.filter((work) => work.photo);
-
-/**
- * Photos from the current site that could not be matched to a catalog title with certainty.
- * They are shown without a label until the artists name them.
- */
-export const UNTITLED_PHOTOS: readonly string[] = [
-	'foto-04',
-	'foto-06',
-	'foto-08',
-	'foto-10',
-	'foto-03',
-	'foto-01',
-	'foto-05',
-	'foto-09',
-	'foto-11',
-	'foto-13'
-];
+/** The work with this slug, if there is one. */
+export const findWork = (slug: string): Work | undefined =>
+	WORKS.find((work) => work.slug === slug);

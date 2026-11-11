@@ -19,7 +19,7 @@ const COPY: Record<Lang, Copy> = { es, en };
 
 export const copyFor = (lang: Lang): Copy => COPY[lang];
 
-const otherLang = (lang: Lang): Lang => (lang === 'es' ? 'en' : 'es');
+export const otherLang = (lang: Lang): Lang => (lang === 'es' ? 'en' : 'es');
 
 const withSlash = (pathname: string): string =>
 	pathname.endsWith('/') ? pathname : `${pathname}/`;
@@ -34,8 +34,11 @@ export const pageFromPath = (pathname: string): PageKey | null => {
 	return PAGES.find((key) => routes[key] === path) ?? null;
 };
 
-/** The same page in the other language. Unknown paths go to the other language's home. */
-export const alternatePath = (pathname: string) => {
-	const target = ROUTES[otherLang(langFromPath(pathname))];
-	return target[pageFromPath(pathname) ?? 'home'];
-};
+/** Address of a work's own page: /obras/guijarro/ or /en/works/guijarro/. */
+export const workPath = (lang: Lang, slug: string): string => `${ROUTES[lang].works}${slug}/`;
+
+const WORK_PATH = /^\/(?:obras|en\/works)\/([a-z0-9-]+)\/$/;
+
+/** The work a path belongs to, or null when the path is not a work's page. */
+export const workSlugFromPath = (pathname: string): string | null =>
+	WORK_PATH.exec(withSlash(pathname))?.[1] ?? null;

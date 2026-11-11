@@ -89,7 +89,23 @@ export const en: typeof es = {
 			whatsapp: 'Message on WhatsApp',
 			email: 'Send an email'
 		},
-		photoAlt: (title: string, medium: string) => `${title}. ${medium}.`
+		photoAlt: (title: string, medium: string) => `${title}. ${medium}.`,
+		status: { label: 'Status', available: 'Available', reserved: 'Reserved', sold: 'Sold' },
+		detail: {
+			material: 'Material',
+			dimensions: 'Dimensions',
+			enquire: 'Ask on WhatsApp',
+			email: 'Send an email',
+			whatsappText: (title: string) => `Hello, I would like to ask about the work “${title}”.`,
+			emailSubject: (title: string) => `Enquiry about the work “${title}”`,
+			navLabel: 'Other works',
+			photos: 'Photos of the work',
+			photoAlt: (title: string, n: number, total: number) => `${title}, photo ${n} of ${total}.`,
+			showPhoto: (n: number) => `Show photo ${n}`,
+			metaTitle: (title: string) => `${title} · Silu`,
+			metaDescription: (title: string, medium: string, dimensions: string) =>
+				`${title}. ${medium}. ${dimensions}. A work by Silvestre Jacobi and Lucila Dickinson, Silu.`
+		}
 	},
 	studio: {
 		label: 'Studio',

@@ -13,6 +13,21 @@ describe('works-index.svelte', () => {
 		await expect.element(page.getByRole('heading', { name: /Simbiosis/ })).toBeInTheDocument();
 	});
 
+	it('links every row to the page of its work', async () => {
+		render(WorksIndex, { works: WORKS.slice(0, 3), lang: 'es' });
+		await expect
+			.element(page.getByRole('link', { name: 'Impronta humana' }))
+			.toHaveAttribute('href', expect.stringMatching(/\/obras\/impronta-humana\/?$/));
+		expect(page.getByRole('link').elements()).toHaveLength(3);
+	});
+
+	it('shows a status only on the works that have one', async () => {
+		const works = [{ ...WORKS[0], status: 'reserved' as const }, WORKS[1]];
+		render(WorksIndex, { works, lang: 'es' });
+		await expect.element(page.getByText('Reservada')).toBeVisible();
+		expect(page.getByText(/Disponible|Vendida/).elements()).toHaveLength(0);
+	});
+
 	it('shows technique and size in the page language', async () => {
 		render(WorksIndex, { works: WORKS.slice(0, 3), lang: 'en' });
 		await expect.element(page.getByText('Carved wood coated in sand')).toBeVisible();

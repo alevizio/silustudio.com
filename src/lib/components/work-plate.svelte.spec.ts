@@ -17,6 +17,13 @@ describe('work-plate.svelte', () => {
 		await expect.element(page.getByRole('heading', { level: 3 })).toHaveTextContent('Guijarro');
 	});
 
+	it('opens the page of the work', async () => {
+		render(WorkPlate, { work: guijarro, lang: 'en', sizes: SIZES });
+		await expect
+			.element(page.getByRole('link', { name: 'Guijarro' }))
+			.toHaveAttribute('href', expect.stringMatching(/\/en\/works\/guijarro\/?$/));
+	});
+
 	it('describes the photo in English on English pages', async () => {
 		render(WorkPlate, { work: guijarro, lang: 'en', sizes: SIZES });
 		await expect

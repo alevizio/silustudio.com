@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { SITE } from '#lib/content/site.ts';
+import { WORKS } from '#lib/content/works.ts';
 import Seo from './seo.svelte';
 
 const head = (selector: string): string | null | undefined =>
@@ -31,6 +32,26 @@ describe('seo.svelte', () => {
 		const robots = document.head.querySelector('meta[name="robots"]');
 		if (SITE.launched) expect(robots).toBeNull();
 		else expect(robots?.getAttribute('content')).toBe('noindex, nofollow');
+	});
+
+	it('describes a work on its own page and ties its two languages', async () => {
+		render(Seo, { lang: 'en', page: 'works', work: WORKS[6] });
+		await expect.poll(() => document.title).toBe('Duna bañada en peltre · Silu');
+		expect(head('meta[name="description"]')).toContain('3 pieces · 100 × 185 × 22 cm');
+		expect(head('link[rel="canonical"]')).toBe(
+			'https://www.silustudio.com/en/works/duna-banada-en-peltre/'
+		);
+		expect(head('link[hreflang="es"]')).toBe(
+			'https://www.silustudio.com/obras/duna-banada-en-peltre/'
+		);
+	});
+
+	it('shares a work with its own photo when it has a full size one', async () => {
+		render(Seo, { lang: 'es', page: 'works', work: WORKS[0] });
+		await expect.poll(() => document.title).toBe('Guijarro · Silu');
+		const image = head('meta[property="og:image"]');
+		expect(image).toMatch(/^https:\/\/www\.silustudio\.com\/.+/);
+		expect(image).not.toContain('og.jpg');
 	});
 
 	it('adds a share card with an image', async () => {

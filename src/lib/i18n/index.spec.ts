@@ -3,10 +3,11 @@ import {
 	LANGS,
 	PAGES,
 	ROUTES,
-	alternatePath,
 	copyFor,
 	langFromPath,
-	pageFromPath
+	pageFromPath,
+	workPath,
+	workSlugFromPath
 } from './index.ts';
 
 describe('langFromPath', () => {
@@ -41,17 +42,22 @@ describe('pageFromPath', () => {
 	});
 });
 
-describe('alternatePath', () => {
-	it('links each page to the same page in the other language', () => {
-		expect(alternatePath('/')).toBe('/en/');
-		expect(alternatePath('/obras/')).toBe('/en/works/');
-		expect(alternatePath('/en/studio/')).toBe('/estudio/');
-		expect(alternatePath('/en/visit')).toBe('/visitar/');
+describe('work pages', () => {
+	it('builds the address of a work in each language', () => {
+		expect(workPath('es', 'guijarro')).toBe('/obras/guijarro/');
+		expect(workPath('en', 'guijarro')).toBe('/en/works/guijarro/');
 	});
 
-	it('falls back to the other home page for unknown paths', () => {
-		expect(alternatePath('/no-existe/')).toBe('/en/');
-		expect(alternatePath('/en/nope/')).toBe('/');
+	it('reads the work back from either address', () => {
+		expect(workSlugFromPath('/obras/duna-banada-en-peltre/')).toBe('duna-banada-en-peltre');
+		expect(workSlugFromPath('/en/works/guijarro')).toBe('guijarro');
+	});
+
+	it('does not mistake the list or other pages for a work', () => {
+		expect(workSlugFromPath('/obras/')).toBeNull();
+		expect(workSlugFromPath('/en/works/')).toBeNull();
+		expect(workSlugFromPath('/estudio/')).toBeNull();
+		expect(pageFromPath('/obras/guijarro/')).toBeNull();
 	});
 });
 

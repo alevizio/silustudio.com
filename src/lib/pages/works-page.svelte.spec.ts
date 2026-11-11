@@ -1,7 +1,8 @@
 import { page } from 'vitest/browser';
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
-import { PHOTOGRAPHED_WORKS, WORKS } from '#lib/content/works.ts';
+import { PHOTOGRAPHED_WORKS } from '#lib/content/images.ts';
+import { WORKS } from '#lib/content/works.ts';
 import WorksPage from './works-page.svelte';
 
 describe('works-page.svelte', () => {
