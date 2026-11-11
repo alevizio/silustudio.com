@@ -37,7 +37,7 @@ export const es = {
 		languageNames: { es: 'Español', en: 'English' }
 	},
 	home: {
-		eyebrow: 'Estudio de arte y galería',
+		eyebrow: 'Silu · Silvestre Jacobi y Lucila Dickinson',
 		title: 'Galería y estudio de arte en Manantiales, Punta del Este.',
 		lead: 'Silvestre Jacobi y Lucila Dickinson trabajan juntos como Silu. Sus relieves y esculturas, hechos con arenas, piedras, maderas y nácares, se exhiben en su propia galería.',
 		heroAlt:

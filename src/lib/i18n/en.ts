@@ -39,7 +39,7 @@ export const en: typeof es = {
 		languageNames: { es: 'Español', en: 'English' }
 	},
 	home: {
-		eyebrow: 'Art studio and gallery',
+		eyebrow: 'Silu · Silvestre Jacobi and Lucila Dickinson',
 		title: 'Art gallery and studio in Manantiales, Punta del Este.',
 		lead: 'Silvestre Jacobi and Lucila Dickinson work together as Silu. Their reliefs and sculptures, made with sand, stone, wood and mother of pearl, are shown in their own gallery.',
 		heroAlt:

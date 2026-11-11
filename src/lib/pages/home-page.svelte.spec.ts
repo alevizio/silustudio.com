@@ -15,6 +15,10 @@ describe('home-page.svelte', () => {
 			.element(page.getByRole('link', { name: 'Cómo llegar' }))
 			.toHaveAttribute('href', expect.stringContaining('google.com/maps/dir/'));
 		await expect.element(page.getByText(/Ruta 10, km 163\.5 · Manantiales/)).toBeVisible();
+		// The line over the headline says whose gallery it is.
+		await expect
+			.element(page.getByText('Silu · Silvestre Jacobi y Lucila Dickinson', { exact: true }))
+			.toBeVisible();
 		// The photo comes before any text.
 		expect(container.querySelector('img')?.getAttribute('alt')).toContain(
 			'Interior de la galería Silu'
@@ -54,6 +58,9 @@ describe('home-page.svelte', () => {
 		await expect
 			.element(page.getByRole('heading', { level: 1 }))
 			.toHaveTextContent('Art gallery and studio in Manantiales, Punta del Este.');
+		await expect
+			.element(page.getByText('Silu · Silvestre Jacobi and Lucila Dickinson', { exact: true }))
+			.toBeVisible();
 		await expect
 			.element(page.getByRole('link', { name: 'About the studio' }))
 			.toHaveAttribute('href', expect.stringMatching(/\/en\/studio\/$/));
