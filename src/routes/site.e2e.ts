@@ -225,6 +225,74 @@ test('the home page opens on a photo that runs edge to edge', async ({ page }) =
 	await expect(page.getByRole('link', { name: 'Cómo llegar' }).first()).toBeInViewport();
 });
 
+test('the daylight on the wall stays put while the page scrolls, and never widens it', async ({
+	page
+}) => {
+	await page.goto('/obras/');
+	const light = page.locator('#wall-light');
+	const viewport = page.viewportSize();
+	const before = await light.boundingBox();
+	expect(before).toEqual({ x: 0, y: 0, width: viewport?.width, height: viewport?.height });
+	await page.mouse.wheel(0, 3000);
+	await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(2000);
+	expect(await light.boundingBox()).toEqual(before);
+	const overflow = await page.evaluate(
+		() => document.documentElement.scrollWidth - window.innerWidth
+	);
+	expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test('the daylight falls behind the page: on the wall, never on a work or a link', async ({
+	page
+}) => {
+	await page.goto('/obras/');
+	const light = page.locator('#wall-light');
+	await expect(light).toHaveCSS('z-index', '-10');
+	await expect(light).toHaveCSS('pointer-events', 'none');
+	// Whatever is at the middle of the first photo is the photo itself, and it can be clicked.
+	const photo = page.locator(`${WALL} > li img`).first();
+	const box = await photo.boundingBox();
+	if (!box) throw new Error('The first photo of the wall has no box');
+	const top = await page.evaluate(
+		([x, y]) => document.elementFromPoint(x, y)?.closest('li')?.id ?? null,
+		[box.x + box.width / 2, box.y + box.height / 2]
+	);
+	expect(top).toBe('guijarro');
+	await page.locator(WALL).getByRole('link', { name: 'Guijarro' }).click();
+	await expect(page).toHaveURL(/\/obras\/guijarro\/$/);
+});
+
+test('the daylight drifts with the scroll, and holds still when less motion is asked for', async ({
+	page
+}) => {
+	const drift = () =>
+		page.evaluate(() => {
+			const moving = document.querySelector('#wall-light')?.firstElementChild;
+			return moving ? getComputedStyle(moving).translate : null;
+		});
+	const toTheEnd = () =>
+		page.evaluate(() =>
+			scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })
+		);
+	await page.goto('/');
+	const atTheTop = await drift();
+	await toTheEnd();
+	await expect.poll(drift).not.toBe(atTheTop);
+
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	await page.goto('/');
+	const still = await drift();
+	await toTheEnd();
+	await page.waitForTimeout(200);
+	expect(await drift()).toBe(still);
+});
+
+test('the daylight steps aside for visitors who ask for more contrast', async ({ page }) => {
+	await page.emulateMedia({ contrast: 'more' });
+	await page.goto('/');
+	await expect(page.locator('#wall-light')).toBeHidden();
+});
+
 test('no work shows a status until one is confirmed', async ({ page }) => {
 	await page.goto('/obras/');
 	await expect(page.getByText(/^(Disponible|Reservada|Vendida)$/)).toHaveCount(0);

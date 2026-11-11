@@ -4,6 +4,7 @@
 	import SiteFooter from '#lib/components/site-footer.svelte';
 	import SiteHeader from '#lib/components/site-header.svelte';
 	import VisitBand from '#lib/components/visit-band.svelte';
+	import WallLight from '#lib/components/wall-light.svelte';
 	import { copyFor, langFromPath, pageFromPath } from '#lib/i18n/index.ts';
 	import type { LayoutProps } from './$types';
 
@@ -28,6 +29,8 @@
 >
 	{copyFor(lang).nav.skip}
 </a>
+
+<WallLight />
 
 <SiteHeader {lang} {current} {pathname} />
 

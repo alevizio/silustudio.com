@@ -27,6 +27,7 @@ The layouts follow three references found on Mobbin: KOBU (two large photos per 
 - `src/lib/i18n/es.ts` and `en.ts`: every piece of text on the site.
 - `src/lib/assets/`: photos. `works/<slug>/` holds the full size photos of a work, `01.jpg` being the one shown on the wall. `catalog/` holds the small photos of each work cropped from the artists' PDF catalog (`07-1.jpg` is the whole view of work 7). `untitled/` holds photos from the old site not yet matched to a work.
 - `src/routes/layout.css`: design tokens (colours, type scale, spacing).
+- `src/lib/components/wall-light.svelte`: the faint daylight on the wall (the shadow of a pergola and a plant). It stays fixed while a page scrolls, sits behind everything so it never falls on a work, and its strength is the token `--opacity-wall-light` in `layout.css`.
 - `src/lib/components/` and `src/lib/pages/`: components and the five page layouts, each with its test next to it.
 
 ## Commands
