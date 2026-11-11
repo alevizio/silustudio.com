@@ -10,6 +10,11 @@ const HOURS: string | null = null;
 
 export const SITE = {
 	name: 'Silu',
+	/**
+	 * False while the redesign is a preview. Every page then tells search engines not to index
+	 * it, so the preview never competes with the live site. Set to true on launch day.
+	 */
+	launched: false,
 	url: 'https://www.silustudio.com',
 	address: {
 		street: 'Ruta 10, km 163.5',

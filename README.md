@@ -45,6 +45,10 @@ npm run test:e2e   # builds the site, then runs every page through Playwright an
 
 The work then appears on the wall at the top of the Works page with its label.
 
+## Launch day
+
+Set `launched` to `true` in `src/lib/content/site.ts`. Until then every page carries `noindex`, so previews stay out of search results.
+
 ## Still needed from the artists
 
 - Opening hours.

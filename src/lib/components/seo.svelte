@@ -20,6 +20,9 @@
 <svelte:head>
 	<title>{meta.title}</title>
 	<meta name="description" content={meta.description} />
+	{#if !SITE.launched}
+		<meta name="robots" content="noindex, nofollow" />
+	{/if}
 	<link rel="canonical" href={canonical} />
 	{#each LANGS as code (code)}
 		<link rel="alternate" hreflang={code} href={`${SITE.url}${ROUTES[code][page]}`} />
