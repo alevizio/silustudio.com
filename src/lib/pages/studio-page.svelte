@@ -3,6 +3,7 @@
 	import workshop from '#lib/assets/studio/artistas-02.jpg?enhanced';
 	import drawing from '#lib/assets/studio/artistas-03.jpg?enhanced';
 	import storage from '#lib/assets/gallery/sala-04.jpg?enhanced';
+	import ArtistsFilm from '#lib/components/artists-film.svelte';
 	import SectionHeading from '#lib/components/section-heading.svelte';
 	import Seo from '#lib/components/seo.svelte';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
@@ -29,13 +30,7 @@
 </header>
 
 <div class="mx-auto max-w-page px-gutter">
-	<enhanced:img
-		src={portrait}
-		alt={copy.alts.portrait}
-		sizes="(min-width: 1280px) 1216px, 100vw"
-		fetchpriority="high"
-		class="h-auto w-full"
-	/>
+	<ArtistsFilm {lang} poster={portrait} posterAlt={copy.alts.portrait} />
 </div>
 
 <section

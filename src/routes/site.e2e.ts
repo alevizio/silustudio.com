@@ -10,22 +10,28 @@ const PAGES = [
 	{ path: '/en/works/', lang: 'en', h1: 'Works' },
 	{ path: '/en/studio/', lang: 'en', h1: 'Silvestre Jacobi and Lucila Dickinson' },
 	{ path: '/en/visit/', lang: 'en', h1: 'Visit the gallery' },
-	// Work pages: one with a full size photo, one with catalog photos only, one in English.
+	// Work pages: one with full size photos, one with catalog photos only, one with no title
+	// yet, one in English.
 	{ path: '/obras/guijarro/', lang: 'es', h1: 'Guijarro' },
 	{ path: '/obras/duna-banada-en-peltre/', lang: 'es', h1: 'Duna bañada en peltre' },
+	{ path: '/obras/obra-41/', lang: 'es', h1: 'Obra 41' },
 	{ path: '/en/works/infinito/', lang: 'en', h1: 'Infinito' }
 ];
 
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 const PHONE = { width: 390, height: 844 };
-const CATALOG_SIZE = 34;
+/** Every work on the site: the 34 of the catalog and the 50 photographed works not in it. */
+const WORKS = 84;
+const WALL = 'main ul[aria-label="Obras"]';
+const LIST = 'main ol';
 
-// The map is a third-party page. The tests never call it: they get an empty document instead.
+// The map and the film are third-party pages. The tests never call them: they get an empty
+// document instead.
 test.beforeEach(async ({ page }) => {
-	await page.route(/google\.com\/maps/, (route) =>
+	await page.route(/google\.com\/maps|player\.vimeo\.com/, (route) =>
 		route.fulfill({
 			contentType: 'text/html',
-			body: '<!doctype html><html lang="en"><head><title>Map</title></head><body><main><h1>Map</h1></main></body></html>'
+			body: '<!doctype html><html lang="en"><head><title>Embed</title></head><body><main><h1>Embed</h1></main></body></html>'
 		})
 	);
 });
@@ -77,36 +83,59 @@ test('the language switch keeps the visitor on the same page', async ({ page }) 
 	await expect(page).toHaveURL(/\/obras\/$/);
 });
 
-test('the works page lists the whole catalog and each work can be linked to', async ({ page }) => {
+test('the works page shows every work once, on the wall or in the list', async ({ page }) => {
 	await page.goto('/obras/#simbiosis');
-	await expect(page.locator('main ol').getByRole('listitem')).toHaveCount(CATALOG_SIZE);
+	const onWall = await page.locator(`${WALL} > li`).count();
+	const inList = await page.locator(`${LIST} > li`).count();
+	expect(onWall).toBeGreaterThan(inList);
+	expect(onWall + inList).toBe(WORKS);
 	await expect(page.locator('#simbiosis')).toBeInViewport();
+});
+
+test('the wall hangs two works to a row on a wide screen, on one baseline', async ({ page }) => {
+	await page.goto('/obras/');
+	const boxes = await page
+		.locator(`${WALL} > li img`)
+		.evaluateAll((images) => images.slice(0, 2).map((image) => image.getBoundingClientRect()));
+	const [left, right] = boxes;
+	expect(right.left).toBeGreaterThan(left.right);
+	expect(Math.abs(left.bottom - right.bottom)).toBeLessThanOrEqual(1);
+});
+
+test('a visitor opens a work from the wall and reads its label beside the photos', async ({
+	page
+}) => {
+	await page.goto('/obras/');
+	await page.locator(WALL).getByRole('link', { name: 'Guijarro' }).click();
+	await expect(page).toHaveURL(/\/obras\/guijarro\/$/);
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Guijarro');
+	await expect(page.getByText('Madera tallada revestida en arena')).toBeVisible();
+	// The label stays in view while the photos scroll past.
+	await page.getByRole('img', { name: 'Guijarro, foto 3 de 3.' }).scrollIntoViewIfNeeded();
+	await expect(page.getByRole('heading', { level: 1 })).toBeInViewport();
 });
 
 test('a visitor opens a work from the list, moves to the next one and comes back', async ({
 	page
 }) => {
 	await page.goto('/obras/');
-	await page.locator('main ol').getByRole('link', { name: 'Duna bañada en peltre' }).click();
+	await page.locator(LIST).getByRole('link', { name: 'Duna bañada en peltre' }).click();
 	await expect(page).toHaveURL(/\/obras\/duna-banada-en-peltre\/$/);
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Duna bañada en peltre');
-	await expect(page.getByText('07 / 34')).toBeVisible();
-	await page
-		.getByRole('navigation', { name: 'Otras obras' })
-		.getByRole('link', { name: 'Avance sostenido' })
-		.click();
-	await expect(page).toHaveURL(/\/obras\/avance-sostenido\/$/);
-	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Avance sostenido');
+	await expect(page.getByText(new RegExp(`^\\d{2} / ${WORKS}$`))).toBeVisible();
+	await page.getByRole('navigation', { name: 'Otras obras' }).locator('a[rel="next"]').click();
+	await expect(page).not.toHaveURL(/duna-banada-en-peltre/);
+	await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
 	await page.getByRole('main').getByRole('link', { name: 'Obras' }).click();
 	await expect(page).toHaveURL(/\/obras\/$/);
 });
 
-test('every work in the list has its own page', async ({ page }) => {
+test('every work on the works page has its own page', async ({ page }) => {
 	await page.goto('/obras/');
 	const hrefs = await page
-		.locator('main ol a')
+		.locator(`${WALL} a, ${LIST} a`)
 		.evaluateAll((links) => links.map((link) => (link as HTMLAnchorElement).href));
-	expect(hrefs).toHaveLength(CATALOG_SIZE);
+	expect(hrefs).toHaveLength(WORKS);
 	for (const href of hrefs) {
 		const response = await page.request.get(href);
 		expect(response.status(), href).toBe(200);
@@ -120,15 +149,57 @@ test('the language switch stays on the same work', async ({ page }) => {
 	await expect(page.getByText('Carved wood coated in sand')).toBeVisible();
 });
 
-test('choosing another photo of a work shows it large', async ({ page }) => {
+test('a work page shows every photo of the work', async ({ page }) => {
 	await page.goto('/en/works/infinito/');
-	await expect(page.getByRole('img', { name: 'Infinito, photo 1 of 3.' })).toBeVisible();
-	await page.getByRole('button', { name: 'Show photo 2' }).click();
-	await expect(page.getByRole('img', { name: 'Infinito, photo 2 of 3.' })).toBeVisible();
-	await expect(page.getByRole('button', { name: 'Show photo 2' })).toHaveAttribute(
-		'aria-pressed',
-		'true'
+	for (const n of [1, 2, 3]) {
+		await expect(page.getByRole('img', { name: `Infinito, photo ${n} of 3.` })).toBeVisible();
+	}
+});
+
+test('a small catalog photo is never stretched past its own size', async ({ page }) => {
+	await page.goto('/obras/duna-banada-en-peltre/');
+	const sizes = await page.locator('article img').evaluateAll((images) =>
+		images.map((image) => ({
+			shown: image.getBoundingClientRect().width,
+			real: Number(image.getAttribute('width'))
+		}))
 	);
+	expect(sizes.length).toBeGreaterThan(0);
+	for (const { shown, real } of sizes) expect(shown).toBeLessThanOrEqual(real);
+});
+
+test('a work with no title yet is asked about by the address of its page', async ({ page }) => {
+	await page.goto('/obras/obra-41/');
+	const address = encodeURIComponent(`${new URL(page.url()).origin}/obras/obra-41/`);
+	await expect(page.getByRole('link', { name: 'Consultar por WhatsApp' })).toHaveAttribute(
+		'href',
+		new RegExp(address.replace(/[.]/g, '\\.'))
+	);
+});
+
+test('the artists film loads from Vimeo only when the visitor presses play', async ({ page }) => {
+	const calls: string[] = [];
+	page.on('request', (request) => {
+		if (request.url().includes('vimeo.com')) calls.push(request.url());
+	});
+	await page.goto('/estudio/', { waitUntil: 'networkidle' });
+	expect(calls).toEqual([]);
+	await page.getByRole('button', { name: 'Ver el video' }).click();
+	await expect(page.locator('iframe[title="Video de los artistas, en Vimeo"]')).toHaveAttribute(
+		'src',
+		/player\.vimeo\.com\/video\/\d+\?.*dnt=1/
+	);
+	await expect.poll(() => calls.length).toBeGreaterThan(0);
+});
+
+test('the home page opens on a photo that runs edge to edge', async ({ page }) => {
+	await page.goto('/');
+	const photo = page.getByRole('img', { name: /Interior de la galería Silu/ });
+	const box = await photo.boundingBox();
+	const viewport = page.viewportSize();
+	expect(box?.x).toBe(0);
+	expect(box?.width).toBe(viewport?.width);
+	await expect(page.getByRole('link', { name: 'Cómo llegar' }).first()).toBeInViewport();
 });
 
 test('no work shows a status until one is confirmed', async ({ page }) => {

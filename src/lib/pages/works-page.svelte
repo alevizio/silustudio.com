@@ -2,11 +2,10 @@
 	import LinkButton from '#lib/components/link-button.svelte';
 	import SectionHeading from '#lib/components/section-heading.svelte';
 	import Seo from '#lib/components/seo.svelte';
-	import WorkPlate from '#lib/components/work-plate.svelte';
 	import WorksIndex from '#lib/components/works-index.svelte';
-	import { PHOTOGRAPHED_WORKS, UNTITLED_PHOTOS } from '#lib/content/images.ts';
+	import WorksWall from '#lib/components/works-wall.svelte';
+	import { LISTED_WORKS, PHOTOGRAPHED_WORKS, UNTITLED_PHOTOS } from '#lib/content/images.ts';
 	import { SITE } from '#lib/content/site.ts';
-	import { WORKS } from '#lib/content/works.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
 
 	interface Props {
@@ -14,13 +13,6 @@
 	}
 
 	let { lang }: Props = $props();
-
-	/** The first plates of the wall are hung larger, two to a row; the rest go three to a row. */
-	const LARGE_PLATES = 2;
-	const PLATE_SIZES = {
-		large: '(min-width: 768px) 46vw, 100vw',
-		regular: '(min-width: 768px) 30vw, 100vw'
-	};
 
 	const copy = $derived(copyFor(lang).works);
 </script>
@@ -32,18 +24,13 @@
 	<p class="max-w-prose pt-4 font-serif text-lead text-ink-soft">{copy.lead}</p>
 </header>
 
-<section aria-label={copy.title} class="mx-auto max-w-page px-gutter pb-section">
-	<div class="grid gap-x-6 gap-y-14 md:grid-cols-6">
-		{#each PHOTOGRAPHED_WORKS as work, index (work.n)}
-			<WorkPlate
-				{work}
-				{lang}
-				sizes={index < LARGE_PLATES ? PLATE_SIZES.large : PLATE_SIZES.regular}
-				class={index < LARGE_PLATES ? 'md:col-span-3' : 'md:col-span-2'}
-			/>
-		{/each}
-	</div>
-</section>
+<!-- Every work with a full size photo hangs here. The tiles bring their own space below. -->
+<WorksWall
+	works={PHOTOGRAPHED_WORKS}
+	{lang}
+	label={copy.title}
+	class="mx-auto max-w-page px-gutter pb-10 md:pb-14"
+/>
 
 <section aria-labelledby="works-details" class="mx-auto max-w-page px-gutter pb-section">
 	<h2 id="works-details" class="pb-6 text-label text-ink-soft uppercase">{copy.details.title}</h2>
@@ -65,11 +52,11 @@
 		<SectionHeading
 			id="works-catalog"
 			label={copy.catalog.label}
-			title={copy.catalog.title(WORKS.length)}
+			title={copy.catalog.title(LISTED_WORKS.length)}
 		/>
 		<LinkButton href={SITE.catalogUrl} external variant="text">{copy.catalog.pdf}</LinkButton>
 	</div>
-	<WorksIndex works={WORKS} {lang} />
+	<WorksIndex works={LISTED_WORKS} {lang} />
 </section>
 
 <section

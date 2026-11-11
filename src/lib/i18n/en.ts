@@ -51,6 +51,7 @@ export const en: typeof es = {
 			alts: {
 				plinths: 'Gallery room with sculptures on plinths and a panel made of wood roots.',
 				corridor: 'Gallery corridor with reliefs on both sides.',
+				long: 'A long view through the gallery: white rings on the floor, a round piece made of roots and reliefs on the walls.',
 				garden: 'Gallery room with sculptures on a white platform and a view of the garden.'
 			},
 			film: {
@@ -60,8 +61,7 @@ export const en: typeof es = {
 		},
 		works: {
 			label: 'Works',
-			title: (count: number) =>
-				`${count} works in sand, quartz, limestone, wood and mother of pearl.`,
+			title: 'Works in sand, quartz, limestone, wood and mother of pearl.',
 			link: 'See all works'
 		},
 		artists: {
@@ -80,7 +80,7 @@ export const en: typeof es = {
 		},
 		catalog: {
 			label: 'Catalog',
-			title: (count: number) => `All ${count} works in the catalog`,
+			title: (count: number) => `${count} more works from the catalog`,
 			pdf: 'See the catalog as a PDF'
 		},
 		enquiry: {
@@ -89,7 +89,8 @@ export const en: typeof es = {
 			whatsapp: 'Message on WhatsApp',
 			email: 'Send an email'
 		},
-		photoAlt: (title: string, medium: string) => `${title}. ${medium}.`,
+		reference: (ref: number) => `Work ${ref}`,
+		photoAlt: (name: string, medium?: string) => (medium ? `${name}. ${medium}.` : `${name}.`),
 		status: { label: 'Status', available: 'Available', reserved: 'Reserved', sold: 'Sold' },
 		detail: {
 			material: 'Material',
@@ -98,13 +99,16 @@ export const en: typeof es = {
 			email: 'Send an email',
 			whatsappText: (title: string) => `Hello, I would like to ask about the work “${title}”.`,
 			emailSubject: (title: string) => `Enquiry about the work “${title}”`,
+			linkText: (url: string) => `Hello, I would like to ask about this work: ${url}`,
+			linkSubject: 'Enquiry about a work',
+			pending: 'Ask us for the title, size and material of this work.',
 			navLabel: 'Other works',
-			photos: 'Photos of the work',
-			photoAlt: (title: string, n: number, total: number) => `${title}, photo ${n} of ${total}.`,
-			showPhoto: (n: number) => `Show photo ${n}`,
-			metaTitle: (title: string) => `${title} · Silu`,
-			metaDescription: (title: string, medium: string, dimensions: string) =>
-				`${title}. ${medium}. ${dimensions}. A work by Silvestre Jacobi and Lucila Dickinson, Silu.`
+			previous: 'Previous work',
+			next: 'Next work',
+			photoAlt: (name: string, n: number, total: number) => `${name}, photo ${n} of ${total}.`,
+			metaTitle: (name: string) => `${name} · Silu`,
+			metaDescription: (facts: string[]) =>
+				`${facts.join('. ')}. A work by Silvestre Jacobi and Lucila Dickinson, Silu.`
 		}
 	},
 	studio: {
@@ -133,6 +137,10 @@ export const en: typeof es = {
 			workshop: 'The artists applying sand to a wave shaped piece on the workshop table.',
 			drawing: 'The artists drawing a plan and holding a small model of a work.',
 			storage: 'Reliefs stored on metal racks.'
+		},
+		film: {
+			title: 'Film of the artists, on Vimeo',
+			play: 'Play the film'
 		}
 	},
 	visit: {

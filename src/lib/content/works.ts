@@ -4,17 +4,36 @@ export type Localized = Record<Lang, string>;
 
 export type WorkStatus = 'available' | 'reserved' | 'sold';
 
-export interface Work {
-	/** Position in the artists' printed catalog, 1 to 34. */
-	n: number;
+interface WorkBase {
 	/** Last part of the work's address, and the name of its photo folder in assets/works. */
 	slug: string;
-	/** Titles are the works' names, so they stay in Spanish in both languages. */
-	title: string;
-	medium: Localized;
-	dimensions: Localized;
+	medium?: Localized;
+	dimensions?: Localized;
 	/** Left out until the artists confirm it. A work with no status shows none. */
 	status?: WorkStatus;
+}
+
+export interface TitledWork extends WorkBase {
+	/** Titles are the works' names, so they stay in Spanish in both languages. */
+	title: string;
+	ref?: never;
+}
+
+/** A photographed work the artists have not sent a title for yet. */
+export interface UntitledWork extends WorkBase {
+	title?: never;
+	/** What the work is called until it has a title. It is the number in its folder name: obra-41 is 41. */
+	ref: number;
+}
+
+export type Work = TitledWork | UntitledWork;
+
+/** A work from the artists' PDF catalog, which gives its number, technique and size. */
+export interface CatalogWork extends TitledWork {
+	/** Position in the catalog, 1 to 34. */
+	n: number;
+	medium: Localized;
+	dimensions: Localized;
 }
 
 /*
@@ -66,7 +85,7 @@ const round = (diameter: number, depth?: number): Localized => ({
 	en: `${diameter} cm diameter${depth ? ` × ${depth} cm deep` : ''}`
 });
 
-export const WORKS: readonly Work[] = [
+export const CATALOG_WORKS: readonly CatalogWork[] = [
 	{
 		n: 1,
 		slug: 'guijarro',
@@ -369,8 +388,45 @@ export const WORKS: readonly Work[] = [
 	}
 ];
 
-/** The catalog number as printed on labels and used for thumbnail files: 7 becomes '07'. */
+/** A number as printed on labels and used in file and folder names: 7 becomes '07'. */
 export const catalogNumber = (n: number): string => String(n).padStart(2, '0');
+
+/*
+ * Works photographed in the artists' stock folder that are not in the PDF catalog. The photos
+ * and these four titles come from the designer's proposal of November 2026, which followed
+ * that folder. The titles still need the artists' confirmation, and none has a technique or
+ * size yet.
+ */
+const TITLED_STOCK_WORKS: readonly TitledWork[] = [
+	{ slug: 'mar-de-fondo', title: 'Mar de fondo' },
+	{ slug: 'pables', title: 'Pables' },
+	{ slug: 'encuentro-en-un-reflejo', title: 'Encuentro en un reflejo' },
+	{ slug: 'ser-antiguo', title: 'Ser antiguo (díptico)' }
+];
+
+/*
+ * Photographed works with no title yet, by the number of their photo set in the proposal.
+ * When the artists name one: move it to the list above (or to the catalog list, with its
+ * technique and size) and rename its folder in assets/works to the new slug.
+ * Set 34 is labelled "Dar es recibir" in the proposal, but its photos show a different work
+ * from the catalog's "Dar es recibir", so it stays untitled until the artists say which it is.
+ */
+const UNTITLED_REFS = [
+	8, 9, 10, 13, 14, 15, 16, 26, 27, 28, 30, 31, 32, 33, 34, 35, 37, 39, 40, 41, 42, 43, 44, 45, 46,
+	47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67
+];
+
+const UNTITLED_STOCK_WORKS: readonly UntitledWork[] = UNTITLED_REFS.map((ref) => ({
+	slug: `obra-${catalogNumber(ref)}`,
+	ref
+}));
+
+/** Every work on the site: the catalog first, then the photographed works that are not in it. */
+export const WORKS: readonly Work[] = [
+	...CATALOG_WORKS,
+	...TITLED_STOCK_WORKS,
+	...UNTITLED_STOCK_WORKS
+];
 
 /** The work with this slug, if there is one. */
 export const findWork = (slug: string): Work | undefined =>

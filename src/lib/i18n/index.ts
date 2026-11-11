@@ -1,3 +1,4 @@
+import type { Work } from '#lib/content/works.ts';
 import { en } from './en';
 import { es } from './es';
 
@@ -20,6 +21,10 @@ const COPY: Record<Lang, Copy> = { es, en };
 export const copyFor = (lang: Lang): Copy => COPY[lang];
 
 export const otherLang = (lang: Lang): Lang => (lang === 'es' ? 'en' : 'es');
+
+/** What to call a work: its title, or "Obra 41" while the artists have not sent one. */
+export const nameOf = (work: Work, lang: Lang): string =>
+	work.title !== undefined ? work.title : COPY[lang].works.reference(work.ref);
 
 const withSlash = (pathname: string): string =>
 	pathname.endsWith('/') ? pathname : `${pathname}/`;

@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { thumbOf } from '#lib/content/images.ts';
-	import { catalogNumber, type Work } from '#lib/content/works.ts';
+	import { catalogNumber, type CatalogWork } from '#lib/content/works.ts';
 	import { workHref } from '#lib/i18n/href.ts';
 	import type { Lang } from '#lib/i18n/index.ts';
 	import { cn } from '#lib/utils/cn.ts';
 	import WorkStatus from './work-status.svelte';
 
 	interface Props {
-		works: readonly Work[];
+		/** Catalog works, which all have a number, a technique and a size. */
+		works: readonly CatalogWork[];
 		lang: Lang;
 		class?: string;
 	}
@@ -15,9 +16,9 @@
 	let { works, lang, class: className }: Props = $props();
 </script>
 
-<!-- The full list of works: thumbnail, number and title, technique, size. Each row opens the work. -->
+<!-- A list of catalog works: thumbnail, number and title, technique, size. Each row opens the work. -->
 <ol class={cn('border-t border-line', className)}>
-	{#each works as work (work.n)}
+	{#each works as work (work.slug)}
 		{@const thumb = thumbOf(work)}
 		<li
 			id={work.slug}

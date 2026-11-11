@@ -25,6 +25,12 @@ describe('studio-page.svelte', () => {
 		await expect.element(page.getByText(/lauyer|fotographer|Curentely/)).not.toBeInTheDocument();
 	});
 
+	it("offers the artists' film and loads nothing from it until asked", async () => {
+		const { container } = render(StudioPage, { lang: 'es' });
+		await expect.element(page.getByRole('button', { name: 'Ver el video' })).toBeVisible();
+		expect(container.querySelector('iframe')).toBeNull();
+	});
+
 	it('describes every photo', async () => {
 		render(StudioPage, { lang: 'es' });
 		await expect.element(page.getByRole('heading', { level: 1 })).toBeVisible();

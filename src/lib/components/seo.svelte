@@ -2,7 +2,15 @@
 	import { fullSizePhotosOf } from '#lib/content/images.ts';
 	import { SITE } from '#lib/content/site.ts';
 	import type { Work } from '#lib/content/works.ts';
-	import { LANGS, ROUTES, copyFor, workPath, type Lang, type PageKey } from '#lib/i18n/index.ts';
+	import {
+		LANGS,
+		ROUTES,
+		copyFor,
+		nameOf,
+		workPath,
+		type Lang,
+		type PageKey
+	} from '#lib/i18n/index.ts';
 
 	interface Props {
 		lang: Lang;
@@ -17,18 +25,15 @@
 	const DEFAULT_SHARE_IMAGE = '/og.jpg';
 
 	const copy = $derived(copyFor(lang));
-	const meta = $derived(
-		work
-			? {
-					title: copy.works.detail.metaTitle(work.title),
-					description: copy.works.detail.metaDescription(
-						work.title,
-						work.medium[lang],
-						work.dimensions[lang]
-					)
-				}
-			: copy.meta[page]
-	);
+	const workMeta = (described: Work) => {
+		const name = nameOf(described, lang);
+		const facts = [name, described.medium?.[lang], described.dimensions?.[lang]];
+		return {
+			title: copy.works.detail.metaTitle(name),
+			description: copy.works.detail.metaDescription(facts.filter((fact) => fact !== undefined))
+		};
+	};
+	const meta = $derived(work ? workMeta(work) : copy.meta[page]);
 	const pathIn = (code: Lang): string => (work ? workPath(code, work.slug) : ROUTES[code][page]);
 	const canonical = $derived(`${SITE.url}${pathIn(lang)}`);
 	// A work is shared with its own photo once it has a full size one.

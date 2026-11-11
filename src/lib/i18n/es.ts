@@ -50,6 +50,7 @@ export const es = {
 				plinths:
 					'Sala de la galería con esculturas sobre pedestales y un panel de raíces de madera.',
 				corridor: 'Pasillo de la galería con relieves a ambos lados.',
+				long: 'Vista larga de la galería: aros blancos en el piso, una pieza circular de raíces y relieves en las paredes.',
 				garden: 'Sala de la galería con esculturas sobre una tarima blanca y vista al jardín.'
 			},
 			film: {
@@ -59,7 +60,7 @@ export const es = {
 		},
 		works: {
 			label: 'Obras',
-			title: (count: number) => `${count} obras en arena, cuarzo, piedra caliza, madera y nácar.`,
+			title: 'Obras en arena, cuarzo, piedra caliza, madera y nácar.',
 			link: 'Ver todas las obras'
 		},
 		artists: {
@@ -78,7 +79,7 @@ export const es = {
 		},
 		catalog: {
 			label: 'Catálogo',
-			title: (count: number) => `Las ${count} obras del catálogo`,
+			title: (count: number) => `${count} obras más del catálogo`,
 			pdf: 'Ver el catálogo en PDF'
 		},
 		enquiry: {
@@ -87,7 +88,9 @@ export const es = {
 			whatsapp: 'Escribir por WhatsApp',
 			email: 'Enviar un correo'
 		},
-		photoAlt: (title: string, medium: string) => `${title}. ${medium}.`,
+		/** A work with no title yet is called by the number of its folder. */
+		reference: (ref: number) => `Obra ${ref}`,
+		photoAlt: (name: string, medium?: string) => (medium ? `${name}. ${medium}.` : `${name}.`),
 		status: { label: 'Estado', available: 'Disponible', reserved: 'Reservada', sold: 'Vendida' },
 		detail: {
 			material: 'Material',
@@ -96,13 +99,18 @@ export const es = {
 			email: 'Enviar un correo',
 			whatsappText: (title: string) => `Hola, quiero consultar por la obra «${title}».`,
 			emailSubject: (title: string) => `Consulta por la obra «${title}»`,
+			/** For a work with no title yet: the message carries the address of its page instead. */
+			linkText: (url: string) => `Hola, quiero consultar por esta obra: ${url}`,
+			linkSubject: 'Consulta por una obra',
+			pending: 'Consultanos por el título, las medidas y el material de esta obra.',
 			navLabel: 'Otras obras',
-			photos: 'Fotos de la obra',
-			photoAlt: (title: string, n: number, total: number) => `${title}, foto ${n} de ${total}.`,
-			showPhoto: (n: number) => `Ver la foto ${n}`,
-			metaTitle: (title: string) => `${title} · Silu`,
-			metaDescription: (title: string, medium: string, dimensions: string) =>
-				`${title}. ${medium}. ${dimensions}. Obra de Silvestre Jacobi y Lucila Dickinson, Silu.`
+			previous: 'Obra anterior',
+			next: 'Obra siguiente',
+			photoAlt: (name: string, n: number, total: number) => `${name}, foto ${n} de ${total}.`,
+			metaTitle: (name: string) => `${name} · Silu`,
+			/** `facts` are the work's name and, when known, its technique and size. */
+			metaDescription: (facts: string[]) =>
+				`${facts.join('. ')}. Obra de Silvestre Jacobi y Lucila Dickinson, Silu.`
 		}
 	},
 	studio: {
@@ -128,6 +136,10 @@ export const es = {
 			workshop: 'Los artistas aplicando arena sobre una pieza ondulada en la mesa del taller.',
 			drawing: 'Los artistas dibujando un plano y sosteniendo una maqueta de una obra.',
 			storage: 'Relieves guardados en estantes metálicos.'
+		},
+		film: {
+			title: 'Video de los artistas, en Vimeo',
+			play: 'Ver el video'
 		}
 	},
 	visit: {

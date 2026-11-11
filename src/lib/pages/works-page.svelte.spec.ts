@@ -1,26 +1,34 @@
 import { page } from 'vitest/browser';
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
-import { PHOTOGRAPHED_WORKS } from '#lib/content/images.ts';
+import { LISTED_WORKS, PHOTOGRAPHED_WORKS } from '#lib/content/images.ts';
 import { WORKS } from '#lib/content/works.ts';
 import WorksPage from './works-page.svelte';
 
 describe('works-page.svelte', () => {
-	it('lists the whole catalog under the page title', async () => {
+	it('hangs every work that has a full size photo under the page title', async () => {
 		render(WorksPage, { lang: 'es' });
 		await expect.element(page.getByRole('heading', { level: 1 })).toHaveTextContent('Obras');
-		await expect
-			.element(page.getByRole('heading', { name: 'Las 34 obras del catálogo' }))
-			.toBeInTheDocument();
-		expect(page.getByRole('listitem').elements()).toHaveLength(WORKS.length);
+		const wall = page.getByRole('list', { name: 'Obras' });
+		expect(wall.getByRole('listitem').elements()).toHaveLength(PHOTOGRAPHED_WORKS.length);
 	});
 
-	it('labels each photographed work once on the wall and once in the list', async () => {
-		render(WorksPage, { lang: 'es' });
+	it('lists the catalog works that only have small photos, under their own heading', async () => {
+		const { container } = render(WorksPage, { lang: 'es' });
+		await expect
+			.element(page.getByRole('heading', { name: `${LISTED_WORKS.length} obras más del catálogo` }))
+			.toBeInTheDocument();
+		expect(container.querySelectorAll('ol > li')).toHaveLength(LISTED_WORKS.length);
+	});
+
+	it('shows every work exactly once', async () => {
+		const { container } = render(WorksPage, { lang: 'es' });
 		await expect.element(page.getByRole('heading', { level: 1 })).toBeVisible();
-		expect(page.getByRole('heading', { level: 3 }).elements()).toHaveLength(
-			WORKS.length + PHOTOGRAPHED_WORKS.length
+		const links = [...container.querySelectorAll('ul[aria-label] a, ol a')].map((link) =>
+			link.getAttribute('href')
 		);
+		expect(links).toHaveLength(WORKS.length);
+		expect(new Set(links).size).toBe(WORKS.length);
 	});
 
 	it('offers the catalog PDF and two ways to ask about a work, in English', async () => {

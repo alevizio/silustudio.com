@@ -44,6 +44,9 @@
 	--spacing-gutter: clamp(1.25rem, 0.5rem + 3.5vw, 3rem);
 	--spacing-thumb: 5rem;
 	--spacing-logo: 3.5rem;
+	--spacing-hang: 34rem; /* tallest a work hangs on the wall of works */
+	--spacing-photo: 85svh; /* tallest a photo shows on a page, so it always fits the screen */
+	--spacing-hero: 60svh; /* tallest the home page's opening photo gets, so the way there stays in view */
 	--container-page: 76rem;
 	--container-prose: 40rem;
 	--aspect-thumb: 2 / 3;

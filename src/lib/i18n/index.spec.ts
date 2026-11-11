@@ -5,6 +5,7 @@ import {
 	ROUTES,
 	copyFor,
 	langFromPath,
+	nameOf,
 	pageFromPath,
 	workPath,
 	workSlugFromPath
@@ -75,5 +76,17 @@ describe('copy', () => {
 	it('keeps the same number of statement paragraphs in both languages', () => {
 		expect(copyFor('en').studio.statement).toHaveLength(copyFor('es').studio.statement.length);
 		expect(copyFor('en').studio.closing).toHaveLength(copyFor('es').studio.closing.length);
+	});
+});
+
+describe('nameOf', () => {
+	it('calls a work by its title, in Spanish in both languages', () => {
+		expect(nameOf({ slug: 'guijarro', title: 'Guijarro' }, 'es')).toBe('Guijarro');
+		expect(nameOf({ slug: 'guijarro', title: 'Guijarro' }, 'en')).toBe('Guijarro');
+	});
+
+	it('calls a work with no title yet by the number of its folder', () => {
+		expect(nameOf({ slug: 'obra-41', ref: 41 }, 'es')).toBe('Obra 41');
+		expect(nameOf({ slug: 'obra-41', ref: 41 }, 'en')).toBe('Work 41');
 	});
 });

@@ -1,5 +1,5 @@
 import type { Picture } from 'vite-imagetools';
-import { WORKS, catalogNumber, type Work } from './works.ts';
+import { CATALOG_WORKS, WORKS, catalogNumber, type CatalogWork, type Work } from './works.ts';
 
 type PictureModule = { default: Picture };
 
@@ -19,7 +19,7 @@ const grouped = (
 };
 
 /* Small photos cropped from the artists' PDF catalog: 07-1.jpg is the whole view of work 7, 07-2.jpg a detail. */
-const CATALOG = grouped(
+const CATALOG_BY_NUMBER = grouped(
 	import.meta.glob<PictureModule>('/src/lib/assets/catalog/*.jpg', {
 		eager: true,
 		// Naming widths makes each photo show at its real pixel size instead of half of it.
@@ -27,6 +27,10 @@ const CATALOG = grouped(
 		query: { enhanced: true, w: '760;380' }
 	}),
 	(path) => fileName(path).slice(0, 2)
+);
+
+const CATALOG_PHOTOS = new Map(
+	CATALOG_WORKS.map((work) => [work.slug, CATALOG_BY_NUMBER[catalogNumber(work.n)] ?? []])
 );
 
 /* Full size photos, one folder per work named after its slug: works/guijarro/01.png, 02.jpg and so on. */
@@ -39,7 +43,7 @@ const FULL_SIZE = grouped(
 );
 
 /** The photo shown beside a work in the list: its whole view from the catalog. */
-export const thumbOf = (work: Work): Picture | undefined => CATALOG[catalogNumber(work.n)]?.[0];
+export const thumbOf = (work: Work): Picture | undefined => CATALOG_PHOTOS.get(work.slug)?.[0];
 
 /** A work's full size photos, in file name order. Empty until the artists send them. */
 export const fullSizePhotosOf = (work: Work): Picture[] => FULL_SIZE[work.slug] ?? [];
@@ -47,17 +51,25 @@ export const fullSizePhotosOf = (work: Work): Picture[] => FULL_SIZE[work.slug] 
 /** What a work's page shows: its full size photos, or the catalog photos while it has none. */
 export const photosOf = (work: Work): Picture[] => {
 	const fullSize = fullSizePhotosOf(work);
-	return fullSize.length > 0 ? fullSize : (CATALOG[catalogNumber(work.n)] ?? []);
+	return fullSize.length > 0 ? fullSize : (CATALOG_PHOTOS.get(work.slug) ?? []);
 };
 
-/** Works that have at least one full size photo, in catalog order. */
-export const PHOTOGRAPHED_WORKS: readonly Work[] = WORKS.filter(
-	(work) => fullSizePhotosOf(work).length > 0
+const hasFullSizePhoto = (work: Work): boolean => fullSizePhotosOf(work).length > 0;
+
+/** Works with at least one full size photo. They hang large on the works page. */
+export const PHOTOGRAPHED_WORKS: readonly Work[] = WORKS.filter(hasFullSizePhoto);
+
+/** Catalog works that only have the small catalog photos. They go in the list below the wall. */
+export const LISTED_WORKS: readonly CatalogWork[] = CATALOG_WORKS.filter(
+	(work) => !hasFullSizePhoto(work)
 );
 
+/** The order a visitor meets the works in: the wall, then the list. */
+export const ORDERED_WORKS: readonly Work[] = [...PHOTOGRAPHED_WORKS, ...LISTED_WORKS];
+
 /**
- * Photos from the old site that could not be matched to a catalog title with certainty:
- * whole works first, then details. They are shown without a label until the artists name them.
+ * Photos from the old site that could not be matched to a work with certainty: whole works
+ * first, then details. They are shown without a label until the artists name them.
  */
 export const UNTITLED_PHOTOS: readonly Picture[] = Object.values(
 	import.meta.glob<PictureModule>('/src/lib/assets/untitled/*.png', {

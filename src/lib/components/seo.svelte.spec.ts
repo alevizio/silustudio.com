@@ -46,6 +46,16 @@ describe('seo.svelte', () => {
 		);
 	});
 
+	it('describes a work with no title yet by its stand-in name, without empty facts', async () => {
+		const untitled = WORKS.find((work) => work.slug === 'obra-41');
+		render(Seo, { lang: 'es', page: 'works', work: untitled });
+		await expect.poll(() => document.title).toBe('Obra 41 · Silu');
+		expect(head('meta[name="description"]')).toBe(
+			'Obra 41. Obra de Silvestre Jacobi y Lucila Dickinson, Silu.'
+		);
+		expect(head('link[rel="canonical"]')).toBe('https://www.silustudio.com/obras/obra-41/');
+	});
+
 	it('shares a work with its own photo when it has a full size one', async () => {
 		render(Seo, { lang: 'es', page: 'works', work: WORKS[0] });
 		await expect.poll(() => document.title).toBe('Guijarro · Silu');
