@@ -32,10 +32,10 @@
 		narrow: '(min-width: 768px) 21vw, 100vw'
 	};
 	const rooms = [
-		{ key: 'plinths', picture: roomPlinths, span: 'md:col-span-3', sizes: ROOM_SIZES.wide },
-		{ key: 'corridor', picture: roomCorridor, span: '', sizes: ROOM_SIZES.narrow },
-		{ key: 'long', picture: roomLong, span: '', sizes: ROOM_SIZES.narrow },
-		{ key: 'garden', picture: roomGarden, span: '', sizes: ROOM_SIZES.narrow }
+		{ key: 'plinths', picture: roomPlinths, sizes: ROOM_SIZES.wide, place: 'md:col-span-3' },
+		{ key: 'corridor', picture: roomCorridor, sizes: ROOM_SIZES.narrow, place: '' },
+		{ key: 'long', picture: roomLong, sizes: ROOM_SIZES.narrow, place: 'reveal-after-1' },
+		{ key: 'garden', picture: roomGarden, sizes: ROOM_SIZES.narrow, place: 'reveal-after-2' }
 	] as const;
 
 	const copy = $derived(copyFor(lang));
@@ -45,20 +45,23 @@
 
 <!-- The page opens on the room itself, edge to edge. The way there comes right under it. -->
 <section class="pb-section">
-	<enhanced:img
-		src={hero}
-		alt={copy.home.heroAlt}
-		sizes="100vw"
-		fetchpriority="high"
-		class="aspect-room max-h-hero w-full object-cover md:aspect-facade"
-	/>
+	<!-- The photo starts a touch too close and settles back as the page opens. -->
+	<div class="aspect-room max-h-hero w-full overflow-hidden md:aspect-facade">
+		<enhanced:img
+			src={hero}
+			alt={copy.home.heroAlt}
+			sizes="100vw"
+			fetchpriority="high"
+			class="size-full object-cover motion-safe:animate-settle"
+		/>
+	</div>
 	<div class="mx-auto grid max-w-page gap-8 px-gutter pt-8 lg:grid-cols-12 lg:gap-x-16 lg:pt-12">
-		<div class="flex flex-col gap-4 lg:col-span-7">
+		<div class="flex flex-col gap-4 motion-safe:animate-arrive lg:col-span-7">
 			<p class="text-label text-ink-soft uppercase">{copy.home.eyebrow}</p>
 			<h1 class="font-serif text-display font-light text-balance">{copy.home.title}</h1>
 		</div>
 		<!-- The address and the way there come first, so they are in view when the page opens. -->
-		<div class="flex flex-col gap-6 lg:col-span-5">
+		<div class="flex flex-col gap-6 arrive-after-1 motion-safe:animate-arrive lg:col-span-5">
 			<p class="text-label text-ink-soft uppercase">
 				{SITE.address.street} · {SITE.address.locality}, {SITE.address.country}
 			</p>
@@ -74,7 +77,9 @@
 </section>
 
 <section aria-labelledby="home-gallery" class="mx-auto max-w-page px-gutter pb-section">
-	<div class="flex flex-col gap-6 pb-10 md:flex-row md:items-end md:justify-between md:pb-14">
+	<div
+		class="flex reveal flex-col gap-6 pb-10 md:flex-row md:items-end md:justify-between md:pb-14"
+	>
 		<SectionHeading
 			id="home-gallery"
 			label={copy.home.gallery.label}
@@ -85,10 +90,10 @@
 	</div>
 	<!-- The film sets the height of the row; the photos beside it fill that height. -->
 	<div class="grid gap-4 md:grid-cols-12 md:gap-6">
-		<GalleryFilm {lang} class="md:col-span-4" />
+		<GalleryFilm {lang} class="reveal md:col-span-4" />
 		<div class="grid gap-4 md:col-span-8 md:grid-cols-3 md:grid-rows-gallery md:gap-6">
 			{#each rooms as room (room.key)}
-				<div class={['relative aspect-room md:aspect-auto', room.span]}>
+				<div class={['relative aspect-room reveal md:aspect-auto', room.place]}>
 					<enhanced:img
 						src={room.picture}
 						alt={copy.home.gallery.alts[room.key]}
@@ -103,7 +108,9 @@
 </section>
 
 <section aria-labelledby="home-works" class="mx-auto max-w-page px-gutter pb-10 md:pb-14">
-	<div class="flex flex-col gap-6 pb-10 md:flex-row md:items-end md:justify-between md:pb-14">
+	<div
+		class="flex reveal flex-col gap-6 pb-10 md:flex-row md:items-end md:justify-between md:pb-14"
+	>
 		<SectionHeading
 			id="home-works"
 			label={copy.home.works.label}
@@ -124,9 +131,9 @@
 		alt={copy.home.artists.alt}
 		sizes="(min-width: 1024px) 55vw, 100vw"
 		loading="lazy"
-		class="h-auto w-full lg:col-span-7"
+		class="h-auto w-full reveal lg:col-span-7"
 	/>
-	<div class="flex flex-col gap-6 lg:col-span-5">
+	<div class="flex reveal flex-col gap-6 reveal-after-1 lg:col-span-5">
 		<SectionHeading
 			id="home-artists"
 			label={copy.home.artists.label}

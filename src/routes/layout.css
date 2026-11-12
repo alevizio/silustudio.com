@@ -56,6 +56,34 @@
 	--wall-light-turn-screens: 5.5;
 	--wall-light-sway: 5deg;
 	--wall-light-sway-screens: 2;
+
+	/*
+	 * Motion for text and photos: slow and soft, the way one walks through a gallery.
+	 * Everything arrives the same way, by fading in while rising a little.
+	 */
+	--ease-settle: cubic-bezier(0.22, 1, 0.36, 1); /* quick to start, long and soft to land */
+	--motion-arrive: 900ms; /* how long something takes to arrive */
+	--motion-stagger: 120ms; /* the pause between neighbours arriving one after another */
+	--motion-rise: 0.75rem; /* how far something rises as it arrives */
+	--motion-crossfade: 450ms; /* one page fading into the next */
+
+	/* A page's opening lines and photo arrive as it loads. */
+	--animate-arrive: arrive var(--motion-arrive) var(--ease-settle) both;
+	/* The photo that opens the home page starts a touch too close and settles back. */
+	--animate-settle: settle 2400ms var(--ease-settle) both;
+
+	@keyframes arrive {
+		from {
+			opacity: 0;
+			translate: 0 var(--motion-rise);
+		}
+	}
+
+	@keyframes settle {
+		from {
+			scale: 1.04;
+		}
+	}
 	--container-page: 76rem;
 	--container-prose: 40rem;
 	--aspect-room: 3 / 2;
@@ -67,6 +95,34 @@
 /* Home gallery: the photo column beside the film is one wide photo over two smaller ones. */
 @utility grid-rows-gallery {
 	grid-template-rows: 1.7fr 1fr;
+}
+
+/*
+ * Arriving on scroll. motion/reveal.ts marks an element as waiting while it is below the screen
+ * and as shown once the visitor reaches it. Only screens with no request for less motion ever
+ * hide anything, so print, and visitors who ask for calm, get the whole page at once.
+ */
+@utility reveal {
+	@media screen and (prefers-reduced-motion: no-preference) {
+		transition:
+			opacity var(--motion-arrive) var(--ease-settle),
+			translate var(--motion-arrive) var(--ease-settle);
+
+		&[data-reveal='waiting'] {
+			opacity: 0;
+			translate: 0 var(--motion-rise);
+		}
+	}
+}
+
+/* Neighbours arrive one after another: reveal-after-1 waits one pause, reveal-after-2 two. */
+@utility reveal-after-* {
+	transition-delay: calc(var(--motion-stagger) * --value(integer));
+}
+
+/* The same pause for what arrives as the page loads. */
+@utility arrive-after-* {
+	animation-delay: calc(var(--motion-stagger) * --value(integer));
 }
 
 /*
@@ -110,6 +166,21 @@
 				var(--wall-light-sway)
 		);
 		will-change: rotate;
+	}
+}
+
+/* Moving between pages: the old page fades into the new one. Asking for less motion turns it off. */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: var(--motion-crossfade);
+	animation-timing-function: ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none;
 	}
 }
 

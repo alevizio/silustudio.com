@@ -28,6 +28,7 @@ The layouts follow three references found on Mobbin: KOBU (two large photos per 
 - `src/lib/assets/`: photos. `works/<slug>/` holds the full size photos of a work, `01.jpg` being the one shown on the wall. `catalog/` holds the small photos of each work cropped from the artists' PDF catalog (`07-1.jpg` is the whole view of work 7). `untitled/` holds photos from the old site not yet matched to a work.
 - `src/routes/layout.css`: design tokens (colours, type scale, spacing).
 - `src/lib/components/wall-light.svelte`: the faint daylight on the wall (the shadow of a pergola and a plant). It stays on the screen while a page scrolls and moves slowly as the visitor scrolls: the pergola's shadow slides and turns, the fronds sway. It sits behind everything, so it never falls on a work. Its strength (`--opacity-wall-light`) and its motion (`--wall-light-*`) are tokens in `layout.css`.
+- `src/lib/motion/reveal.ts` and the motion tokens in `layout.css` (`--motion-*`, `--ease-settle`): the quiet motion of text and photos. An element with the class `reveal` arrives softly the first time it is scrolled to (`reveal-after-1`, `reveal-after-2` make neighbours follow one another). `motion-safe:animate-arrive` does the same for what opens a page. Work photos come a hair closer under the pointer, and pages cross-fade. All of it is off for visitors who ask for less motion, in print, and without scripts nothing is ever hidden.
 - `src/lib/components/` and `src/lib/pages/`: components and the five page layouts, each with its test next to it.
 
 ## Commands

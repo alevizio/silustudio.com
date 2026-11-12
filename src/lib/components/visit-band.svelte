@@ -19,7 +19,7 @@
 <!-- Closes every page except Visit itself: the invitation to come to the gallery. -->
 <section aria-labelledby={HEADING_ID} class={cn('bg-plate', className)}>
 	<div class="mx-auto grid max-w-page gap-12 px-gutter py-section lg:grid-cols-12 lg:gap-x-16">
-		<div class="flex flex-col gap-10 lg:col-span-5">
+		<div class="flex reveal flex-col gap-10 lg:col-span-5">
 			<SectionHeading id={HEADING_ID} label={copy.label} title={copy.title} />
 			<VisitDetails {lang} />
 		</div>
@@ -28,7 +28,7 @@
 			alt={copy.facadeAlt}
 			sizes="(min-width: 1024px) 55vw, 100vw"
 			loading="lazy"
-			class="aspect-room size-full object-cover lg:col-span-7"
+			class="aspect-room size-full reveal object-cover reveal-after-1 lg:col-span-7"
 		/>
 	</div>
 </section>

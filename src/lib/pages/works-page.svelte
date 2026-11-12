@@ -18,7 +18,9 @@
 
 <Seo {lang} page="works" />
 
-<header class="mx-auto max-w-page px-gutter pt-6 pb-12 md:pt-12 md:pb-16">
+<header
+	class="mx-auto max-w-page px-gutter pt-6 pb-12 motion-safe:animate-arrive md:pt-12 md:pb-16"
+>
 	<h1 class="font-serif text-display font-light">{copy.title}</h1>
 	<p class="max-w-prose pt-4 font-serif text-lead text-ink-soft">{copy.lead}</p>
 </header>
@@ -33,7 +35,9 @@
 />
 
 <section aria-labelledby="works-details" class="mx-auto max-w-page px-gutter pb-section">
-	<h2 id="works-details" class="pb-6 text-label text-ink-soft uppercase">{copy.details.title}</h2>
+	<h2 id="works-details" class="reveal pb-6 text-label text-ink-soft uppercase">
+		{copy.details.title}
+	</h2>
 	<div class="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
 		{#each UNTITLED_PHOTOS as picture, index (index)}
 			<enhanced:img
@@ -41,14 +45,14 @@
 				alt={copy.details.alt}
 				sizes="(min-width: 768px) 18vw, 46vw"
 				loading="lazy"
-				class="h-auto w-full bg-plate"
+				class="h-auto w-full reveal bg-plate"
 			/>
 		{/each}
 	</div>
 </section>
 
 <section aria-labelledby="works-catalog" class="mx-auto max-w-page px-gutter pb-section">
-	<div class="flex flex-col gap-6 pb-10 md:flex-row md:items-end md:justify-between">
+	<div class="flex reveal flex-col gap-6 pb-10 md:flex-row md:items-end md:justify-between">
 		<SectionHeading
 			id="works-catalog"
 			label={copy.catalog.label}
@@ -62,7 +66,7 @@
 
 <section
 	aria-labelledby="works-enquiry"
-	class="mx-auto flex max-w-page flex-col items-start gap-6 px-gutter pb-section"
+	class="mx-auto flex max-w-page reveal flex-col items-start gap-6 px-gutter pb-section"
 >
 	<SectionHeading id="works-enquiry" title={copy.enquiry.title} />
 	<p class="max-w-prose font-serif text-lead text-ink-soft">{copy.enquiry.text}</p>

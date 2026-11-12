@@ -28,7 +28,12 @@
 -->
 <div class={cn('grid items-center gap-4 sm:grid-cols-2 md:gap-6', className)}>
 	{#each photos as photo, index (index)}
-		<div class={cn('flex justify-center', alone(index) && 'sm:col-span-2')}>
+		<div
+			class={cn(
+				'flex reveal justify-center',
+				alone(index) ? 'sm:col-span-2' : 'sm:even:reveal-after-1'
+			)}
+		>
 			<enhanced:img
 				src={photo}
 				alt={alt(index)}

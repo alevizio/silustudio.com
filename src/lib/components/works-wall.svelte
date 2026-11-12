@@ -27,11 +27,15 @@
 	const LAYOUTS = {
 		2: {
 			grid: 'md:grid-cols-2',
-			sizes: '(min-width: 1280px) 35rem, (min-width: 768px) 45vw, 92vw'
+			sizes: '(min-width: 1280px) 35rem, (min-width: 768px) 45vw, 92vw',
+			// The works of a row arrive one after another, left to right.
+			stagger: 'md:even:reveal-after-1'
 		},
 		3: {
 			grid: 'sm:grid-cols-2 lg:grid-cols-3',
-			sizes: '(min-width: 1280px) 22rem, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw'
+			sizes: '(min-width: 1280px) 22rem, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw',
+			stagger:
+				'sm:max-lg:even:reveal-after-1 lg:[&:nth-child(3n+2)]:reveal-after-1 lg:[&:nth-child(3n)]:reveal-after-2'
 		}
 	};
 
@@ -49,17 +53,24 @@
 	A wall of works. Each photo keeps its own shape, is never cropped and never shown larger
 	than its own pixels. A tile spans two rows of the list's grid, photo then label, so the
 	photos of a row share one baseline and their labels start on one line. The whole tile
-	opens the work's page, and its id lets a link point at it (/obras/#simbiosis).
+	opens the work's page, and its id lets a link point at it (/obras/#simbiosis). A tile
+	arrives softly as the visitor reaches it, and its photo comes a hair closer under the pointer.
 -->
 <ul aria-label={label} class={cn('grid gap-x-gutter', layout.grid, className)}>
 	{#each hung as { work, photo, name }, index (work.slug)}
-		<li id={work.slug} class="relative row-span-2 grid grid-rows-subgrid gap-y-5 pb-16 md:pb-24">
+		<li
+			id={work.slug}
+			class={cn(
+				'group relative row-span-2 grid reveal grid-rows-subgrid gap-y-5 pb-16 md:pb-24',
+				layout.stagger
+			)}
+		>
 			<enhanced:img
 				src={photo}
 				alt={photoAlt(name, work.medium?.[lang])}
 				sizes={layout.sizes}
 				loading={opensPage && index < columns ? 'eager' : 'lazy'}
-				class="max-h-hang max-w-full self-end justify-self-center object-contain"
+				class="max-h-hang max-w-full self-end justify-self-center object-contain transition-transform duration-700 ease-settle motion-safe:group-focus-within:scale-102 motion-safe:group-hover:scale-102"
 			/>
 			<div class="flex flex-col items-center gap-1.5 text-center">
 				<p class="text-label text-ink uppercase">

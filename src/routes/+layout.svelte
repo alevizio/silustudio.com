@@ -1,10 +1,12 @@
 <script lang="ts">
 	import './layout.css';
+	import { afterNavigate, onNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import SiteFooter from '#lib/components/site-footer.svelte';
 	import SiteHeader from '#lib/components/site-header.svelte';
 	import VisitBand from '#lib/components/visit-band.svelte';
 	import WallLight from '#lib/components/wall-light.svelte';
+	import { watchReveals } from '#lib/motion/reveal.ts';
 	import { copyFor, langFromPath, pageFromPath } from '#lib/i18n/index.ts';
 	import type { LayoutProps } from './$types';
 
@@ -20,6 +22,25 @@
 	// full page load has to update it here, or screen readers keep the old pronunciation.
 	$effect(() => {
 		document.documentElement.lang = lang;
+	});
+
+	// One page fades into the next where the browser can do it. The styles set the pace, and
+	// turn it off for visitors who ask for less motion.
+	onNavigate((navigation) => {
+		if (!document.startViewTransition) return;
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
+
+	// Each page brings its own content, so what should arrive on scroll is looked up again.
+	let stopWatching = () => {};
+	afterNavigate(() => {
+		stopWatching();
+		stopWatching = watchReveals();
 	});
 </script>
 

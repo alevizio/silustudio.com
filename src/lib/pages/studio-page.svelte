@@ -25,11 +25,13 @@
 
 <Seo {lang} page="studio" />
 
-<header class="mx-auto max-w-page px-gutter pt-6 pb-12 md:pt-12 md:pb-16">
+<header
+	class="mx-auto max-w-page px-gutter pt-6 pb-12 motion-safe:animate-arrive md:pt-12 md:pb-16"
+>
 	<SectionHeading level={1} label={copy.label} title={copy.title} />
 </header>
 
-<div class="mx-auto max-w-page px-gutter">
+<div class="mx-auto max-w-page px-gutter arrive-after-1 motion-safe:animate-arrive">
 	<ArtistsFilm {lang} poster={portrait} posterAlt={copy.alts.portrait} />
 </div>
 
@@ -37,13 +39,13 @@
 	aria-label={copy.label}
 	class="mx-auto grid max-w-page gap-12 px-gutter py-section lg:grid-cols-12 lg:gap-x-16"
 >
-	<div class="flex max-w-prose flex-col gap-6 lg:col-span-7">
+	<div class="flex max-w-prose reveal flex-col gap-6 lg:col-span-7">
 		<p class="font-serif text-lead text-ink">{copy.statement[0]}</p>
 		{#each copy.statement.slice(1) as paragraph (paragraph)}
 			<p class={proseClass}>{paragraph}</p>
 		{/each}
 	</div>
-	<div class="flex flex-col gap-10 lg:col-span-5">
+	<div class="flex reveal flex-col gap-10 reveal-after-1 lg:col-span-5">
 		<dl class="flex flex-col border-t border-line">
 			{#each copy.bios as bio (bio.name)}
 				<div class="flex flex-col gap-1 border-b border-line py-5">
@@ -65,7 +67,7 @@
 			alt={photo.alt}
 			sizes="(min-width: 768px) 32vw, 100vw"
 			loading="lazy"
-			class="aspect-room size-full object-cover"
+			class="aspect-room size-full reveal object-cover md:last:reveal-after-2 md:even:reveal-after-1"
 		/>
 	{/each}
 </div>

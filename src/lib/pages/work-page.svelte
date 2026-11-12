@@ -71,9 +71,16 @@
 <article
 	class="mx-auto grid max-w-page gap-x-16 gap-y-10 px-gutter pb-section lg:grid-cols-3 lg:gap-y-6"
 >
-	<WorkPhotos photos={photos.slice(0, 1)} alt={photoAlt} eager class="lg:col-span-2" />
+	<WorkPhotos
+		photos={photos.slice(0, 1)}
+		alt={photoAlt}
+		eager
+		class="motion-safe:animate-arrive lg:col-span-2"
+	/>
 
-	<div class="flex flex-col gap-8 lg:sticky lg:top-gutter lg:row-span-2 lg:self-start">
+	<div
+		class="flex flex-col gap-8 arrive-after-1 motion-safe:animate-arrive lg:sticky lg:top-gutter lg:row-span-2 lg:self-start"
+	>
 		{#if work.title !== undefined}
 			<h1 lang="es" class="font-serif text-display font-light text-balance">{work.title}</h1>
 		{:else}

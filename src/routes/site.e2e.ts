@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 const PAGES = [
 	{ path: '/', lang: 'es', h1: 'Galería y estudio de arte en Manantiales, Punta del Este.' },
@@ -26,6 +26,10 @@ const WALL = 'main ul[aria-label="Obras"]';
 /** The catalog works that only have small photos hang in their own, smaller wall. */
 const CATALOG = 'main ul[aria-label="Catálogo"]';
 
+/** Waits until nothing on the page is still arriving, so it is checked the way a visitor reads it. */
+const settled = (page: Page) =>
+	page.evaluate(() => Promise.all(document.getAnimations().map((animation) => animation.finished)));
+
 // The map and the film are third-party pages. The tests never call them: they get an empty
 // document instead.
 test.beforeEach(async ({ page }) => {
@@ -49,6 +53,7 @@ for (const { path, lang, h1 } of PAGES) {
 
 		test('has no accessibility violations', async ({ page }) => {
 			await page.goto(path);
+			await settled(page);
 			const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
 			expect(results.violations).toEqual([]);
 		});
@@ -217,6 +222,7 @@ test('the artists film loads from Vimeo only when the visitor presses play', asy
 
 test('the home page opens on a photo that runs edge to edge', async ({ page }) => {
 	await page.goto('/');
+	await settled(page);
 	const photo = page.getByRole('img', { name: /Interior de la galería Silu/ });
 	const box = await photo.boundingBox();
 	const viewport = page.viewportSize();
@@ -360,6 +366,80 @@ test('the daylight steps aside for visitors who ask for more contrast', async ({
 	await page.emulateMedia({ contrast: 'more' });
 	await page.goto('/');
 	await expect(page.locator('#wall-light')).toBeHidden();
+});
+
+test('what lies below the screen waits, and arrives when the visitor reaches it', async ({
+	page
+}) => {
+	await page.goto('/');
+	const artists = page.locator('section[aria-labelledby="home-artists"] .reveal').first();
+	await expect(artists).toHaveAttribute('data-reveal', 'waiting');
+	await expect(artists).toHaveCSS('opacity', '0');
+	await artists.scrollIntoViewIfNeeded();
+	await expect(artists).toHaveAttribute('data-reveal', 'shown');
+	await expect(artists).toHaveCSS('opacity', '1');
+	// Once seen it stays: going back up and down again does not replay it.
+	await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+	await expect(artists).toHaveAttribute('data-reveal', 'shown');
+});
+
+test('what is on screen when a page opens is there at once, fully visible once it has arrived', async ({
+	page
+}) => {
+	await page.goto('/obras/');
+	await settled(page);
+	await expect(page.getByRole('heading', { level: 1 })).toHaveCSS('opacity', '1');
+	const firstWork = page.locator(`${WALL} > li`).first();
+	await expect(firstWork).toHaveAttribute('data-reveal', 'shown');
+	await expect(firstWork).toHaveCSS('opacity', '1');
+});
+
+test('nothing waits or moves into place for visitors who ask for less motion', async ({ page }) => {
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	await page.goto('/');
+	expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
+	// Anything fainter than fully visible would be something still waiting to arrive. Parts
+	// that are never drawn at all, like the sources inside a video, report no opacity.
+	const faint = await page.evaluate(() =>
+		[...document.querySelectorAll('main *')]
+			.filter((element) => Number(getComputedStyle(element).opacity || 1) < 1)
+			.map((element) => element.tagName)
+	);
+	expect(faint).toEqual([]);
+});
+
+test('a printed page shows everything, also what the visitor never scrolled to', async ({
+	page
+}) => {
+	await page.goto('/');
+	await page.emulateMedia({ media: 'print' });
+	const artists = page.locator('section[aria-labelledby="home-artists"] .reveal').first();
+	await expect(artists).toHaveCSS('opacity', '1');
+});
+
+test('the whole page is there for a visitor whose browser runs no scripts', async ({ browser }) => {
+	const context = await browser.newContext({ javaScriptEnabled: false });
+	const page = await context.newPage();
+	await page.goto('/');
+	const artists = page.locator('section[aria-labelledby="home-artists"] .reveal').first();
+	await expect(artists).toHaveCSS('opacity', '1');
+	await expect(artists).not.toHaveAttribute('data-reveal', /.+/);
+	await context.close();
+});
+
+test('a work on the wall comes a hair closer under the pointer', async ({ page }) => {
+	await page.goto('/obras/');
+	await settled(page);
+	const tile = page.locator(`${WALL} > li`).first();
+	const photo = tile.locator('img');
+	const before = await photo.boundingBox();
+	await tile.hover();
+	await expect
+		.poll(async () => (await photo.boundingBox())?.width ?? 0)
+		.toBeGreaterThan(before?.width ?? 0);
+	const after = await photo.boundingBox();
+	// A hair, not a jump: the photo grows by about two percent.
+	expect((after?.width ?? 0) / (before?.width ?? 1)).toBeLessThan(1.03);
 });
 
 test('no work shows a status until one is confirmed', async ({ page }) => {
