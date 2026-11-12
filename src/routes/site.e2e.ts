@@ -274,12 +274,14 @@ test('the daylight moves as the visitor scrolls, and holds still when less motio
 				return `${style.translate} ${style.rotate}`;
 			})
 		);
+	// Half a screen is far enough for both shadows to have moved, and no motion is back at rest.
+	const HALF_A_SCREEN = 0.5;
 	const scrollScreens = (screens: number) =>
 		page.evaluate((count) => scrollTo({ top: innerHeight * count, behavior: 'instant' }), screens);
 
 	await page.goto('/obras/');
 	const atTheTop = await pose();
-	await scrollScreens(1);
+	await scrollScreens(HALF_A_SCREEN);
 	await expect.poll(pose).not.toEqual(atTheTop);
 	const [slats, fronds] = await pose();
 	expect(slats).not.toBe(atTheTop[0]);
@@ -291,36 +293,45 @@ test('the daylight moves as the visitor scrolls, and holds still when less motio
 	await page.emulateMedia({ reducedMotion: 'reduce' });
 	await page.goto('/obras/');
 	const still = await pose();
-	await scrollScreens(1);
+	await scrollScreens(HALF_A_SCREEN);
 	await page.waitForTimeout(200);
 	expect(await pose()).toEqual(still);
 });
 
-test('the daylight still covers the whole screen wherever its motion takes it', async ({
+test('the shadow of the pergola still covers the whole screen wherever its motion takes it', async ({
 	page
 }) => {
-	await page.goto('/obras/');
-	const viewport = page.viewportSize();
-	if (!viewport) throw new Error('The page has no viewport');
-	for (const screens of [0, 1.25, 1.75, 3.75, 5.25, 8.75, 12.25]) {
-		await page.evaluate(
-			(count) => scrollTo({ top: innerHeight * count, behavior: 'instant' }),
-			screens
-		);
-		// Each corner of the screen has to fall inside both shadow layers, even when they are moved
-		// and turned. A corner is mapped back into the layer's own space and compared with its size.
-		const uncovered = await page.evaluate(({ width, height }) => {
-			const corners = [
-				[0, 0],
-				[width, 0],
-				[0, height],
-				[width, height]
-			];
-			const missing: string[] = [];
-			for (const part of ['slats', 'fronds']) {
-				const shadow = document.querySelector(`#wall-light [data-part="${part}"]`);
+	// A laptop, a phone held upright and a very wide monitor: the wider the screen, the further
+	// a turn swings the ends of the layer.
+	const SCREENS = [
+		{ width: 1280, height: 720 },
+		{ width: 390, height: 844 },
+		{ width: 2560, height: 1080 }
+	];
+	// Places where the slide and the turn are both near their furthest.
+	const SCROLLED = [0, 1, 1.375, 3, 4.125, 5, 6.875, 9.625, 12.375, 15.125, 20.625];
+	for (const viewport of SCREENS) {
+		await page.setViewportSize(viewport);
+		await page.goto('/obras/');
+		for (const screens of SCROLLED) {
+			await page.evaluate(
+				(count) => scrollTo({ top: innerHeight * count, behavior: 'instant' }),
+				screens
+			);
+			// The pergola's shadow runs across the whole screen, so each corner of the screen has to
+			// fall inside its layer even when it is moved and turned. (The plant only fills one corner
+			// of its own layer, so that layer has nothing to show or to miss elsewhere.) A corner is
+			// mapped back into the layer's own space and compared with its size.
+			const uncovered = await page.evaluate(({ width, height }) => {
+				const corners = [
+					[0, 0],
+					[width, 0],
+					[0, height],
+					[width, height]
+				];
+				const shadow = document.querySelector('#wall-light [data-part="slats"]');
 				const box = shadow?.parentElement?.getBoundingClientRect();
-				if (!shadow || !box) return [`${part} is missing`];
+				if (!shadow || !box) return ['the shadow is missing'];
 				const style = getComputedStyle(shadow);
 				const length = (value: string, full: number): number =>
 					value.endsWith('%') ? (parseFloat(value) / 100) * full : parseFloat(value);
@@ -330,19 +341,18 @@ test('the daylight still covers the whole screen wherever its motion takes it', 
 				const shiftX = length(moveX, box.width);
 				const shiftY = length(moveY, box.height);
 				const angle = style.rotate === 'none' ? 0 : (parseFloat(style.rotate) * Math.PI) / 180;
-				for (const [x, y] of corners) {
+				return corners.flatMap(([x, y]) => {
 					// Undo the move, then undo the turn about the layer's origin.
 					const dx = x - box.left - shiftX - originX;
 					const dy = y - box.top - shiftY - originY;
 					const localX = originX + dx * Math.cos(-angle) - dy * Math.sin(-angle);
 					const localY = originY + dx * Math.sin(-angle) + dy * Math.cos(-angle);
 					const inside = localX >= 0 && localY >= 0 && localX <= box.width && localY <= box.height;
-					if (!inside) missing.push(`${part} leaves the corner ${x},${y} bare`);
-				}
-			}
-			return missing;
-		}, viewport);
-		expect(uncovered, `after ${screens} screens`).toEqual([]);
+					return inside ? [] : [`the corner ${x},${y} is bare`];
+				});
+			}, viewport);
+			expect(uncovered, `${viewport.width} wide, after ${screens} screens`).toEqual([]);
+		}
 	}
 });
 

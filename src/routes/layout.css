@@ -46,16 +46,16 @@
 	--spacing-hang: 34rem; /* tallest a work hangs on the wall of works */
 	--spacing-photo: 85svh; /* tallest a photo shows on a page, so it always fits the screen */
 	--spacing-hero: 60svh; /* tallest the home page's opening photo gets, so the way there stays in view */
-	--spacing-overscan: 12%; /* how far the wall light reaches past the screen, so its motion never shows an edge */
+	--spacing-overscan: 22%; /* how far the wall light reaches past the screen, so its motion never shows an edge */
 	--opacity-wall-light: 6%; /* strength of the daylight on the wall: barely there */
 
 	/* How the wall light moves as the visitor scrolls: how far, and over how many screens it swings there and back. */
-	--wall-light-slide: 4%;
-	--wall-light-slide-screens: 5;
-	--wall-light-turn: 1.5deg;
-	--wall-light-turn-screens: 7;
-	--wall-light-sway: 2.5deg;
-	--wall-light-sway-screens: 2.4;
+	--wall-light-slide: 8%;
+	--wall-light-slide-screens: 4;
+	--wall-light-turn: 3deg;
+	--wall-light-turn-screens: 5.5;
+	--wall-light-sway: 5deg;
+	--wall-light-sway-screens: 2;
 	--container-page: 76rem;
 	--container-prose: 40rem;
 	--aspect-room: 3 / 2;
@@ -84,10 +84,8 @@
  * they never quite repeat. Only position and angle change, which costs the browser nothing.
  * When the visitor asks for less motion, the light stays still.
  */
+/* The pergola's shadow turns about its middle, which keeps its corners from swinging far. */
 @utility wall-light-slats {
-	/* The pergola's shadow turns about the corner the light comes in from. */
-	transform-origin: top right;
-
 	@media (prefers-reduced-motion: no-preference) {
 		translate: 0
 			calc(
