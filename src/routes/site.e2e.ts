@@ -699,6 +699,31 @@ for (const [screen, size] of [
 	['a wide screen', { width: 1440, height: 900 }],
 	['a phone', PHONE]
 ] as const) {
+	test(`on ${screen} the map comes up close under the visit details without covering them`, async ({
+		page
+	}) => {
+		await page.setViewportSize(size);
+		await page.goto('/visitar/');
+		const main = page.getByRole('main');
+		const directions = main.getByRole('link', { name: 'Cómo llegar' });
+		const map = page.getByRole('img', { name: /^Mapa de la costa/ });
+		await directions.scrollIntoViewIfNeeded();
+		await settled(page);
+		const [button, drawing] = await Promise.all([directions.boundingBox(), map.boundingBox()]);
+		// The map starts no lower than a little under the buttons: no empty band between them.
+		const gap = (drawing?.y ?? 0) - ((button?.y ?? 0) + (button?.height ?? 0));
+		expect(gap).toBeLessThan(40);
+		// Where the two overlap, the buttons and links win: each can still be pressed.
+		for (const name of ['Cómo llegar', 'Escribir por WhatsApp']) {
+			await main.getByRole('link', { name }).click({ trial: true });
+		}
+	});
+}
+
+for (const [screen, size] of [
+	['a wide screen', { width: 1440, height: 900 }],
+	['a phone', PHONE]
+] as const) {
 	test(`on ${screen} the names on the map sit where the drawing puts their places`, async ({
 		page
 	}) => {

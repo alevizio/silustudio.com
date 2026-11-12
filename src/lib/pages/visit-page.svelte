@@ -33,10 +33,13 @@
 	/>
 </div>
 
-<!-- Little room is left under the details: the map's land fades in from its top edge by itself. -->
-<section aria-label={copy.pageTitle} class="mx-auto max-w-page px-gutter pt-section pb-6">
+<!--
+	The map comes up under the details: its land fades in from its top edge, so that edge can
+	sit behind the buttons. The details stay on top, so every link in them can still be pressed.
+-->
+<section aria-label={copy.pageTitle} class="relative z-10 mx-auto max-w-page px-gutter pt-section">
 	<VisitDetails {lang} class="reveal" />
 </section>
 
 <!-- The page closes on the map, as wide as the screen. -->
-<GalleryMap {lang} class="pb-section" />
+<GalleryMap {lang} class="-mt-6 pb-section md:-mt-24" />
