@@ -62,15 +62,15 @@
 	 * Everything arrives the same way, by fading in while rising a little.
 	 */
 	--ease-settle: cubic-bezier(0.22, 1, 0.36, 1); /* quick to start, long and soft to land */
-	--motion-arrive: 900ms; /* how long something takes to arrive */
-	--motion-stagger: 120ms; /* the pause between neighbours arriving one after another */
-	--motion-rise: 0.75rem; /* how far something rises as it arrives */
+	--motion-arrive: 1400ms; /* how long something takes to arrive */
+	--motion-stagger: 220ms; /* the pause between neighbours arriving one after another */
+	--motion-rise: 2rem; /* how far something rises as it arrives */
 	--motion-crossfade: 450ms; /* one page fading into the next */
 
 	/* A page's opening lines and photo arrive as it loads. */
 	--animate-arrive: arrive var(--motion-arrive) var(--ease-settle) both;
 	/* The photo that opens the home page starts a touch too close and settles back. */
-	--animate-settle: settle 2400ms var(--ease-settle) both;
+	--animate-settle: settle 3200ms var(--ease-settle) both;
 
 	@keyframes arrive {
 		from {
@@ -81,7 +81,7 @@
 
 	@keyframes settle {
 		from {
-			scale: 1.04;
+			scale: 1.07;
 		}
 	}
 	--container-page: 76rem;
