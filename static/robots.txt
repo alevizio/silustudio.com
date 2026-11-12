@@ -1,3 +1,5 @@
-# allow crawling everything by default
+# Everything may be read. While the site is a preview, each page says "noindex" itself.
 User-agent: *
 Disallow:
+
+Sitemap: https://www.silustudio.com/sitemap.xml

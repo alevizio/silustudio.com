@@ -9,7 +9,34 @@ const head = (selector: string): string | null | undefined =>
 		.querySelector(selector)
 		?.getAttribute(selector.startsWith('link') ? 'href' : 'content');
 
+/** What the page tells search engines in schema.org terms, by type. */
+const structured = (): Record<string, Record<string, unknown>> =>
+	Object.fromEntries(
+		[...document.head.querySelectorAll('script[type="application/ld+json"]')].map((script) => {
+			const data: Record<string, unknown> = JSON.parse(script.textContent ?? '{}');
+			return [String(data['@type']), data];
+		})
+	);
+
 describe('seo.svelte', () => {
+	it('tells search engines about the gallery on the pages people come to it from', async () => {
+		const home = render(Seo, { lang: 'es', page: 'home' });
+		await expect.poll(() => structured().ArtGallery?.name).toBe('Silu');
+		home.unmount();
+		const works = render(Seo, { lang: 'es', page: 'works' });
+		await expect.poll(() => document.title).toBe('Obras · Silu');
+		expect(structured().ArtGallery).toBeUndefined();
+		works.unmount();
+	});
+
+	it('tells search engines a work is an artwork, and where its page sits in the site', async () => {
+		const page = render(Seo, { lang: 'en', page: 'works', work: WORKS[0] });
+		await expect.poll(() => structured().VisualArtwork?.name).toBe('Guijarro');
+		expect(structured().BreadcrumbList).toBeDefined();
+		expect(structured().ArtGallery).toBeUndefined();
+		page.unmount();
+	});
+
 	it('sets the title and description of the page', async () => {
 		render(Seo, { lang: 'es', page: 'works' });
 		await expect.poll(() => document.title).toBe('Obras · Silu');
@@ -36,7 +63,7 @@ describe('seo.svelte', () => {
 
 	it('describes a work on its own page and ties its two languages', async () => {
 		render(Seo, { lang: 'en', page: 'works', work: WORKS[6] });
-		await expect.poll(() => document.title).toBe('Duna bañada en peltre · Silu');
+		await expect.poll(() => document.title).toBe('Duna bañada en peltre · Works · Silu');
 		expect(head('meta[name="description"]')).toContain('3 pieces · 100 × 185 × 22 cm');
 		expect(head('link[rel="canonical"]')).toBe(
 			'https://www.silustudio.com/en/works/duna-banada-en-peltre/'
@@ -49,7 +76,7 @@ describe('seo.svelte', () => {
 	it('describes a work with no title yet by its stand-in name, without empty facts', async () => {
 		const untitled = WORKS.find((work) => work.slug === 'obra-41');
 		render(Seo, { lang: 'es', page: 'works', work: untitled });
-		await expect.poll(() => document.title).toBe('Obra 41 · Silu');
+		await expect.poll(() => document.title).toBe('Obra 41 · Obras · Silu');
 		expect(head('meta[name="description"]')).toBe(
 			'Obra 41. Obra de Silvestre Jacobi y Lucila Dickinson, Silu.'
 		);
@@ -58,7 +85,7 @@ describe('seo.svelte', () => {
 
 	it('shares a work with its own photo when it has a full size one', async () => {
 		render(Seo, { lang: 'es', page: 'works', work: WORKS[0] });
-		await expect.poll(() => document.title).toBe('Guijarro · Silu');
+		await expect.poll(() => document.title).toBe('Guijarro · Obras · Silu');
 		const image = head('meta[property="og:image"]');
 		expect(image).toMatch(/^https:\/\/www\.silustudio\.com\/.+/);
 		expect(image).not.toContain('og.jpg');

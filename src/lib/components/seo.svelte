@@ -1,6 +1,13 @@
 <script lang="ts">
 	import { fullSizePhotosOf } from '#lib/content/images.ts';
 	import { SITE } from '#lib/content/site.ts';
+	import {
+		galleryData,
+		serialise,
+		workData,
+		workTrail,
+		type StructuredData
+	} from '#lib/content/structured-data.ts';
 	import type { Work } from '#lib/content/works.ts';
 	import {
 		LANGS,
@@ -36,6 +43,15 @@
 	const meta = $derived(work ? workMeta(work) : copy.meta[page]);
 	const pathIn = (code: Lang): string => (work ? workPath(code, work.slug) : ROUTES[code][page]);
 	const canonical = $derived(`${SITE.url}${pathIn(lang)}`);
+	// What the page says to search engines in their own vocabulary: a work's page describes
+	// the work, and the two pages people come to the gallery from describe the gallery.
+	const structured = $derived.by((): StructuredData[] => {
+		if (work) {
+			const artwork = workData(work, lang);
+			return [...(artwork ? [artwork] : []), workTrail(work, nameOf(work, lang), lang)];
+		}
+		return page === 'home' || page === 'visit' ? [galleryData(lang)] : [];
+	});
 	// A work is shared with its own photo once it has a full size one.
 	const shareImage = $derived(
 		`${SITE.url}${(work && fullSizePhotosOf(work)[0]?.img.src) || DEFAULT_SHARE_IMAGE}`
@@ -62,4 +78,9 @@
 	<meta property="og:locale" content={OG_LOCALE[lang]} />
 	<meta property="og:image" content={shareImage} />
 	<meta name="twitter:card" content="summary_large_image" />
+	{#each structured as data (data['@type'])}
+		<!-- The data is the site's own, never a visitor's, and it cannot end its script. -->
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+		{@html `<script type="application/ld+json">${serialise(data)}</` + 'script>'}
+	{/each}
 </svelte:head>

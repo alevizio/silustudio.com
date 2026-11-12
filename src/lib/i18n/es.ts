@@ -117,7 +117,7 @@ export const es = {
 			/** `place` is the work's position and `total` how many there are: "Obra 7 de 84". */
 			place: (place: number, total: number) => `Obra ${place} de ${total}`,
 			photoAlt: (name: string, n: number, total: number) => `${name}, foto ${n} de ${total}.`,
-			metaTitle: (name: string) => `${name} · Silu`,
+			metaTitle: (name: string) => `${name} · Obras · Silu`,
 			/** `facts` are the work's name and, when known, its technique and size. */
 			metaDescription: (facts: string[]) =>
 				`${facts.join('. ')}. Obra de Silvestre Jacobi y Lucila Dickinson, Silu.`

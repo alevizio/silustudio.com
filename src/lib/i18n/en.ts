@@ -115,7 +115,7 @@ export const en: typeof es = {
 			after: 'Next',
 			place: (place: number, total: number) => `Work ${place} of ${total}`,
 			photoAlt: (name: string, n: number, total: number) => `${name}, photo ${n} of ${total}.`,
-			metaTitle: (name: string) => `${name} · Silu`,
+			metaTitle: (name: string) => `${name} · Works · Silu`,
 			metaDescription: (facts: string[]) =>
 				`${facts.join('. ')}. A work by Silvestre Jacobi and Lucila Dickinson, Silu.`
 		}

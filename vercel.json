@@ -1,0 +1,24 @@
+{
+	"$schema": "https://openapi.vercel.sh/vercel.json",
+	"trailingSlash": true,
+	"redirects": [
+		{ "source": "/inicio", "destination": "/", "permanent": true },
+		{ "source": "/inicio/", "destination": "/", "permanent": true },
+		{ "source": "/inicio-eleccin-idioma", "destination": "/", "permanent": true },
+		{ "source": "/inicio-eleccin-idioma/", "destination": "/", "permanent": true },
+		{ "source": "/landing", "destination": "/", "permanent": true },
+		{ "source": "/landing/", "destination": "/", "permanent": true },
+		{ "source": "/english-1", "destination": "/en/", "permanent": true },
+		{ "source": "/english-1/", "destination": "/en/", "permanent": true },
+		{ "source": "/artistas", "destination": "/estudio/", "permanent": true },
+		{ "source": "/artistas/", "destination": "/estudio/", "permanent": true },
+		{ "source": "/artists", "destination": "/en/studio/", "permanent": true },
+		{ "source": "/artists/", "destination": "/en/studio/", "permanent": true },
+		{ "source": "/work", "destination": "/en/works/", "permanent": true },
+		{ "source": "/work/", "destination": "/en/works/", "permanent": true },
+		{ "source": "/contacto", "destination": "/visitar/", "permanent": true },
+		{ "source": "/contacto/", "destination": "/visitar/", "permanent": true },
+		{ "source": "/contact", "destination": "/en/visit/", "permanent": true },
+		{ "source": "/contact/", "destination": "/en/visit/", "permanent": true }
+	]
+}

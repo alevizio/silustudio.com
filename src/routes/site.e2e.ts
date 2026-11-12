@@ -781,6 +781,75 @@ test('a button fills with colour under the pointer, and its label stays readable
 		.toBe('rgb(35, 33, 30)');
 });
 
+test('every work page lets a visitor ask about that very work, by WhatsApp and by email', async ({
+	page
+}) => {
+	await page.goto('/obras/');
+	const hrefs = await page
+		.locator(`${WALL} a, ${CATALOG} a`)
+		.evaluateAll((links) => links.map((link) => (link as HTMLAnchorElement).href));
+	expect(hrefs).toHaveLength(WORKS);
+	for (const href of hrefs) {
+		const html = await (await page.request.get(href)).text();
+		const links = [...html.matchAll(/href="([^"]+)"/g)].map(([, link]) =>
+			link.replaceAll('&amp;', '&')
+		);
+		// The label's two links carry a message. The ones in the invitation to visit do not.
+		const whatsapp = links
+			.filter((link) => link.startsWith('https://wa.me/59895342939?text='))
+			.map((link) => new URL(link).searchParams.get('text') ?? '');
+		const mail = links
+			.filter((link) => link.startsWith('mailto:info@silustudio.com?subject='))
+			.map((link) => decodeURIComponent(link));
+		expect(whatsapp, href).toHaveLength(1);
+		expect(mail, href).toHaveLength(1);
+		const slug = new URL(href).pathname.split('/').filter(Boolean).pop() ?? '';
+		const title = /<h1[^>]*>([^<]+)<\/h1>/.exec(html)?.[1] ?? '';
+		// A work with a title is asked about by it, one without by the address of its page.
+		const names = slug.startsWith('obra-') ? `/obras/${slug}/` : `«${title}»`;
+		expect(whatsapp[0], href).toContain(names);
+		expect(mail[0], href).toContain(slug.startsWith('obra-') ? `/obras/${slug}/` : title);
+	}
+});
+
+test("the sitemap lists every page once, in both languages, with the works' photos", async ({
+	page
+}) => {
+	const xml = await (await page.request.get('/sitemap.xml')).text();
+	const addresses = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, address]) => address);
+	// Four main pages and every work, each in Spanish and in English.
+	expect(addresses).toHaveLength((4 + WORKS) * 2);
+	expect(new Set(addresses).size).toBe(addresses.length);
+	for (const address of addresses)
+		expect(address).toMatch(/^https:\/\/www\.silustudio\.com\/(.*\/)?$/);
+	expect(xml.match(/hreflang="x-default"/g)).toHaveLength(addresses.length);
+	expect(xml.match(/<image:loc>/g)?.length).toBeGreaterThan(WORKS);
+	// A sample of them really are pages of this site.
+	for (const address of [addresses[0], addresses[9], addresses.at(-1) ?? '']) {
+		const response = await page.request.get(new URL(address).pathname);
+		expect(response.status(), address).toBe(200);
+	}
+	const robots = await (await page.request.get('/robots.txt')).text();
+	expect(robots).toContain('Sitemap: https://www.silustudio.com/sitemap.xml');
+});
+
+test('pages tell search engines what they are in valid structured data', async ({ page }) => {
+	const read = () =>
+		page.evaluate(() =>
+			[...document.querySelectorAll('script[type="application/ld+json"]')].map(
+				(script): Record<string, unknown> => JSON.parse(script.textContent ?? '{}')
+			)
+		);
+	await page.goto('/visitar/');
+	const [gallery] = await read();
+	expect(gallery['@type']).toBe('ArtGallery');
+	expect(gallery.address).toMatchObject({ addressLocality: 'Manantiales', addressCountry: 'UY' });
+	await page.goto('/en/works/reencause/');
+	const types = (await read()).map((data) => data['@type']);
+	expect(types).toEqual(['VisualArtwork', 'BreadcrumbList']);
+	await expect(page).toHaveTitle('Reencause · Works · Silu');
+});
+
 test('every page except Visit ends with the invitation to visit', async ({ page }) => {
 	await page.goto('/estudio/');
 	await expect(page.getByRole('region', { name: 'Visitá la galería' })).toBeVisible();

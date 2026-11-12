@@ -22,6 +22,8 @@ export const SITE = {
 		region: 'Punta del Este',
 		country: 'Uruguay'
 	},
+	/** Where the gallery is, for maps and for what the pages tell search engines. */
+	geo: GEO,
 	phone: { display: '+598 95 342 939', href: `tel:+${WHATSAPP_NUMBER}` },
 	whatsappUrl: `https://wa.me/${WHATSAPP_NUMBER}`,
 	email: 'info@silustudio.com',
