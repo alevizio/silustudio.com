@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import type { Picture } from 'vite-imagetools';
 	import { cn } from '#lib/utils/cn.ts';
 
@@ -11,7 +12,9 @@
 		/** The photo that takes most of the row. */
 		large: Photo;
 		/** A smaller photo that hangs in the column beside it, under the text. */
-		small: Photo;
+		small?: Photo;
+		/** Something else to hang there instead of the small photo, such as a film. */
+		aside?: Snippet;
 		/** The wall text that goes with them. */
 		text: string;
 		/** Puts the large photo on the right and the column on the left. */
@@ -19,7 +22,7 @@
 		class?: string;
 	}
 
-	let { large, small, text, flipped = false, class: className }: Props = $props();
+	let { large, small, aside, text, flipped = false, class: className }: Props = $props();
 
 	/** Where the two parts stand on a wide screen. On a phone they simply follow one another. */
 	const SIDES = {
@@ -36,7 +39,7 @@
 <!--
 	Two photos hung together the way a gallery hangs a large work beside a small one: the large
 	one takes most of the row, and a narrow column beside it holds a short wall text at the top
-	and the small photo at the bottom. Neither photo is cropped.
+	and the small photo, or a film in its place, at the bottom. Neither photo is cropped.
 -->
 <div class={cn('grid gap-8 lg:grid-cols-12 lg:gap-x-16', className)}>
 	<enhanced:img
@@ -48,12 +51,16 @@
 	/>
 	<div class={cn('flex flex-col justify-between gap-8', side.column)}>
 		<p class="reveal font-serif text-prose text-ink-soft reveal-after-1">{text}</p>
-		<enhanced:img
-			src={small.picture}
-			alt={small.alt}
-			sizes="(min-width: 1280px) 22rem, (min-width: 1024px) 30vw, 100vw"
-			loading="lazy"
-			class="h-auto w-full reveal reveal-after-2"
-		/>
+		{#if aside}
+			{@render aside()}
+		{:else if small}
+			<enhanced:img
+				src={small.picture}
+				alt={small.alt}
+				sizes="(min-width: 1280px) 22rem, (min-width: 1024px) 30vw, 100vw"
+				loading="lazy"
+				class="h-auto w-full reveal reveal-after-2"
+			/>
+		{/if}
 	</div>
 </div>

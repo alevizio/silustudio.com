@@ -895,23 +895,49 @@ test('the catalog a visitor can download is a real PDF on the site, in both lang
 	}
 });
 
-test('the films of the workshop load only when the visitor presses play', async ({ page }) => {
-	const films: string[] = [];
+test('a film of the workshop runs by itself, silent, only while it is on screen', async ({
+	page
+}) => {
+	const asked: string[] = [];
 	page.on('request', (request) => {
-		if (/taller-\d\.mp4/.test(request.url())) films.push(request.url());
+		if (/taller-\d\.mp4/.test(request.url())) asked.push(request.url());
 	});
 	await page.goto('/estudio/');
-	const reels = page.getByRole('list', { name: 'Videos del taller' });
-	await reels.scrollIntoViewIfNeeded();
-	await expect(reels.locator('video')).toHaveCount(3);
 	await page.waitForLoadState('networkidle');
-	expect(films).toEqual([]);
-	// Each has a still to show meanwhile, and captions in the page language.
-	const first = reels.locator('video').first();
-	await expect(first).toHaveAttribute('poster', /taller-1\.jpg$/);
-	await expect(first.locator('track')).toHaveAttribute('srclang', 'es');
-	await first.evaluate((film: HTMLVideoElement) => film.play().catch(() => {}));
-	await expect.poll(() => films.length).toBeGreaterThan(0);
+	// Nothing is downloaded for a film the visitor has not reached.
+	expect(asked).toEqual([]);
+
+	const film = page.locator('video[aria-label^="Video sin sonido"]').first();
+	await film.scrollIntoViewIfNeeded();
+	await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(false);
+	expect(await film.evaluate((video: HTMLVideoElement) => video.muted && video.loop)).toBe(true);
+	await expect.poll(() => asked.length).toBeGreaterThan(0);
+
+	// Scrolled away, it stops. The visitor can also stop it where it is.
+	await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+	await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
+	await film.scrollIntoViewIfNeeded();
+	await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(false);
+	await page.getByRole('button', { name: 'Pausar el video' }).first().click();
+	await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
+	// Having stopped it, the visitor is not overruled when it comes back on screen.
+	await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+	await film.scrollIntoViewIfNeeded();
+	await page.waitForTimeout(600);
+	expect(await film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
+});
+
+test('no film starts by itself for a visitor who asks for less motion', async ({ page }) => {
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	await page.goto('/estudio/');
+	const film = page.locator('video[aria-label^="Video sin sonido"]').first();
+	await film.scrollIntoViewIfNeeded();
+	await page.waitForTimeout(800);
+	expect(await film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
+	// The still is there, and the visitor can start the film.
+	await expect(film).toHaveAttribute('poster', /taller-1\.jpg$/);
+	await page.getByRole('button', { name: 'Reproducir el video' }).first().click();
+	await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(false);
 });
 
 test('every page except Visit ends with the invitation to visit', async ({ page }) => {

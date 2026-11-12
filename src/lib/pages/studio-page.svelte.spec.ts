@@ -7,7 +7,7 @@ import StudioPage from './studio-page.svelte';
 /** The film's still and the three colour photos of the workshop, besides the artists at work. */
 const OWN_PHOTOS = 4;
 /** Photos of the artists at work that hang among the wall texts, before the rest of the series. */
-const HUNG_AT_WORK = 2;
+const HUNG_AT_WORK = 1;
 
 describe('studio-page.svelte', () => {
 	it('presents both artists and their statement', async () => {
@@ -67,20 +67,25 @@ describe('studio-page.svelte', () => {
 		expect(texts[0].classList.contains('text-title')).toBe(true);
 		expect(texts[4].classList.contains('text-title')).toBe(true);
 		expect(texts[2].classList.contains('text-title')).toBe(false);
-		// And two of the photos of the artists at work hang among them.
-		expect(statement.element().querySelectorAll('img')).toHaveLength(4);
+		// And three photos hang among them, with the three films of the workshop.
+		expect(statement.element().querySelectorAll('img')).toHaveLength(3);
+		expect(statement.element().querySelectorAll('video')).toHaveLength(3);
 		expect(container.querySelectorAll('h1')).toHaveLength(1);
 	});
 
-	it("shows the artists' films of the workshop with the photos of it", async () => {
+	it("hangs the artists' films of the workshop among the wall texts, silent and without controls", async () => {
 		const { container } = render(StudioPage, { lang: 'es' });
-		const section = page.getByRole('region', { name: 'En el taller' });
-		await expect.element(section).toBeInTheDocument();
-		const films = section.element().querySelectorAll('video');
+		await expect.element(page.getByRole('heading', { level: 1 })).toBeVisible();
+		const films = [...container.querySelectorAll('video')];
 		expect(films).toHaveLength(3);
-		// The films come before the photos, and none starts by itself.
-		const first = section.element().querySelector('video, img');
-		expect(first?.tagName).toBe('VIDEO');
-		expect(container.querySelectorAll('video[autoplay]')).toHaveLength(0);
+		for (const film of films) {
+			expect(film.muted).toBe(true);
+			expect(film.controls).toBe(false);
+			expect(film.getAttribute('aria-label')).toMatch(/^Video sin sonido/);
+		}
+		// Each has its own button to stop it.
+		expect(
+			page.getByRole('button', { name: /el video$/ }).elements().length
+		).toBeGreaterThanOrEqual(3);
 	});
 });

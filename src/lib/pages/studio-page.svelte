@@ -5,7 +5,7 @@
 	import HungPair from '#lib/components/hung-pair.svelte';
 	import PhotoColumns from '#lib/components/photo-columns.svelte';
 	import SectionHeading from '#lib/components/section-heading.svelte';
-	import WorkshopReels from '#lib/components/workshop-reels.svelte';
+	import WorkshopReel from '#lib/components/workshop-reel.svelte';
 	import Seo from '#lib/components/seo.svelte';
 	import { AT_WORK_PHOTOS, DRAWING_PHOTO, WORKSHOP_PHOTO } from '#lib/content/images.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
@@ -17,12 +17,14 @@
 	let { lang }: Props = $props();
 
 	/** How many of the photos of the artists at work hang among the wall texts. The rest follow. */
-	const HUNG_AT_WORK = 2;
+	const HUNG_AT_WORK = 1;
 
 	const copy = $derived(copyFor(lang).studio);
-	const [together, sanding] = AT_WORK_PHOTOS;
+	const [together] = AT_WORK_PHOTOS;
 	const statementClass = 'reveal font-serif text-title font-light text-balance';
 	const proseClass = 'text-prose text-ink-soft font-serif';
+	/** A row that hangs a film beside a wall text. */
+	const rowClass = 'grid items-center gap-8 lg:grid-cols-12 lg:gap-x-16';
 </script>
 
 <Seo {lang} page="studio" />
@@ -39,8 +41,9 @@
 
 <!--
 	The statement is hung like the wall texts of an exhibition: broken into its paragraphs, each
-	with room around it, and the photos hang between them at uneven sizes. The first and the
-	last paragraph are set large, as what the room says first and last.
+	with room around it, and the photos and the artists' short films of the workshop hang
+	between them at uneven sizes. The first and the last paragraph are set large, as what the
+	room says first and last.
 -->
 <section
 	aria-label={copy.label}
@@ -48,13 +51,18 @@
 >
 	<p class={[statementClass, 'max-w-4xl']}>{copy.statement[0]}</p>
 
-	<HungPair
-		large={{ picture: together, alt: copy.atWork.alts[0] }}
-		small={{ picture: sanding, alt: copy.atWork.alts[1] }}
-		text={copy.statement[1]}
-	/>
+	<HungPair large={{ picture: together, alt: copy.atWork.alts[0] }} text={copy.statement[1]}>
+		{#snippet aside()}
+			<WorkshopReel {lang} film={1} class="reveal-after-2" />
+		{/snippet}
+	</HungPair>
 
-	<p class={[proseClass, 'mx-auto max-w-prose reveal']}>{copy.statement[2]}</p>
+	<div class={rowClass}>
+		<WorkshopReel {lang} film={2} class="lg:col-span-4 lg:col-start-2" />
+		<p class={[proseClass, 'reveal reveal-after-1 lg:col-span-5 lg:col-start-7']}>
+			{copy.statement[2]}
+		</p>
+	</div>
 
 	<HungPair
 		flipped
@@ -63,7 +71,10 @@
 		text={copy.statement[3]}
 	/>
 
-	<p class={[statementClass, 'max-w-4xl lg:ml-auto']}>{copy.statement[4]}</p>
+	<div class={rowClass}>
+		<p class={[statementClass, 'lg:col-span-7']}>{copy.statement[4]}</p>
+		<WorkshopReel {lang} film={3} class="reveal-after-1 lg:col-span-4 lg:col-start-9" />
+	</div>
 </section>
 
 <!-- Who the two artists are, beside a photo of them planning a work. -->
@@ -93,15 +104,11 @@
 	</div>
 </section>
 
-<!--
-	The workshop itself: the artists' own short films of the work, then the rest of the photos
-	of them and their helpers at it.
--->
+<!-- The rest of the artists and their helpers at work, as their own photographers caught them. -->
 <section aria-labelledby="studio-at-work" class="mx-auto max-w-page px-gutter pb-section">
 	<h2 id="studio-at-work" class="reveal pb-6 text-label text-ink-soft uppercase">
 		{copy.atWork.title}
 	</h2>
-	<WorkshopReels {lang} class="pb-3 md:pb-6" />
 	<PhotoColumns
 		photos={AT_WORK_PHOTOS.slice(HUNG_AT_WORK)}
 		alts={copy.atWork.alts.slice(HUNG_AT_WORK)}

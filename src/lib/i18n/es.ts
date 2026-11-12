@@ -168,13 +168,13 @@ export const es = {
 			play: 'Ver el video'
 		},
 		reels: {
-			title: 'Videos del taller',
-			captions: 'Subtítulos',
-			/** One for each film in workshop-reels.svelte, in the same order. */
+			pause: 'Pausar el video',
+			play: 'Reproducir el video',
+			/** One for each film in workshop-reel.svelte, in the same order. */
 			labels: [
-				'Video de 19 segundos: espátula, lija y amoladora sobre una pieza redonda en el taller.',
-				'Video de 40 segundos: mezclando arena, marcando y dando forma a una pieza.',
-				'Video de 50 segundos: del lijado en el taller a la obra colgada en una casa.'
+				'Video sin sonido: espátula, lija y amoladora sobre una pieza redonda en el taller.',
+				'Video sin sonido: mezclando arena, marcando y dando forma a una pieza.',
+				'Video sin sonido: del lijado en el taller a la obra colgada en una casa.'
 			]
 		},
 		atWork: {

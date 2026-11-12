@@ -1,4 +1,5 @@
 import { page } from 'vitest/browser';
+import { createRawSnippet } from 'svelte';
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { AT_WORK_PHOTOS } from '#lib/content/images.ts';
@@ -47,5 +48,15 @@ describe('hung-pair.svelte', () => {
 	it('accepts extra classes', async () => {
 		const { container } = render(HungPair, { ...props, class: 'pb-section' });
 		expect(container.firstElementChild?.classList.contains('pb-section')).toBe(true);
+	});
+
+	it('hangs something else in place of the small photo when it is handed one', async () => {
+		const aside = createRawSnippet(() => ({
+			render: () => '<p data-testid="film">Una película</p>'
+		}));
+		const { container } = render(HungPair, { large: props.large, text: props.text, aside });
+		await expect.element(page.getByTestId('film')).toBeInTheDocument();
+		// Only the large photo is left as a photo.
+		expect(container.querySelectorAll('img')).toHaveLength(1);
 	});
 });
