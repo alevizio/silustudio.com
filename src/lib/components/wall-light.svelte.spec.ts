@@ -25,15 +25,33 @@ describe('wall-light.svelte', () => {
 		}
 	});
 
-	it('draws the shadow of a pergola and of a plant, both blurred', () => {
+	it('draws the shadow of a pergola and of a plant, each blurred and on its own layer', () => {
 		const { container } = render(WallLight);
 		const layer = layerOf(container);
-		expect(layer.querySelectorAll('[data-part="slats"] rect').length).toBeGreaterThan(5);
-		expect(layer.querySelectorAll('[data-part="fronds"] ellipse').length).toBeGreaterThan(2);
-		for (const part of layer.querySelectorAll('[data-part]')) {
-			const filter = /url\(#(.+)\)/.exec(part.getAttribute('filter') ?? '')?.[1];
-			expect(layer.querySelector(`filter#${filter} feGaussianBlur`), filter).not.toBeNull();
+		expect(layer.querySelectorAll('svg[data-part="slats"] rect').length).toBeGreaterThan(5);
+		expect(layer.querySelectorAll('svg[data-part="fronds"] ellipse').length).toBeGreaterThan(2);
+		for (const part of layer.querySelectorAll('svg[data-part]')) {
+			const blurred = part.querySelector('g[filter]');
+			const filter = /url\(#(.+)\)/.exec(blurred?.getAttribute('filter') ?? '')?.[1];
+			expect(part.querySelector(`filter#${filter} feGaussianBlur`), filter).not.toBeNull();
 		}
+	});
+
+	it('tells the styles how many screens the visitor has scrolled', async () => {
+		const { container } = render(WallLight);
+		const layer = layerOf(container);
+		const written = (): number =>
+			Number(getComputedStyle(layer).getPropertyValue('--wall-light-screens'));
+		expect(written()).toBe(0);
+		// The test page is short, so it is made tall enough to scroll one and a half screens.
+		const spacer = document.createElement('div');
+		spacer.setAttribute('style', `height: ${window.innerHeight * 3}px`);
+		document.body.append(spacer);
+		window.scrollTo(0, window.innerHeight * 1.5);
+		await expect.poll(written).toBe(1.5);
+		window.scrollTo(0, 0);
+		await expect.poll(written).toBe(0);
+		spacer.remove();
 	});
 
 	it('steps aside for print and for visitors who ask for more contrast', () => {

@@ -262,29 +262,88 @@ test('the daylight falls behind the page: on the wall, never on a work or a link
 	await expect(page).toHaveURL(/\/obras\/guijarro\/$/);
 });
 
-test('the daylight drifts with the scroll, and holds still when less motion is asked for', async ({
+test('the daylight moves as the visitor scrolls, and holds still when less motion is asked for', async ({
 	page
 }) => {
-	const drift = () =>
-		page.evaluate(() => {
-			const moving = document.querySelector('#wall-light')?.firstElementChild;
-			return moving ? getComputedStyle(moving).translate : null;
-		});
-	const toTheEnd = () =>
+	const pose = () =>
 		page.evaluate(() =>
-			scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })
+			['slats', 'fronds'].map((part) => {
+				const shadow = document.querySelector(`#wall-light [data-part="${part}"]`);
+				if (!shadow) return null;
+				const style = getComputedStyle(shadow);
+				return `${style.translate} ${style.rotate}`;
+			})
 		);
-	await page.goto('/');
-	const atTheTop = await drift();
-	await toTheEnd();
-	await expect.poll(drift).not.toBe(atTheTop);
+	const scrollScreens = (screens: number) =>
+		page.evaluate((count) => scrollTo({ top: innerHeight * count, behavior: 'instant' }), screens);
+
+	await page.goto('/obras/');
+	const atTheTop = await pose();
+	await scrollScreens(1);
+	await expect.poll(pose).not.toEqual(atTheTop);
+	const [slats, fronds] = await pose();
+	expect(slats).not.toBe(atTheTop[0]);
+	expect(fronds).not.toBe(atTheTop[1]);
+	// Scrolling back brings the light back to where it was.
+	await scrollScreens(0);
+	await expect.poll(pose).toEqual(atTheTop);
 
 	await page.emulateMedia({ reducedMotion: 'reduce' });
-	await page.goto('/');
-	const still = await drift();
-	await toTheEnd();
+	await page.goto('/obras/');
+	const still = await pose();
+	await scrollScreens(1);
 	await page.waitForTimeout(200);
-	expect(await drift()).toBe(still);
+	expect(await pose()).toEqual(still);
+});
+
+test('the daylight still covers the whole screen wherever its motion takes it', async ({
+	page
+}) => {
+	await page.goto('/obras/');
+	const viewport = page.viewportSize();
+	if (!viewport) throw new Error('The page has no viewport');
+	for (const screens of [0, 1.25, 1.75, 3.75, 5.25, 8.75, 12.25]) {
+		await page.evaluate(
+			(count) => scrollTo({ top: innerHeight * count, behavior: 'instant' }),
+			screens
+		);
+		// Each corner of the screen has to fall inside both shadow layers, even when they are moved
+		// and turned. A corner is mapped back into the layer's own space and compared with its size.
+		const uncovered = await page.evaluate(({ width, height }) => {
+			const corners = [
+				[0, 0],
+				[width, 0],
+				[0, height],
+				[width, height]
+			];
+			const missing: string[] = [];
+			for (const part of ['slats', 'fronds']) {
+				const shadow = document.querySelector(`#wall-light [data-part="${part}"]`);
+				const box = shadow?.parentElement?.getBoundingClientRect();
+				if (!shadow || !box) return [`${part} is missing`];
+				const style = getComputedStyle(shadow);
+				const length = (value: string, full: number): number =>
+					value.endsWith('%') ? (parseFloat(value) / 100) * full : parseFloat(value);
+				const [originX, originY] = style.transformOrigin.split(' ').map(parseFloat);
+				const [moveX = '0', moveY = '0'] =
+					style.translate === 'none' ? [] : style.translate.split(' ');
+				const shiftX = length(moveX, box.width);
+				const shiftY = length(moveY, box.height);
+				const angle = style.rotate === 'none' ? 0 : (parseFloat(style.rotate) * Math.PI) / 180;
+				for (const [x, y] of corners) {
+					// Undo the move, then undo the turn about the layer's origin.
+					const dx = x - box.left - shiftX - originX;
+					const dy = y - box.top - shiftY - originY;
+					const localX = originX + dx * Math.cos(-angle) - dy * Math.sin(-angle);
+					const localY = originY + dx * Math.sin(-angle) + dy * Math.cos(-angle);
+					const inside = localX >= 0 && localY >= 0 && localX <= box.width && localY <= box.height;
+					if (!inside) missing.push(`${part} leaves the corner ${x},${y} bare`);
+				}
+			}
+			return missing;
+		}, viewport);
+		expect(uncovered, `after ${screens} screens`).toEqual([]);
+	}
 });
 
 test('the daylight steps aside for visitors who ask for more contrast', async ({ page }) => {
