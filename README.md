@@ -22,7 +22,7 @@ The layouts follow three references found on Mobbin: KOBU (two large photos per 
 
 ## Where things live
 
-- `src/lib/content/works.ts`: every work. The 34 of the PDF catalog (title, technique, size, in both languages), then the photographed works that are not in the catalog: six with a title, 44 with none yet.
+- `src/lib/content/works.sheet.ts` and `works.ts`: every work. The first is written by `npm run sync` from the artists' Google Sheet, one row per work. The second gives those rows the shape the pages use. Today: the 34 works of the PDF catalog, then the photographed works that are not in it, six with a title and 44 with none yet.
 - `src/lib/content/site.ts`: address, phone, email, links. Opening hours go here once the artists provide them.
 - `src/lib/i18n/es.ts` and `en.ts`: every piece of text on the site.
 - `src/lib/assets/`: photos. `works/<slug>/` holds the full size photos of a work, `01.jpg` being the one shown on the wall. `catalog/` holds the small photos of each work cropped from the artists' PDF catalog (`07-1.jpg` is the whole view of work 7). `untitled/` holds photos from the old site not yet matched to a work.
@@ -67,6 +67,16 @@ Every work has its own page (`/obras/guijarro/`, `/en/works/guijarro/`) with its
 The visit page closes on the site's own drawing of the coast from Punta del Este to José Ignacio, with the gallery on Ruta 10. It is drawn from OpenStreetMap data (© OpenStreetMap contributors, ODbL, credited under the map), in the colours of the wall, and loads nothing from anyone else. A visitor who wants to move around the map presses "Ver mapa interactivo", and only then does Google's map load in its place.
 
 `src/lib/content/coast-map.ts` is generated. The downloaded data, the queries and the script that draws it (`tools/build_map.py`) are kept outside this repository, in `Silu/Map data 2026-11-11`. To draw it again: run `uv run --with shapely python3 tools/build_map.py` there, copy the `coast-map.ts` it writes over the one here, and run `npm run format`. The names on the map are placed in `coast-map.svelte`.
+
+## Updating the works from the Google Sheet
+
+Every fact about a work (title, technique, size, tag, whether it shows on the site and in the PDF) lives in the Google Sheet "Silu Obras", which the artists keep. `npm run sync` reads it and rewrites `src/lib/content/works.sheet.ts`, the only file the site takes its works from, then says what is new, changed or gone. Nothing is published by it: look at the site, run the tests, then deploy. `npm run catalog` afterwards rebuilds the PDF from the same rows.
+
+- **What it reads.** The sheet's tab "Para la web", which mirrors only the public columns, published as CSV (File, Share, Publish to web). Its address goes in `src/lib/content/sheet-source.ts`. The price and notes columns are not in that tab, so they never leave the sheet. `npm run sync -- --from file.csv` reads a downloaded CSV instead.
+- **A slip in the sheet never reaches the site.** A code that is not lower case words joined by hyphens, a code used twice, a work with no title whose code is not `obra-NN`, a tag that is not on the list, or a missing column stops the run with the row number and the reason.
+- **Photos are not in the sheet.** They go in `src/lib/assets/works/<código>/`, named in the order they should show. The command lists the works that have none.
+- **New work:** a new row with its code, plus its photo folder. **Sold or in the gallery:** the "Estado" column. **Hide a work:** "En la web: No". **Name an untitled work:** fill in its title; to give it a proper address as well, change its code and rename its photo folder to match.
+- `src/lib/content/works.ts` gives the rows the shape the pages use: sizes are written once in Spanish and said in English there, and the 34 works of the old PDF catalog keep their catalog numbers, which is how their small catalog photos are found.
 
 ## The PDF catalog
 

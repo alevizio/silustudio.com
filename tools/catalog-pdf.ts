@@ -7,7 +7,8 @@
  *   npm run catalog -- --out some/file.pdf  somewhere else
  *   npm run catalog -- --only guijarro,cause  just these works (for a quick look)
  *
- * It shows every work that has full size photos, in the order of the works page. Tags
+ * It shows every work the sheet marks "En el PDF" that has full size photos, in the order of
+ * the works page. Tags
  * (sold, in the gallery) are left out until the artists confirm real ones: the ones on the
  * site today are samples, and a PDF gets passed around.
  */
@@ -19,7 +20,7 @@ import { parseArgs } from 'node:util';
 import { chromium } from 'playwright';
 import sharp from 'sharp';
 import { SITE } from '../src/lib/content/site.ts';
-import { WORKS, type Work } from '../src/lib/content/works.ts';
+import { PDF_WORKS, WORKS, type Work } from '../src/lib/content/works.ts';
 import { en } from '../src/lib/i18n/en.ts';
 import { es } from '../src/lib/i18n/es.ts';
 
@@ -138,9 +139,10 @@ const page = (kind: string, inner: string): string =>
 export const buildCatalog = async ({ lang, out, only }: CatalogOptions): Promise<number> => {
 	const copy = COPY[lang];
 	const words = WORDS[lang];
-	const works = WORKS.filter((work) => photosOf(work).length > 0).filter(
-		(work) => !only || only.includes(work.slug)
-	);
+	// A work goes in when the sheet says so ("En el PDF") and it has a photo to show.
+	const works = WORKS.filter(
+		(work) => PDF_WORKS.has(work.slug) && photosOf(work).length > 0
+	).filter((work) => !only || only.includes(work.slug));
 	const folder = mkdtempSync(path.join(tmpdir(), 'silu-catalog-'));
 	const address = `${SITE.address.street}, ${SITE.address.locality}, ${SITE.address.region}, ${SITE.address.country}`;
 	const website = SITE.url.replace('https://', '');

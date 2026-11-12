@@ -1,7 +1,16 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { SITE } from './site.ts';
-import { CATALOG_WORKS, SAMPLE_STATUSES, WORKS, catalogNumber, findWork } from './works.ts';
+import {
+	CATALOG_WORKS,
+	PDF_WORKS,
+	SAMPLE_STATUSES,
+	WORKS,
+	catalogNumber,
+	dimensionsInEnglish,
+	findWork
+} from './works.ts';
+import { SHEET_ROWS } from './works.sheet.ts';
 
 const CATALOG_SIZE = 34;
 const ASSETS = 'src/lib/assets';
@@ -76,6 +85,41 @@ describe('SAMPLE_STATUSES', () => {
 	it('is the only place a status comes from until the artists confirm the real ones', () => {
 		const withStatus = WORKS.filter((work) => work.status !== undefined).map((work) => work.slug);
 		expect(withStatus.sort()).toEqual(Object.keys(SAMPLE_STATUSES).sort());
+	});
+});
+
+describe('the works and the sheet', () => {
+	it('shows every row the sheet marks for the site, and no other', () => {
+		const onSite = SHEET_ROWS.filter((row) => row.onSite).map((row) => row.code);
+		expect(WORKS.map((work) => work.slug).sort()).toEqual(onSite.sort());
+	});
+
+	it("keeps the sheet's words: title, technique in both languages and size", () => {
+		for (const row of SHEET_ROWS.filter((candidate) => candidate.onSite)) {
+			const work = findWork(row.code);
+			expect(work?.title ?? '', row.code).toBe(row.title);
+			expect(work?.medium?.es ?? '', row.code).toBe(row.medium);
+			expect(work?.medium?.en ?? '', row.code).toBe(row.mediumEn || row.medium);
+			expect(work?.dimensions?.es ?? '', row.code).toBe(row.dimensions);
+		}
+	});
+
+	it('puts in the PDF catalog only the works the sheet marks for it', () => {
+		for (const row of SHEET_ROWS) expect(PDF_WORKS.has(row.code), row.code).toBe(row.inPdf);
+	});
+});
+
+describe('dimensionsInEnglish', () => {
+	it('keeps the figures and swaps the words around them', () => {
+		expect(dimensionsInEnglish('220 × 90 × 10 cm')).toBe('220 × 90 × 10 cm');
+		expect(dimensionsInEnglish('3 piezas · 100 × 185 × 22 cm')).toBe(
+			'3 pieces · 100 × 185 × 22 cm'
+		);
+		expect(dimensionsInEnglish('100 cm de diámetro × 9 cm de profundidad')).toBe(
+			'100 cm diameter × 9 cm deep'
+		);
+		expect(dimensionsInEnglish('Tamaños varios')).toBe('Various sizes');
+		expect(dimensionsInEnglish('Varias medidas')).toBe('Various sizes');
 	});
 });
 

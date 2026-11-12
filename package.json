@@ -19,7 +19,8 @@
 		"test:e2e": "playwright install chromium && playwright test",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"catalog": "node tools/catalog-pdf.ts"
+		"catalog": "node tools/catalog-pdf.ts",
+		"sync": "node tools/sync-works.ts"
 	},
 	"devDependencies": {
 		"@axe-core/playwright": "^4.14.0",
