@@ -878,6 +878,23 @@ test('pages tell search engines what they are in valid structured data', async (
 	await expect(page).toHaveTitle('Reencause · Works · Silu');
 });
 
+test('the catalog a visitor can download is a real PDF on the site, in both languages', async ({
+	page
+}) => {
+	for (const [path, name] of [
+		['/obras/', 'Ver el catálogo en PDF (11 MB)'],
+		['/en/works/', 'See the catalog as a PDF (11 MB)']
+	]) {
+		await page.goto(path);
+		const href = await page.getByRole('link', { name }).getAttribute('href');
+		expect(href).toMatch(/\.pdf$/);
+		const response = await page.request.get(href ?? '');
+		expect(response.status(), href ?? '').toBe(200);
+		expect(response.headers()['content-type']).toContain('pdf');
+		expect((await response.body()).subarray(0, 4).toString()).toBe('%PDF');
+	}
+});
+
 test('the films of the workshop load only when the visitor presses play', async ({ page }) => {
 	const films: string[] = [];
 	page.on('request', (request) => {

@@ -36,8 +36,8 @@ describe('works-page.svelte', () => {
 	it('offers the catalog PDF and two ways to ask about a work, in English', async () => {
 		render(WorksPage, { lang: 'en' });
 		await expect
-			.element(page.getByRole('link', { name: 'See the catalog as a PDF' }))
-			.toHaveAttribute('href', expect.stringContaining('drive.google.com'));
+			.element(page.getByRole('link', { name: 'See the catalog as a PDF (11 MB)' }))
+			.toHaveAttribute('href', expect.stringMatching(/\/silu-catalog\.pdf$/));
 		await expect
 			.element(page.getByRole('link', { name: 'Message on WhatsApp' }))
 			.toBeInTheDocument();
@@ -54,5 +54,18 @@ describe('works-page.svelte', () => {
 		await expect
 			.element(page.getByRole('img', { name: 'A round blue work above a sofa.' }))
 			.toBeInTheDocument();
+	});
+
+	it('offers the catalog as a PDF kept on the site, in the language of the page', async () => {
+		render(WorksPage, { lang: 'es' });
+		const spanish = page.getByRole('link', { name: 'Ver el catálogo en PDF (11 MB)' });
+		await expect
+			.element(spanish)
+			.toHaveAttribute('href', expect.stringMatching(/\/catalogo-silu\.pdf$/));
+		await expect.element(spanish).toHaveAttribute('target', '_blank');
+		render(WorksPage, { lang: 'en' });
+		await expect
+			.element(page.getByRole('link', { name: 'See the catalog as a PDF (11 MB)' }))
+			.toHaveAttribute('href', expect.stringMatching(/\/silu-catalog\.pdf$/));
 	});
 });

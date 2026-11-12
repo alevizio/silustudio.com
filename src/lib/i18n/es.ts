@@ -96,7 +96,7 @@ export const es = {
 		catalog: {
 			label: 'Catálogo',
 			title: (count: number) => `${count} obras más del catálogo`,
-			pdf: 'Ver el catálogo en PDF'
+			pdf: 'Ver el catálogo en PDF (11 MB)'
 		},
 		enquiry: {
 			title: '¿Te interesa una obra?',

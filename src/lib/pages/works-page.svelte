@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { asset } from '$app/paths';
 	import LinkButton from '#lib/components/link-button.svelte';
 	import PhotoColumns from '#lib/components/photo-columns.svelte';
 	import SectionHeading from '#lib/components/section-heading.svelte';
@@ -18,6 +19,9 @@
 	}
 
 	let { lang }: Props = $props();
+
+	/** The PDF catalog in each language, in static/. */
+	const CATALOG_PDF = { es: asset('catalogo-silu.pdf'), en: asset('silu-catalog.pdf') };
 
 	const copy = $derived(copyFor(lang).works);
 </script>
@@ -72,7 +76,8 @@
 			label={copy.catalog.label}
 			title={copy.catalog.title(LISTED_WORKS.length)}
 		/>
-		<LinkButton href={SITE.catalogUrl} external variant="text">{copy.catalog.pdf}</LinkButton>
+		<!-- The catalog is made from these same works (npm run catalog), so it never falls behind. -->
+		<LinkButton href={CATALOG_PDF[lang]} external variant="text">{copy.catalog.pdf}</LinkButton>
 	</div>
 	<!-- The catalog's own photos are small, so these hang three to a row at their real size. -->
 	<WorksWall works={LISTED_WORKS} {lang} label={copy.catalog.label} columns={3} />

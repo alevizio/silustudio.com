@@ -32,6 +32,5 @@ export const SITE = {
 	mapEmbedUrl: `https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s${GEO.lat},${GEO.lng}!6i${MAP_ZOOM}`,
 	/** The artists' own film, "SILU Artistas Loop", which their current site also embeds. */
 	filmUrl: 'https://player.vimeo.com/video/338790525',
-	catalogUrl: 'https://drive.google.com/file/d/1En0UzVLrQFdl0SnQh6q0omCLxa_tVwoh/view?usp=sharing',
 	hours: HOURS
 } as const;

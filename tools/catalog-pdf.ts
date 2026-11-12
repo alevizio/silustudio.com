@@ -2,9 +2,9 @@
  * Makes the PDF catalog of the works from the same data and photos the site uses, so the
  * catalog can never fall behind the site. One work to a page, in the look of the site.
  *
- *   npm run catalog                         Spanish, written to catalog/catalogo-silu.pdf
- *   npm run catalog -- --lang en            English, written to catalog/silu-catalog.pdf
- *   npm run catalog -- --out some/file.pdf  somewhere else
+ *   npm run catalog                         both catalogs the site offers, written to static/
+ *   npm run catalog -- --lang en            only the English one
+ *   npm run catalog -- --out some/file.pdf  one catalog somewhere else (Spanish unless --lang en)
  *   npm run catalog -- --only guijarro,cause  just these works (for a quick look)
  *
  * It shows every work the sheet marks "En el PDF" that has full size photos, in the order of
@@ -244,13 +244,17 @@ export const buildCatalog = async ({ lang, out, only }: CatalogOptions): Promise
 if (import.meta.main) {
 	const { values } = parseArgs({
 		options: {
-			lang: { type: 'string', default: 'es' },
+			lang: { type: 'string' },
 			out: { type: 'string' },
 			only: { type: 'string' }
 		}
 	});
-	const lang: Lang = values.lang === 'en' ? 'en' : 'es';
-	const out = path.resolve(values.out ?? path.join(ROOT, 'catalog', WORDS[lang].file));
-	const count = await buildCatalog({ lang, out, only: values.only?.split(',') });
-	console.log(`${count} works written to ${out}`);
+	// With nothing asked for, both catalogs the site offers are made again, each in its place.
+	const langs: Lang[] =
+		values.lang === 'en' ? ['en'] : values.lang === 'es' ? ['es'] : ['es', 'en'];
+	for (const lang of values.out ? langs.slice(0, 1) : langs) {
+		const out = path.resolve(values.out ?? path.join(ROOT, 'static', WORDS[lang].file));
+		const count = await buildCatalog({ lang, out, only: values.only?.split(',') });
+		console.log(`${count} works written to ${out}`);
+	}
 }

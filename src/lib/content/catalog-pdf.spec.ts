@@ -2,7 +2,9 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
+import { existsSync } from 'node:fs';
 import { buildCatalog } from '../../../tools/catalog-pdf.ts';
+import { PDF_WORKS, WORKS } from './works.ts';
 
 const folder = mkdtempSync(path.join(tmpdir(), 'silu-catalog-test-'));
 
@@ -34,4 +36,15 @@ describe('the PDF catalog (tools/catalog-pdf.ts)', () => {
 		expect(count).toBe(1);
 		expect(pagesOf(out)).toBe(3);
 	}, 60_000);
+
+	it('keeps on the site a catalog in each language that matches the works of today', () => {
+		// Cover, one page for each work marked for the PDF that has photos, and the last page.
+		const shown = WORKS.filter(
+			(work) => PDF_WORKS.has(work.slug) && existsSync(`src/lib/assets/works/${work.slug}`)
+		).length;
+		for (const file of ['static/catalogo-silu.pdf', 'static/silu-catalog.pdf']) {
+			expect(existsSync(file), `${file} is missing: run npm run catalog`).toBe(true);
+			expect(pagesOf(file), `${file} is out of date: run npm run catalog`).toBe(shown + 2);
+		}
+	});
 });

@@ -24,5 +24,3 @@ vite.config.ts.timestamp-*
 # Playwright
 test-results
 
-# The PDF catalog is made from the site's data (npm run catalog), never kept by hand.
-/catalog
