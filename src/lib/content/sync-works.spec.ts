@@ -92,13 +92,28 @@ describe('worksFromSheet', () => {
 		expect(JSON.stringify(works)).not.toContain('9000');
 	});
 
-	it('skips empty rows', () => {
+	it('skips empty rows, and rows made ready for new works with only empty tick boxes', () => {
 		const works = worksFromSheet([
 			HEADINGS,
 			row('guijarro', 'Guijarro'),
-			['', '', '', '', '', '', '', '']
+			['', '', '', '', '', '', '', ''],
+			['', '', '', '', '', '', 'FALSE', 'FALSE']
 		]);
 		expect(works).toHaveLength(1);
+	});
+
+	it('reads the tick boxes of the sheet, in English and in Spanish', () => {
+		const works = worksFromSheet([
+			HEADINGS,
+			row('guijarro', 'Guijarro', ['', '', '', '', 'TRUE', 'FALSE']),
+			row('cause', 'Cause', ['', '', '', '', 'VERDADERO', 'FALSO']),
+			row('pables', 'Pables', ['', '', '', '', 'FALSE', 'TRUE'])
+		]);
+		expect(works.map((work) => [work.onSite, work.inPdf])).toEqual([
+			[true, false],
+			[true, false],
+			[false, true]
+		]);
 	});
 
 	it('refuses the whole sheet when a row cannot be used, and says which row and why', () => {
@@ -121,7 +136,7 @@ describe('worksFromSheet', () => {
 		expect(message).toContain('Row 4: the code "guijarro" is used twice');
 		expect(message).toContain('Row 5 (sin-titulo): a work with no title needs a code like obra-41');
 		expect(message).toContain('Row 6 (cause): "Prestada" is not one of the tags');
-		expect(message).toContain('Row 7 (pables): "En la web" must be Sí or No');
+		expect(message).toContain('Row 7 (pables): "En la web" must be a tick box, ticked or not');
 	});
 
 	it('refuses a sheet that lost one of its columns, or has no works', () => {

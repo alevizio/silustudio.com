@@ -1,7 +1,7 @@
 /*
  * Brings the works from the Google Sheet "Silu Obras" into the site.
  *
- *   npm run sync                       reads the sheet's published tab "Para la web"
+ *   npm run sync                       reads the sheet's published tab "Para la web" (hidden)
  *   npm run sync -- --from file.csv    reads a CSV file instead (the same columns)
  *
  * It rewrites src/lib/content/works.sheet.ts, which is all the site knows about the works,
@@ -36,7 +36,12 @@ const COLUMNS = {
 } as const;
 
 const STATUSES = ['', 'En la galería', 'Vendida', 'Reservada', 'Disponible'];
-const YES_NO = ['Sí', 'No'];
+/**
+ * What a tick box says in the published sheet, in English and in Spanish, and the words the
+ * first version of the sheet used.
+ */
+const TICKED = ['TRUE', 'VERDADERO', 'Sí'];
+const UNTICKED = ['FALSE', 'FALSO', 'No'];
 /** What a code may be: lower case words joined by hyphens, as in an address. */
 const CODE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const UNTITLED = /^obra-\d+$/;
@@ -93,8 +98,8 @@ export const worksFromSheet = (table: string[][]): SheetRow[] => {
 		const at = `Row ${index + 2}`;
 		const cell = (key: keyof typeof COLUMNS): string => (line[column[key]] ?? '').trim();
 		const code = cell('code');
-		// An empty row is not a work.
-		if (line.every((value) => value.trim() === '')) continue;
+		// An empty row is not a work, and neither is one that only has boxes nobody ticked.
+		if (line.every((value) => value.trim() === '' || UNTICKED.includes(value.trim()))) continue;
 		if (!CODE.test(code)) {
 			problems.push(`${at}: the code "${code}" must be lower case words joined by hyphens.`);
 			continue;
@@ -108,8 +113,8 @@ export const worksFromSheet = (table: string[][]): SheetRow[] => {
 			problems.push(`${at} (${code}): "${cell('status')}" is not one of the tags.`);
 		}
 		for (const key of ['onSite', 'inPdf'] as const) {
-			if (!YES_NO.includes(cell(key))) {
-				problems.push(`${at} (${code}): "${COLUMNS[key]}" must be Sí or No.`);
+			if (!TICKED.includes(cell(key)) && !UNTICKED.includes(cell(key))) {
+				problems.push(`${at} (${code}): "${COLUMNS[key]}" must be a tick box, ticked or not.`);
 			}
 		}
 		works.push({
@@ -119,8 +124,8 @@ export const worksFromSheet = (table: string[][]): SheetRow[] => {
 			mediumEn: cell('mediumEn'),
 			dimensions: cell('dimensions'),
 			status: cell('status'),
-			onSite: cell('onSite') === 'Sí',
-			inPdf: cell('inPdf') === 'Sí'
+			onSite: TICKED.includes(cell('onSite')),
+			inPdf: TICKED.includes(cell('inPdf'))
 		});
 	}
 	if (works.length === 0) problems.push('The sheet has no works.');
