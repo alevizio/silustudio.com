@@ -1,5 +1,4 @@
 <script lang="ts">
-	import hero from '#lib/assets/gallery/sala-01.jpg?enhanced';
 	import roomPlinths from '#lib/assets/gallery/sala-02.jpg?enhanced';
 	import roomCorridor from '#lib/assets/gallery/sala-03.jpg?enhanced';
 	import roomGarden from '#lib/assets/gallery/sala-06.jpg?enhanced';
@@ -11,7 +10,7 @@
 	import Seo from '#lib/components/seo.svelte';
 	import WorksWall from '#lib/components/works-wall.svelte';
 	import { SITE } from '#lib/content/site.ts';
-	import { PHOTOGRAPHED_WORKS } from '#lib/content/images.ts';
+	import { HERO_PHOTO, PHOTOGRAPHED_WORKS } from '#lib/content/images.ts';
 	import { pageHref } from '#lib/i18n/href.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
 
@@ -48,7 +47,7 @@
 	<!-- The photo starts a touch too close and settles back as the page opens. -->
 	<div class="aspect-room max-h-hero w-full overflow-hidden md:aspect-facade">
 		<enhanced:img
-			src={hero}
+			src={HERO_PHOTO}
 			alt={copy.home.heroAlt}
 			sizes="100vw"
 			fetchpriority="high"

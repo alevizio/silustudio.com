@@ -84,6 +84,7 @@ The visit page closes on the site's own drawing of the coast from Punta del Este
 - **Three more full size photos** (Desde el centro del ser, Mismo origen, Dar es recibir) and the photos in `untitled/` come from the artists' old site.
 - **Two works named from Instagram.** "Opuestos en tensión" and "Azul profundo" were sets 34 and 42 with no title. A post on the artists' Instagram shows the very same work as our photos and gives its title, technique and size, so they carry them now, still to be confirmed.
 - **Copies from the artists' Instagram**, about 1080 pixels wide, to be replaced by the original files: the nine black and white photos of the artists at work on the studio page (`assets/studio/taller-NN.jpg`) and the ten photos of works in homes on the works page (`assets/homes/`). Their descriptions are in `es.ts` and `en.ts`, one for each photo in file name order. Recent posts credit the photographers @marufolch and @veme.productora: ask the artists whether a credit is due.
+- **The photos of the gallery and of the artists** (`assets/gallery/`, `assets/studio/artistas-NN.jpg`) are the files the artists uploaded to their old Squarespace site, at the size they uploaded them. Ask its image server for them with `?format=original` and the header `Accept: image/jpeg`: without that header it hands over a re-compressed WebP, which is what the site carried until the originals replaced it. The photo that opens the home page is only 1779 pixels wide, so it is soft on large high-density screens: the camera file (`_MG_5343`) would fix that.
 - **The film on the studio page** is the artists' own, "SILU Artistas Loop", on Vimeo, which their old site also embeds. It loads from Vimeo only when a visitor presses play.
 
 ## Launch day
@@ -96,6 +97,7 @@ Set `launched` to `true` in `src/lib/content/site.ts`. Until then every page car
 - Titles, technique and size for the 44 photographed works that have none (`obra-08` to `obra-67`). Their Instagram captions name many works: the list read from them is kept outside this repository, in `Silu/Instagram survey 2026-11-11/works-from-captions.tsv`.
 - Confirmation of four titles that come from the designer's proposal and are not in the catalog: Mar de fondo, Pables, Encuentro en un reflejo, Ser antiguo (díptico). And their technique and size.
 - Confirmation of the two titles taken from Instagram, Opuestos en tensión and Azul profundo, with their technique and size.
+- The camera files of the gallery photos, above all the one that opens the home page (`_MG_5343`), which is only 1779 pixels wide.
 - Full size photos of the 15 catalog works that only have small catalog photos, or word that they are sold.
 - Which works are in the gallery, sold, reserved or available. The five tags on the site today are samples.
 - Titles for the nine photos in `src/lib/assets/untitled/`.

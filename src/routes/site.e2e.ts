@@ -425,6 +425,24 @@ test('the home page opens on a photo that runs edge to edge', async ({ page }) =
 	await expect(page.getByRole('link', { name: 'Cómo llegar' }).first()).toBeInViewport();
 });
 
+for (const width of [1280, 1440, 1920]) {
+	test(`on a ${width} pixel wide screen the opening photo is never a small copy stretched out`, async ({
+		page
+	}) => {
+		// The photo itself is 1779 pixels wide. An ordinary screen must get as many pixels as
+		// it has, up to that, and never the half-size copy it once got.
+		const OWN_WIDTH = 1779;
+		await page.setViewportSize({ width, height: 900 });
+		await page.goto('/');
+		const photo = page.getByRole('img', { name: /Interior de la galería Silu/ });
+		await expect
+			.poll(() => photo.evaluate((img: HTMLImageElement) => img.naturalWidth))
+			.toBeGreaterThan(0);
+		const shown = await photo.evaluate((img: HTMLImageElement) => img.naturalWidth);
+		expect(shown).toBeGreaterThanOrEqual(Math.min(width, OWN_WIDTH));
+	});
+}
+
 test('the daylight on the wall stays put while the page scrolls, and never widens it', async ({
 	page
 }) => {

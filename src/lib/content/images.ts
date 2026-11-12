@@ -70,6 +70,19 @@ const inOrder = (modules: Record<string, PictureModule>): Picture[] =>
 		.sort()
 		.map((path) => modules[path].default);
 
+/**
+ * The photo that opens the home page. It runs from edge to edge of the screen, so it is
+ * offered at every width up to its own and with less compression than the other photos.
+ * Left to the usual two copies, an ordinary screen would get the half-size one, 890 pixels
+ * stretched across the whole screen.
+ */
+export const HERO_PHOTO: Picture = inOrder(
+	import.meta.glob<PictureModule>('/src/lib/assets/gallery/sala-01.jpg', {
+		eager: true,
+		query: { enhanced: true, w: '1779;1280;960;640', quality: '82' }
+	})
+)[0];
+
 /*
  * The next two sets are copies from the artists' Instagram (about 1080 pixels wide), to be
  * replaced by the original files when the artists send them.
