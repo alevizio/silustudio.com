@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const PAGES = [
 	{ path: '/', lang: 'es', h1: 'Galería y estudio de arte en Manantiales, Punta del Este.' },
@@ -52,6 +52,12 @@ const moving = (page: Page, parts: string[]) =>
 		parts,
 		{ polling: 'raf' }
 	);
+
+/** The artists' film at the top of the studio page, which Vimeo plays. */
+const ARTISTS_FILM = 'iframe[title="Video de los artistas, en Vimeo"]';
+
+/** The one button on a film that runs by itself, which stops it and starts it again. */
+const toggleOf = (film: Locator): Locator => film.locator('xpath=..').getByRole('button');
 
 // The map and the film are third-party pages. The tests never call them: they get an empty
 // document instead.
@@ -399,19 +405,62 @@ test('a work with no title yet is asked about by the address of its page', async
 	);
 });
 
-test('the artists film loads from Vimeo only when the visitor presses play', async ({ page }) => {
+test('the artists film starts by itself from Vimeo, silent, with one button to stop it', async ({
+	page
+}) => {
+	await page.goto('/estudio/');
+	const player = page.locator(ARTISTS_FILM);
+	await expect(player).toHaveAttribute(
+		'src',
+		/player\.vimeo\.com\/video\/\d+\?autoplay=1&muted=1&loop=1&controls=0.*dnt=1/
+	);
+	const toggle = toggleOf(player);
+	await expect(toggle).toHaveAccessibleName('Pausar el video');
+	// Starting by itself, it leaves the keyboard focus alone.
+	await expect(toggle).not.toBeFocused();
+	await toggle.click();
+	await expect(toggle).toHaveAccessibleName('Reproducir el video');
+});
+
+test('for a visitor who asks for less motion, nothing loads from Vimeo until they press play', async ({
+	page
+}) => {
 	const calls: string[] = [];
 	page.on('request', (request) => {
 		if (request.url().includes('vimeo.com')) calls.push(request.url());
 	});
+	await page.emulateMedia({ reducedMotion: 'reduce' });
 	await page.goto('/estudio/', { waitUntil: 'networkidle' });
 	expect(calls).toEqual([]);
 	await page.getByRole('button', { name: 'Ver el video' }).click();
-	await expect(page.locator('iframe[title="Video de los artistas, en Vimeo"]')).toHaveAttribute(
-		'src',
-		/player\.vimeo\.com\/video\/\d+\?.*dnt=1/
-	);
+	const player = page.locator(ARTISTS_FILM);
+	await expect(player).toHaveAttribute('src', /player\.vimeo\.com\/video\/\d+\?.*dnt=1/);
 	await expect.poll(() => calls.length).toBeGreaterThan(0);
+	// The button they pressed is gone, so the focus follows to the one that stops the film.
+	await expect(toggleOf(player)).toBeFocused();
+});
+
+test('the film on the home page runs by itself, silent, once the visitor reaches it', async ({
+	page
+}) => {
+	const asked: string[] = [];
+	page.on('request', (request) => {
+		if (request.url().includes('silu-galeria.mp4')) asked.push(request.url());
+	});
+	await page.goto('/');
+	await page.waitForLoadState('networkidle');
+	// Nothing of it is downloaded while it is still below the first screen.
+	expect(asked).toEqual([]);
+
+	const film = page.locator('video[aria-label^="Película sin sonido"]');
+	await film.scrollIntoViewIfNeeded();
+	await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(false);
+	expect(
+		await film.evaluate((video: HTMLVideoElement) => video.muted && video.loop && !video.controls)
+	).toBe(true);
+	await expect(toggleOf(film)).toHaveAccessibleName('Pausar el video');
+	await toggleOf(film).click();
+	await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
 });
 
 test('the home page opens on a photo that runs edge to edge', async ({ page }) => {
@@ -918,7 +967,8 @@ test('a film of the workshop runs by itself, silent, only while it is on screen'
 	await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
 	await film.scrollIntoViewIfNeeded();
 	await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(false);
-	await page.getByRole('button', { name: 'Pausar el video' }).first().click();
+	await expect(toggleOf(film)).toHaveAccessibleName('Pausar el video');
+	await toggleOf(film).click();
 	await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
 	// Having stopped it, the visitor is not overruled when it comes back on screen.
 	await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
@@ -936,7 +986,8 @@ test('no film starts by itself for a visitor who asks for less motion', async ({
 	expect(await film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
 	// The still is there, and the visitor can start the film.
 	await expect(film).toHaveAttribute('poster', /taller-1\.jpg$/);
-	await page.getByRole('button', { name: 'Reproducir el video' }).first().click();
+	await expect(toggleOf(film)).toHaveAccessibleName('Reproducir el video');
+	await toggleOf(film).click();
 	await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(false);
 });
 

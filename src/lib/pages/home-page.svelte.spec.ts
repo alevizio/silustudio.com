@@ -53,6 +53,16 @@ describe('home-page.svelte', () => {
 		}
 	});
 
+	it('hangs the film of the gallery beside the photos, silent and without controls', async () => {
+		const { container } = render(HomePage, { lang: 'es' });
+		await expect.element(page.getByRole('heading', { level: 1 })).toBeVisible();
+		const films = container.querySelectorAll('video');
+		expect(films).toHaveLength(1);
+		expect(films[0].muted).toBe(true);
+		expect(films[0].controls).toBe(false);
+		expect(films[0].getAttribute('aria-label')).toMatch(/^Película sin sonido/);
+	});
+
 	it('renders in English', async () => {
 		render(HomePage, { lang: 'en' });
 		await expect

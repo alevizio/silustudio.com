@@ -1,12 +1,15 @@
 <script lang="ts">
 	import type { Picture } from 'vite-imagetools';
+	import FilmToggle from '#lib/components/film-toggle.svelte';
 	import { SITE } from '#lib/content/site.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
+	import { watchInView } from '#lib/motion/in-view.ts';
+	import { asksForLessMotion } from '#lib/motion/preference.ts';
 	import { cn } from '#lib/utils/cn.ts';
 
 	interface Props {
 		lang: Lang;
-		/** The still shown until the visitor asks for the film. */
+		/** The still that stands in until the film's first frame arrives. */
 		poster: Picture;
 		posterAlt: string;
 		/** Address of the film's player. */
@@ -16,37 +19,86 @@
 
 	let { lang, poster, posterAlt, src = SITE.filmUrl, class: className }: Props = $props();
 
-	/** Starts at once, without Vimeo's title, author and avatar, and without its tracking. */
-	const PLAYER_OPTIONS = 'autoplay=1&title=0&byline=0&portrait=0&dnt=1';
+	/**
+	 * Starts at once, silent and in a loop, with none of Vimeo's own controls, title, author or
+	 * avatar, and without its tracking.
+	 */
+	const PLAYER_OPTIONS = 'autoplay=1&muted=1&loop=1&controls=0&title=0&byline=0&portrait=0&dnt=1';
 
-	let playing = $state(false);
+	/** The player is on the page. Until then there is only the still. */
+	let started = $state(false);
+	/** The visitor started the film by hand, so the focus follows to the button that stops it. */
+	let pressed = $state(false);
+	/** The visitor has paused the film. */
+	let stopped = $state(false);
+	let player: HTMLIFrameElement | undefined = $state();
+	let loaded = false;
+	let inView = true;
 
 	const copy = $derived(copyFor(lang).studio.film);
+
+	// The film starts by itself, unless the visitor has asked their device for less motion.
+	$effect(() => {
+		if (!asksForLessMotion()) started = true;
+	});
+
+	// Vimeo's player takes its orders as messages, once it has loaded. Out of sight the film
+	// waits, and back on screen it goes on, unless the visitor has stopped it.
+	const order = (): void => {
+		if (!loaded) return;
+		const method = inView && !stopped ? 'play' : 'pause';
+		player?.contentWindow?.postMessage({ method }, new URL(src).origin);
+	};
+
+	const runInView = (frame: HTMLIFrameElement) =>
+		watchInView(frame, (now) => {
+			inView = now;
+			order();
+		});
+
+	const toggle = (): void => {
+		stopped = !stopped;
+		order();
+	};
 </script>
 
-<!-- The artists' film is on Vimeo. Nothing loads from Vimeo until the visitor presses play. -->
+<!--
+	The artists' film is on Vimeo. It starts by itself, silent, and runs in a loop while it is on
+	screen, with one button to stop it. A visitor who asks for less motion gets the still, and
+	nothing loads from Vimeo until they press play.
+-->
 <div class={cn('relative aspect-video bg-plate', className)}>
-	{#if playing}
-		<!-- The button that had the focus is gone, so the focus moves on to the player. -->
+	<!-- The still stays under the player, which is clear until the film's first frame arrives. -->
+	<enhanced:img
+		src={poster}
+		alt={posterAlt}
+		sizes="(min-width: 1280px) 1216px, 100vw"
+		fetchpriority="high"
+		class="absolute inset-0 size-full object-cover"
+	/>
+	{#if started}
+		<!-- The player has no controls of its own, so it is kept out of reach like a picture. -->
 		<iframe
-			{@attach (player) => player.focus()}
+			bind:this={player}
+			{@attach runInView}
+			onload={() => {
+				loaded = true;
+				order();
+			}}
 			src={`${src}?${PLAYER_OPTIONS}`}
 			title={copy.title}
-			allow="autoplay; fullscreen; picture-in-picture"
-			allowfullscreen
-			class="absolute inset-0 size-full"
+			allow="autoplay"
+			tabindex="-1"
+			class="pointer-events-none absolute inset-0 size-full"
 		></iframe>
+		<FilmToggle {lang} running={!stopped} onclick={toggle} takesFocus={pressed} />
 	{:else}
-		<enhanced:img
-			src={poster}
-			alt={posterAlt}
-			sizes="(min-width: 1280px) 1216px, 100vw"
-			fetchpriority="high"
-			class="absolute inset-0 size-full object-cover"
-		/>
 		<button
 			type="button"
-			onclick={() => (playing = true)}
+			onclick={() => {
+				pressed = true;
+				started = true;
+			}}
 			class="group absolute inset-0 flex cursor-pointer items-center justify-center"
 		>
 			<span

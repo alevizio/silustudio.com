@@ -38,6 +38,10 @@ export const en: typeof es = {
 		language: 'Language',
 		languageNames: { es: 'Español', en: 'English' }
 	},
+	films: {
+		pause: 'Pause the film',
+		play: 'Play the film'
+	},
 	home: {
 		eyebrow: 'Silu · Silvestre Jacobi and Lucila Dickinson',
 		title: 'Art gallery and studio in Manantiales, Punta del Este.',
@@ -55,8 +59,7 @@ export const en: typeof es = {
 				garden: 'Gallery room with sculptures on a white platform and a view of the garden.'
 			},
 			film: {
-				label: 'An 88 second film: the artists in the workshop and a walk through the gallery.',
-				captions: 'Captions'
+				label: 'Silent film: the artists in the workshop and a walk through the gallery.'
 			}
 		},
 		works: {
@@ -167,8 +170,6 @@ export const en: typeof es = {
 			play: 'Play the film'
 		},
 		reels: {
-			pause: 'Pause the film',
-			play: 'Play the film',
 			labels: [
 				'Silent film: spatula, sandpaper and grinder on a round piece in the workshop.',
 				'Silent film: mixing sand, marking and shaping a piece.',

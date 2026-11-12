@@ -36,6 +36,11 @@ export const es = {
 		language: 'Idioma',
 		languageNames: { es: 'Español', en: 'English' }
 	},
+	/** The button on every film that runs by itself. */
+	films: {
+		pause: 'Pausar el video',
+		play: 'Reproducir el video'
+	},
 	home: {
 		eyebrow: 'Silu · Silvestre Jacobi y Lucila Dickinson',
 		title: 'Galería y estudio de arte en Manantiales, Punta del Este.',
@@ -54,8 +59,7 @@ export const es = {
 				garden: 'Sala de la galería con esculturas sobre una tarima blanca y vista al jardín.'
 			},
 			film: {
-				label: 'Película de 88 segundos: los artistas en el taller y un recorrido por la galería.',
-				captions: 'Subtítulos'
+				label: 'Película sin sonido: los artistas en el taller y un recorrido por la galería.'
 			}
 		},
 		works: {
@@ -168,8 +172,6 @@ export const es = {
 			play: 'Ver el video'
 		},
 		reels: {
-			pause: 'Pausar el video',
-			play: 'Reproducir el video',
 			/** One for each film in workshop-reel.svelte, in the same order. */
 			labels: [
 				'Video sin sonido: espátula, lija y amoladora sobre una pieza redonda en el taller.',

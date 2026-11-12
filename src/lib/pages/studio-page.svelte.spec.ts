@@ -1,7 +1,8 @@
 import { page } from 'vitest/browser';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { AT_WORK_PHOTOS } from '#lib/content/images.ts';
+import { askForLessMotion } from '#lib/motion/preference.mock.ts';
 import StudioPage from './studio-page.svelte';
 
 /** The film's still and the three colour photos of the workshop, besides the artists at work. */
@@ -10,6 +11,11 @@ const OWN_PHOTOS = 4;
 const HUNG_AT_WORK = 1;
 
 describe('studio-page.svelte', () => {
+	// As it opens, the page asks Vimeo for the artists' film. The tests never call Vimeo, so
+	// they see the page as a visitor who asks for less motion does: still, until asked.
+	beforeEach(() => askForLessMotion());
+	afterEach(() => vi.restoreAllMocks());
+
 	it('presents both artists and their statement', async () => {
 		render(StudioPage, { lang: 'es' });
 		await expect
@@ -31,7 +37,7 @@ describe('studio-page.svelte', () => {
 		await expect.element(page.getByText(/lauyer|fotographer|Curentely/)).not.toBeInTheDocument();
 	});
 
-	it("offers the artists' film and loads nothing from it until asked", async () => {
+	it("offers the artists' film to a visitor who asks for less motion, and loads nothing from it until asked", async () => {
 		const { container } = render(StudioPage, { lang: 'es' });
 		await expect.element(page.getByRole('button', { name: 'Ver el video' })).toBeVisible();
 		expect(container.querySelector('iframe')).toBeNull();
