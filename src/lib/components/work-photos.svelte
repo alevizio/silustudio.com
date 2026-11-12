@@ -13,35 +13,24 @@
 
 	let { photos, alt, eager = false, class: className }: Props = $props();
 
-	const SIZES = {
-		alone: '(min-width: 1024px) 60vw, 100vw',
-		paired: '(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw'
-	};
-
-	/** Photos go in pairs. With an odd number, the last one takes the whole row. */
-	const alone = (index: number): boolean => photos.length % 2 === 1 && index === photos.length - 1;
+	/** The photos fill the column beside a work's label, or the whole screen on a phone. */
+	const SIZES = '(min-width: 1536px) 74rem, (min-width: 1024px) calc(100vw - 26rem), 100vw';
 </script>
 
 <!--
-	A work's photos, large and at their own shape. A photo takes its width from its own pixel
-	size and is only ever scaled down, so a small catalog photo is never stretched.
+	A work's photos, one to a row, each as large as its column or as tall as the screen allows,
+	so a whole work is always in view at once. A photo takes its width from its own pixel size
+	and is only ever scaled down, so a small catalog photo is never stretched.
 -->
-<div class={cn('grid items-center gap-4 sm:grid-cols-2 md:gap-6', className)}>
+<div class={cn('flex flex-col items-center gap-4 md:gap-6', className)}>
 	{#each photos as photo, index (index)}
-		<div
-			class={cn(
-				'flex reveal justify-center',
-				alone(index) ? 'sm:col-span-2' : 'sm:even:reveal-after-1'
-			)}
-		>
-			<enhanced:img
-				src={photo}
-				alt={alt(index)}
-				sizes={alone(index) ? SIZES.alone : SIZES.paired}
-				loading={eager ? 'eager' : 'lazy'}
-				fetchpriority={eager ? 'high' : 'auto'}
-				class="max-h-photo max-w-full object-contain"
-			/>
-		</div>
+		<enhanced:img
+			src={photo}
+			alt={alt(index)}
+			sizes={SIZES}
+			loading={eager ? 'eager' : 'lazy'}
+			fetchpriority={eager ? 'high' : 'auto'}
+			class="max-h-photo max-w-full reveal object-contain"
+		/>
 	{/each}
 </div>

@@ -44,7 +44,8 @@
 	--spacing-gutter: clamp(1.25rem, 0.5rem + 3.5vw, 3rem);
 	--spacing-logo: 3.5rem;
 	--spacing-hang: 34rem; /* tallest a work hangs on the wall of works */
-	--spacing-photo: 85svh; /* tallest a photo shows on a page, so it always fits the screen */
+	--spacing-photo: 92svh; /* tallest a photo shows on a work's page, so the whole work fits the screen */
+	--spacing-label: 18rem; /* width of the label beside a work's photos: just enough for its lines and button */
 	--spacing-hero: 60svh; /* tallest the home page's opening photo gets, so the way there stays in view */
 	--spacing-overscan: 22%; /* how far the wall light reaches past the screen, so its motion never shows an edge */
 	--opacity-wall-light: 6%; /* strength of the daylight on the wall: barely there */
@@ -85,11 +86,17 @@
 		}
 	}
 	--container-page: 76rem;
+	--container-wide: 96rem; /* a work's page: the photos take more room than the rest of the site gives */
 	--container-prose: 40rem;
 	--aspect-room: 3 / 2;
 	--aspect-facade: 5 / 2;
 	--aspect-map: 16 / 9;
 	--aspect-film: 9 / 16;
+}
+
+/* A work's page: the photos take everything the slim label leaves. */
+@utility grid-cols-work {
+	grid-template-columns: minmax(0, 1fr) var(--spacing-label);
 }
 
 /* Home gallery: the photo column beside the film is one wide photo over two smaller ones. */

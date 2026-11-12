@@ -184,6 +184,44 @@ test('a work page shows every photo of the work', async ({ page }) => {
 	}
 });
 
+test("on a work's page every photo has a row of its own and the photos take most of the page", async ({
+	page
+}) => {
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto('/obras/guijarro/');
+	await settled(page);
+	const boxes = await page.locator('article img').evaluateAll((images) =>
+		images.map((image) => {
+			const box = image.getBoundingClientRect();
+			return { top: box.top, bottom: box.bottom, width: box.width, height: box.height };
+		})
+	);
+	expect(boxes).toHaveLength(3);
+	// One under another: each photo starts below the end of the one before.
+	expect(boxes[1].top).toBeGreaterThanOrEqual(boxes[0].bottom);
+	expect(boxes[2].top).toBeGreaterThanOrEqual(boxes[1].bottom);
+	// The first photo is a wide one: it fills its column, which is most of the screen.
+	expect(boxes[0].width).toBeGreaterThan(1440 * 0.65);
+	// No photo is taller than the screen, so a whole work can always be seen at once.
+	for (const box of boxes) expect(box.height).toBeLessThanOrEqual(900);
+	// The label is slim beside them and stays readable.
+	const label = await page.getByRole('heading', { level: 1 }).boundingBox();
+	expect(label?.x).toBeGreaterThan(1440 * 0.7);
+});
+
+test('the unlabelled photos on the works page show three to a row', async ({ page }) => {
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto('/obras/');
+	const photos = page.locator('section[aria-labelledby="works-details"] img');
+	const tops = await photos.evaluateAll((images) =>
+		images.map((image) => Math.round(image.getBoundingClientRect().top))
+	);
+	expect(tops.length).toBeGreaterThan(3);
+	expect(tops[0]).toBe(tops[1]);
+	expect(tops[1]).toBe(tops[2]);
+	expect(tops[3]).toBeGreaterThan(tops[2]);
+});
+
 test('a small catalog photo is never stretched past its own size', async ({ page }) => {
 	await page.goto('/obras/duna-banada-en-peltre/');
 	const sizes = await page.locator('article img').evaluateAll((images) =>

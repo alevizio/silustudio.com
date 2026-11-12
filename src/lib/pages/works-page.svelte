@@ -38,12 +38,12 @@
 	<h2 id="works-details" class="reveal pb-6 text-label text-ink-soft uppercase">
 		{copy.details.title}
 	</h2>
-	<div class="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
+	<div class="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-6">
 		{#each UNTITLED_PHOTOS as picture, index (index)}
 			<enhanced:img
 				src={picture}
 				alt={copy.details.alt}
-				sizes="(min-width: 768px) 18vw, 46vw"
+				sizes="(min-width: 1280px) 23rem, (min-width: 768px) 30vw, 46vw"
 				loading="lazy"
 				class="h-auto w-full reveal bg-plate"
 			/>

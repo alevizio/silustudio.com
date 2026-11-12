@@ -65,28 +65,25 @@
 </div>
 
 <!--
-	The photos are the page. On a wide screen they fill two thirds and the label stays in
-	view beside them. On a phone the first photo comes first, then the label, then the rest.
+	The photos are the page, and the words matter less. On a wide screen the photos take
+	everything a slim label leaves, in a wider space than the rest of the site, and the label
+	stays in view beside them. On a phone the first photo comes first, then the label, then
+	the rest.
 -->
 <article
-	class="mx-auto grid max-w-page gap-x-16 gap-y-10 px-gutter pb-section lg:grid-cols-3 lg:gap-y-6"
+	class="mx-auto grid max-w-wide gap-x-16 gap-y-10 px-gutter pb-section lg:grid-cols-work lg:gap-y-6"
 >
-	<WorkPhotos
-		photos={photos.slice(0, 1)}
-		alt={photoAlt}
-		eager
-		class="motion-safe:animate-arrive lg:col-span-2"
-	/>
+	<WorkPhotos photos={photos.slice(0, 1)} alt={photoAlt} eager class="motion-safe:animate-arrive" />
 
 	<div
 		class="flex flex-col gap-8 arrive-after-1 motion-safe:animate-arrive lg:sticky lg:top-gutter lg:row-span-2 lg:self-start"
 	>
 		{#if work.title !== undefined}
-			<h1 lang="es" class="font-serif text-display font-light text-balance">{work.title}</h1>
+			<h1 lang="es" class="font-serif text-title font-light text-balance">{work.title}</h1>
 		{:else}
 			<div class="flex flex-col gap-3">
 				<h1 class={termClass}>{name}</h1>
-				<p class="font-serif text-lead text-ink-soft">{copy.detail.pending}</p>
+				<p class="font-serif text-prose text-ink-soft">{copy.detail.pending}</p>
 			</div>
 		{/if}
 		{#if work.dimensions || work.medium || work.status}
@@ -94,13 +91,13 @@
 				{#if work.dimensions}
 					<div class={rowClass}>
 						<dt class={termClass}>{copy.detail.dimensions}</dt>
-						<dd class="font-serif text-lead tabular-nums">{work.dimensions[lang]}</dd>
+						<dd class="font-serif text-prose tabular-nums">{work.dimensions[lang]}</dd>
 					</div>
 				{/if}
 				{#if work.medium}
 					<div class={rowClass}>
 						<dt class={termClass}>{copy.detail.material}</dt>
-						<dd class="font-serif text-lead">{work.medium[lang]}</dd>
+						<dd class="font-serif text-prose">{work.medium[lang]}</dd>
 					</div>
 				{/if}
 				{#if work.status}
@@ -122,11 +119,7 @@
 	</div>
 
 	{#if photos.length > 1}
-		<WorkPhotos
-			photos={photos.slice(1)}
-			alt={(index) => photoAlt(index + 1)}
-			class="lg:col-span-2"
-		/>
+		<WorkPhotos photos={photos.slice(1)} alt={(index) => photoAlt(index + 1)} />
 	{/if}
 </article>
 

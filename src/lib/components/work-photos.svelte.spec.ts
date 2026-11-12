@@ -7,11 +7,6 @@ import WorkPhotos from './work-photos.svelte';
 /** Every full size photo on the site, to cut lists of any length from. */
 const PHOTOS = PHOTOGRAPHED_WORKS.flatMap(fullSizePhotosOf);
 const alt = (index: number): string => `Foto ${index + 1}`;
-const WHOLE_ROW = 'sm:col-span-2';
-
-const wholeRow = (image: Element): boolean =>
-	image.closest('div')?.classList.contains(WHOLE_ROW) ?? false;
-
 describe('work-photos.svelte', () => {
 	it('shows every photo with its own description', async () => {
 		render(WorkPhotos, { photos: PHOTOS.slice(0, 4), alt });
@@ -20,22 +15,23 @@ describe('work-photos.svelte', () => {
 		expect(page.getByRole('img').elements()).toHaveLength(4);
 	});
 
-	it('hangs an even number of photos in pairs', async () => {
-		render(WorkPhotos, { photos: PHOTOS.slice(0, 4), alt });
-		await expect.element(page.getByRole('img', { name: 'Foto 1' })).toBeInTheDocument();
-		expect(page.getByRole('img').elements().map(wholeRow)).toEqual([false, false, false, false]);
+	it('gives every photo a row of its own, whatever their number', async () => {
+		const { container } = render(WorkPhotos, { photos: PHOTOS.slice(0, 4), alt });
+		await expect.element(page.getByRole('img', { name: 'Foto 4' })).toBeInTheDocument();
+		// The photos are stacked in one column and centred in it.
+		const column = container.firstElementChild;
+		expect(column?.classList.contains('flex-col')).toBe(true);
+		expect(column?.classList.contains('items-center')).toBe(true);
+		expect(column?.querySelectorAll('img')).toHaveLength(4);
 	});
 
-	it('gives the last photo the whole row when the number is odd', async () => {
-		render(WorkPhotos, { photos: PHOTOS.slice(0, 3), alt });
-		await expect.element(page.getByRole('img', { name: 'Foto 3' })).toBeInTheDocument();
-		expect(page.getByRole('img').elements().map(wholeRow)).toEqual([false, false, true]);
-	});
-
-	it('gives a single photo the whole row', async () => {
-		render(WorkPhotos, { photos: PHOTOS.slice(0, 1), alt });
-		await expect.element(page.getByRole('img', { name: 'Foto 1' })).toBeInTheDocument();
-		expect(page.getByRole('img').elements().map(wholeRow)).toEqual([true]);
+	it('never lets a photo grow past its column or past the height of the screen', async () => {
+		render(WorkPhotos, { photos: PHOTOS.slice(0, 2), alt });
+		for (const image of page.getByRole('img').elements()) {
+			expect(image.classList.contains('max-w-full')).toBe(true);
+			expect(image.classList.contains('max-h-photo')).toBe(true);
+			expect(image.classList.contains('object-contain')).toBe(true);
+		}
 	});
 
 	it('waits to load photos unless they open the page', async () => {
