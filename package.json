@@ -18,7 +18,8 @@
 		"test": "npm run test:unit -- --run && npm run test:e2e",
 		"test:e2e": "playwright install chromium && playwright test",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"catalog": "node tools/catalog-pdf.ts"
 	},
 	"devDependencies": {
 		"@axe-core/playwright": "^4.14.0",

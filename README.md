@@ -67,6 +67,17 @@ The visit page closes on the site's own drawing of the coast from Punta del Este
 
 `src/lib/content/coast-map.ts` is generated. The downloaded data, the queries and the script that draws it (`tools/build_map.py`) are kept outside this repository, in `Silu/Map data 2026-11-11`. To draw it again: run `uv run --with shapely python3 tools/build_map.py` there, copy the `coast-map.ts` it writes over the one here, and run `npm run format`. The names on the map are placed in `coast-map.svelte`.
 
+## The PDF catalog
+
+`npm run catalog` writes the catalog of works as a PDF, from the same data and photos the site uses, so it can never fall behind the site: a cover, one page for each work with full size photos (the large photo, title, size, material, up to two details), and a last page with the way to the gallery. It takes a few seconds and the result is about 11 MB for 69 works. `-- --lang en` writes it in English, `-- --out file.pdf` somewhere else, `-- --only guijarro,cause` just a few works. A work with no title yet is shown by its reference ("Ref. 41"), so a client can still ask about it. Tags are left out until the artists confirm real ones. The tool is `tools/catalog-pdf.ts` and its output folder, `catalog/`, is not kept in git.
+
+## What search engines get
+
+- **Each page** has its own title and description, the address of its twin in the other language, and a share image (`src/lib/components/seo.svelte`).
+- **`/sitemap.xml`** lists every page in both languages with the works' photos (`src/routes/sitemap.xml/+server.ts`), and `robots.txt` points to it.
+- **Structured data** (`src/lib/content/structured-data.ts`): the home and visit pages say Silu is an art gallery, with its address, place on the map, phone and Instagram. Each titled work's page says it is an artwork by the two artists, with its photos, technique and size. Opening hours join it once they are confirmed. Nothing says whether a work is for sale.
+- **Old addresses.** `vercel.json` sends the ten addresses of the Squarespace site (`/inicio`, `/artistas`, `/contacto`, `/work` and so on) to their new pages for good, and makes every address end in a slash. It has not been through a deploy yet: check a few on the first one.
+
 ## Where the photos come from
 
 - **Full size photos of the works:** the artists' stock folder, taken from a designer's proposal of November 2026 (208 photos in 66 sets). 16 sets are catalog works: each shares at least one photograph with the PDF catalog, so the match is certain. The other 50 sets are not in the catalog.
@@ -75,7 +86,7 @@ The visit page closes on the site's own drawing of the coast from Punta del Este
 
 ## Launch day
 
-Set `launched` to `true` in `src/lib/content/site.ts`. Until then every page carries `noindex`, so previews stay out of search results. The same switch removes the sample tags, so the works that are really in the gallery or sold need their real `status` before that day.
+Set `launched` to `true` in `src/lib/content/site.ts`. Until then every page carries `noindex`, so previews stay out of search results. Then, the same day: check that the old addresses redirect, add the site to Google Search Console and hand it `/sitemap.xml`, and put the new address of each page in the gallery's Google Maps listing and Instagram bio. The same switch removes the sample tags, so the works that are really in the gallery or sold need their real `status` before that day.
 
 ## Still needed from the artists
 
