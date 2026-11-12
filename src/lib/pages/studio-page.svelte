@@ -1,13 +1,12 @@
 <script lang="ts">
 	import portrait from '#lib/assets/studio/artistas-01.jpg?enhanced';
-	import workshop from '#lib/assets/studio/artistas-02.jpg?enhanced';
-	import drawing from '#lib/assets/studio/artistas-03.jpg?enhanced';
 	import storage from '#lib/assets/gallery/sala-04.jpg?enhanced';
 	import ArtistsFilm from '#lib/components/artists-film.svelte';
+	import HungPair from '#lib/components/hung-pair.svelte';
 	import PhotoColumns from '#lib/components/photo-columns.svelte';
 	import SectionHeading from '#lib/components/section-heading.svelte';
 	import Seo from '#lib/components/seo.svelte';
-	import { AT_WORK_PHOTOS } from '#lib/content/images.ts';
+	import { AT_WORK_PHOTOS, DRAWING_PHOTO, WORKSHOP_PHOTO } from '#lib/content/images.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
 
 	interface Props {
@@ -16,13 +15,13 @@
 
 	let { lang }: Props = $props();
 
+	/** How many of the photos of the artists at work hang among the wall texts. The rest follow. */
+	const HUNG_AT_WORK = 2;
+
 	const copy = $derived(copyFor(lang).studio);
+	const [together, sanding] = AT_WORK_PHOTOS;
+	const statementClass = 'reveal font-serif text-title font-light text-balance';
 	const proseClass = 'text-prose text-ink-soft font-serif';
-	const photos = $derived([
-		{ picture: workshop, alt: copy.alts.workshop },
-		{ picture: drawing, alt: copy.alts.drawing },
-		{ picture: storage, alt: copy.alts.storage }
-	]);
 </script>
 
 <Seo {lang} page="studio" />
@@ -37,17 +36,48 @@
 	<ArtistsFilm {lang} poster={portrait} posterAlt={copy.alts.portrait} />
 </div>
 
+<!--
+	The statement is hung like the wall texts of an exhibition: broken into its paragraphs, each
+	with room around it, and the photos hang between them at uneven sizes. The first and the
+	last paragraph are set large, as what the room says first and last.
+-->
 <section
 	aria-label={copy.label}
-	class="mx-auto grid max-w-page gap-12 px-gutter py-section lg:grid-cols-12 lg:gap-x-16"
+	class="mx-auto flex max-w-page flex-col gap-section px-gutter py-section"
 >
-	<div class="flex max-w-prose reveal flex-col gap-6 lg:col-span-7">
-		<p class="font-serif text-lead text-ink">{copy.statement[0]}</p>
-		{#each copy.statement.slice(1) as paragraph (paragraph)}
-			<p class={proseClass}>{paragraph}</p>
-		{/each}
-	</div>
-	<div class="flex reveal flex-col gap-10 reveal-after-1 lg:col-span-5">
+	<p class={[statementClass, 'max-w-4xl']}>{copy.statement[0]}</p>
+
+	<HungPair
+		large={{ picture: together, alt: copy.atWork.alts[0] }}
+		small={{ picture: sanding, alt: copy.atWork.alts[1] }}
+		text={copy.statement[1]}
+	/>
+
+	<p class={[proseClass, 'mx-auto max-w-prose reveal']}>{copy.statement[2]}</p>
+
+	<HungPair
+		flipped
+		large={{ picture: WORKSHOP_PHOTO, alt: copy.alts.workshop }}
+		small={{ picture: storage, alt: copy.alts.storage }}
+		text={copy.statement[3]}
+	/>
+
+	<p class={[statementClass, 'max-w-4xl lg:ml-auto']}>{copy.statement[4]}</p>
+</section>
+
+<!-- Who the two artists are, beside a photo of them planning a work. -->
+<section
+	aria-label={copy.title}
+	class="mx-auto grid max-w-page gap-10 px-gutter pb-section lg:grid-cols-12 lg:items-end lg:gap-x-16"
+>
+	<enhanced:img
+		src={DRAWING_PHOTO}
+		alt={copy.alts.drawing}
+		sizes="(min-width: 1280px) 41rem, (min-width: 1024px) 55vw, 100vw"
+		loading="lazy"
+		class="h-auto w-full reveal lg:col-span-7"
+	/>
+	<div class="flex reveal flex-col gap-8 reveal-after-1 lg:col-span-4 lg:col-start-9">
 		<dl class="flex flex-col border-t border-line">
 			{#each copy.bios as bio (bio.name)}
 				<div class="flex flex-col gap-1 border-b border-line py-5">
@@ -62,22 +92,13 @@
 	</div>
 </section>
 
-<div class="mx-auto grid max-w-page gap-4 px-gutter pb-section md:grid-cols-3 md:gap-6">
-	{#each photos as photo (photo.alt)}
-		<enhanced:img
-			src={photo.picture}
-			alt={photo.alt}
-			sizes="(min-width: 768px) 32vw, 100vw"
-			loading="lazy"
-			class="aspect-room size-full reveal object-cover md:last:reveal-after-2 md:even:reveal-after-1"
-		/>
-	{/each}
-</div>
-
-<!-- The artists and their helpers at work, as their own photographers caught them. -->
+<!-- The rest of the artists and their helpers at work, as their own photographers caught them. -->
 <section aria-labelledby="studio-at-work" class="mx-auto max-w-page px-gutter pb-section">
 	<h2 id="studio-at-work" class="reveal pb-6 text-label text-ink-soft uppercase">
 		{copy.atWork.title}
 	</h2>
-	<PhotoColumns photos={AT_WORK_PHOTOS} alts={copy.atWork.alts} />
+	<PhotoColumns
+		photos={AT_WORK_PHOTOS.slice(HUNG_AT_WORK)}
+		alts={copy.atWork.alts.slice(HUNG_AT_WORK)}
+	/>
 </section>

@@ -4,8 +4,10 @@ import { render } from 'vitest-browser-svelte';
 import { AT_WORK_PHOTOS } from '#lib/content/images.ts';
 import StudioPage from './studio-page.svelte';
 
-/** The film's still and the three photos of the workshop, before the series of the artists at work. */
+/** The film's still and the three colour photos of the workshop, besides the artists at work. */
 const OWN_PHOTOS = 4;
+/** Photos of the artists at work that hang among the wall texts, before the rest of the series. */
+const HUNG_AT_WORK = 2;
 
 describe('studio-page.svelte', () => {
 	it('presents both artists and their statement', async () => {
@@ -50,6 +52,23 @@ describe('studio-page.svelte', () => {
 		await expect
 			.element(page.getByRole('img', { name: 'Soldando una escultura de acero, con máscara.' }))
 			.toBeInTheDocument();
-		expect(section.getByRole('img').elements()).toHaveLength(AT_WORK_PHOTOS.length);
+		expect(section.getByRole('img').elements()).toHaveLength(AT_WORK_PHOTOS.length - HUNG_AT_WORK);
+	});
+
+	it('hangs the statement as separate wall texts, the first and the last set large', async () => {
+		const { container } = render(StudioPage, { lang: 'es' });
+		const statement = page.getByRole('region', { name: 'Estudio' });
+		await expect.element(statement).toBeInTheDocument();
+		const texts = [...statement.element().querySelectorAll('p')];
+		// Five paragraphs, each on its own, in the order the artists wrote them.
+		expect(texts).toHaveLength(5);
+		expect(texts[0].textContent).toContain('trabajan juntos');
+		expect(texts[4].textContent).toContain('la luz y la sombra');
+		expect(texts[0].classList.contains('text-title')).toBe(true);
+		expect(texts[4].classList.contains('text-title')).toBe(true);
+		expect(texts[2].classList.contains('text-title')).toBe(false);
+		// And two of the photos of the artists at work hang among them.
+		expect(statement.element().querySelectorAll('img')).toHaveLength(4);
+		expect(container.querySelectorAll('h1')).toHaveLength(1);
 	});
 });

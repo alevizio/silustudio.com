@@ -83,6 +83,17 @@ export const HERO_PHOTO: Picture = inOrder(
 	})
 )[0];
 
+/**
+ * The two colour photos of the workshop, for the studio page, where each is shown large:
+ * offered at every width up to its own, like the opening photo.
+ */
+export const [WORKSHOP_PHOTO, DRAWING_PHOTO]: readonly Picture[] = inOrder(
+	import.meta.glob<PictureModule>('/src/lib/assets/studio/artistas-0{2,3}.jpg', {
+		eager: true,
+		query: { enhanced: true, w: '1280;960;640' }
+	})
+);
+
 /*
  * The next two sets are copies from the artists' Instagram (about 1080 pixels wide), to be
  * replaced by the original files when the artists send them.

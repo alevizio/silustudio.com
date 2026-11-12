@@ -33,6 +33,7 @@ The layouts follow three references found on Mobbin: KOBU (two large photos per 
 - `src/lib/components/work-pager.svelte` and `work-neighbours.svelte`: the two ways from one work to another. The arrows at the top sit in the same spot on every work's page, and the left and right arrow keys do the same. The end of the page shows the works before and after with their photos. The way back from a work opens the wall at that work.
 - `src/lib/components/coast-map.svelte` and `src/lib/content/coast-map.ts`: the map on the visit page. See "The map" below.
 - `src/lib/components/link-button.svelte`: buttons fill with colour from the bottom under the pointer or the keyboard (`--motion-fill`), and text links draw a darker rule over their faint one.
+- `src/lib/pages/studio-page.svelte` and `src/lib/components/hung-pair.svelte`: the studio page hangs the artists' statement like the wall texts of an exhibition. Each paragraph stands on its own, the first and the last set large, and the photos hang between them at uneven sizes: a large one with a small one and a short text beside it. The layout follows three "About" pages found on Mobbin (Aino Agency, Fiasco, Siena Film Foundation).
 - `src/lib/components/` and `src/lib/pages/`: components and the five page layouts, each with its test next to it.
 
 ## Commands
