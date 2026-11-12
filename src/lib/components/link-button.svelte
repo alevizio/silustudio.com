@@ -18,11 +18,20 @@
 		variant?: 'solid' | 'line' | 'text';
 		/** Opens in a new tab. Use for maps, WhatsApp and other sites. */
 		external?: boolean;
+		/** Saves the file the link leads to, under its own name, instead of opening it. */
+		download?: boolean;
 		class?: string;
 		children: Snippet;
 	}
 
-	let { href, variant = 'solid', external = false, class: className, children }: Props = $props();
+	let {
+		href,
+		variant = 'solid',
+		external = false,
+		download = false,
+		class: className,
+		children
+	}: Props = $props();
 
 	/*
 	 * A button fills with colour from the bottom under the pointer or the keyboard, the way
@@ -41,6 +50,7 @@
 	{href}
 	target={external ? '_blank' : undefined}
 	rel={external ? 'noopener noreferrer' : undefined}
+	download={download ? '' : undefined}
 	class={cn(
 		'inline-flex items-center text-label uppercase transition-colors',
 		VARIANTS[variant],

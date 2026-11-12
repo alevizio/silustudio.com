@@ -29,10 +29,14 @@
 <Seo {lang} page="works" />
 
 <header
-	class="mx-auto max-w-page px-gutter pt-6 pb-12 motion-safe:animate-arrive md:pt-12 md:pb-16"
+	class="mx-auto flex max-w-page flex-col items-start gap-8 px-gutter pt-6 pb-12 motion-safe:animate-arrive md:flex-row md:items-end md:justify-between md:pt-12 md:pb-16"
 >
-	<h1 class="font-serif text-display font-light">{copy.title}</h1>
-	<p class="max-w-prose pt-4 font-serif text-lead text-ink-soft">{copy.lead}</p>
+	<div>
+		<h1 class="font-serif text-display font-light">{copy.title}</h1>
+		<p class="max-w-prose pt-4 font-serif text-lead text-ink-soft">{copy.lead}</p>
+	</div>
+	<!-- The catalog is made from these same works (npm run catalog), so it never falls behind. -->
+	<LinkButton href={CATALOG_PDF[lang]} download variant="line">{copy.catalog.pdf}</LinkButton>
 </header>
 
 <!-- Every work with a full size photo hangs here. The tiles bring their own space below. -->
@@ -70,15 +74,12 @@
 </section>
 
 <section aria-labelledby="works-catalog" class="mx-auto max-w-page px-gutter pb-section">
-	<div class="flex reveal flex-col gap-6 pb-10 md:flex-row md:items-end md:justify-between">
-		<SectionHeading
-			id="works-catalog"
-			label={copy.catalog.label}
-			title={copy.catalog.title(LISTED_WORKS.length)}
-		/>
-		<!-- The catalog is made from these same works (npm run catalog), so it never falls behind. -->
-		<LinkButton href={CATALOG_PDF[lang]} external variant="text">{copy.catalog.pdf}</LinkButton>
-	</div>
+	<SectionHeading
+		id="works-catalog"
+		label={copy.catalog.label}
+		title={copy.catalog.title(LISTED_WORKS.length)}
+		class="reveal pb-10"
+	/>
 	<!-- The catalog's own photos are small, so these hang three to a row at their real size. -->
 	<WorksWall works={LISTED_WORKS} {lang} label={copy.catalog.label} columns={3} />
 </section>

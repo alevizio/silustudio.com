@@ -36,7 +36,7 @@ describe('works-page.svelte', () => {
 	it('offers the catalog PDF and two ways to ask about a work, in English', async () => {
 		render(WorksPage, { lang: 'en' });
 		await expect
-			.element(page.getByRole('link', { name: 'See the catalog as a PDF (11 MB)' }))
+			.element(page.getByRole('link', { name: 'Download the catalog (PDF)' }))
 			.toHaveAttribute('href', expect.stringMatching(/\/silu-catalog\.pdf$/));
 		await expect
 			.element(page.getByRole('link', { name: 'Message on WhatsApp' }))
@@ -56,16 +56,19 @@ describe('works-page.svelte', () => {
 			.toBeInTheDocument();
 	});
 
-	it('offers the catalog as a PDF kept on the site, in the language of the page', async () => {
-		render(WorksPage, { lang: 'es' });
-		const spanish = page.getByRole('link', { name: 'Ver el catálogo en PDF (11 MB)' });
+	it('offers the catalog to download at the top of the page, in the language of the page', async () => {
+		const { container } = render(WorksPage, { lang: 'es' });
+		const spanish = page.getByRole('link', { name: 'Descargar el catálogo (PDF)' });
 		await expect
 			.element(spanish)
 			.toHaveAttribute('href', expect.stringMatching(/\/catalogo-silu\.pdf$/));
-		await expect.element(spanish).toHaveAttribute('target', '_blank');
+		// It saves the file instead of opening it, and it comes before the wall of works.
+		await expect.element(spanish).toHaveAttribute('download', '');
+		expect(container.querySelector('header')?.contains(spanish.element())).toBe(true);
+		expect(container.querySelectorAll('a[href$=".pdf"]')).toHaveLength(1);
 		render(WorksPage, { lang: 'en' });
 		await expect
-			.element(page.getByRole('link', { name: 'See the catalog as a PDF (11 MB)' }))
+			.element(page.getByRole('link', { name: 'Download the catalog (PDF)' }))
 			.toHaveAttribute('href', expect.stringMatching(/\/silu-catalog\.pdf$/));
 	});
 });

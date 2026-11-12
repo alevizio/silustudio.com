@@ -930,12 +930,17 @@ test('pages tell search engines what they are in valid structured data', async (
 test('the catalog a visitor can download is a real PDF on the site, in both languages', async ({
 	page
 }) => {
-	for (const [path, name] of [
-		['/obras/', 'Ver el catálogo en PDF (11 MB)'],
-		['/en/works/', 'See the catalog as a PDF (11 MB)']
+	for (const [path, name, file] of [
+		['/obras/', 'Descargar el catálogo (PDF)', 'catalogo-silu.pdf'],
+		['/en/works/', 'Download the catalog (PDF)', 'silu-catalog.pdf']
 	]) {
 		await page.goto(path);
-		const href = await page.getByRole('link', { name }).getAttribute('href');
+		// The button is in the first screen, and pressing it saves the file under its own name.
+		const button = page.getByRole('link', { name });
+		await expect(button).toBeInViewport();
+		const [saved] = await Promise.all([page.waitForEvent('download'), button.click()]);
+		expect(saved.suggestedFilename()).toBe(file);
+		const href = await button.getAttribute('href');
 		expect(href).toMatch(/\.pdf$/);
 		const response = await page.request.get(href ?? '');
 		expect(response.status(), href ?? '').toBe(200);

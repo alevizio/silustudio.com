@@ -99,7 +99,7 @@ export const en: typeof es = {
 		catalog: {
 			label: 'Catalog',
 			title: (count: number) => `${count} more works from the catalog`,
-			pdf: 'See the catalog as a PDF (11 MB)'
+			pdf: 'Download the catalog (PDF)'
 		},
 		enquiry: {
 			title: 'Interested in a work?',

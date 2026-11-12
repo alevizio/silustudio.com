@@ -25,6 +25,15 @@ describe('link-button.svelte', () => {
 		await expect.element(link).toHaveAttribute('rel', 'noopener noreferrer');
 	});
 
+	it('saves a file instead of opening it when asked to, and only then', async () => {
+		render(LinkButton, { href: '/catalogo.pdf', download: true, children: label('Descargar') });
+		await expect
+			.element(page.getByRole('link', { name: 'Descargar' }))
+			.toHaveAttribute('download', '');
+		render(LinkButton, { href: '/obras/', children: label('Obras') });
+		await expect.element(page.getByRole('link', { name: 'Obras' })).not.toHaveAttribute('download');
+	});
+
 	it('renders secondary links as underlined text instead of a button', async () => {
 		render(LinkButton, {
 			href: '/visitar/',
