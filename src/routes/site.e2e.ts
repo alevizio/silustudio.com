@@ -878,6 +878,25 @@ test('pages tell search engines what they are in valid structured data', async (
 	await expect(page).toHaveTitle('Reencause · Works · Silu');
 });
 
+test('the films of the workshop load only when the visitor presses play', async ({ page }) => {
+	const films: string[] = [];
+	page.on('request', (request) => {
+		if (/taller-\d\.mp4/.test(request.url())) films.push(request.url());
+	});
+	await page.goto('/estudio/');
+	const reels = page.getByRole('list', { name: 'Videos del taller' });
+	await reels.scrollIntoViewIfNeeded();
+	await expect(reels.locator('video')).toHaveCount(3);
+	await page.waitForLoadState('networkidle');
+	expect(films).toEqual([]);
+	// Each has a still to show meanwhile, and captions in the page language.
+	const first = reels.locator('video').first();
+	await expect(first).toHaveAttribute('poster', /taller-1\.jpg$/);
+	await expect(first.locator('track')).toHaveAttribute('srclang', 'es');
+	await first.evaluate((film: HTMLVideoElement) => film.play().catch(() => {}));
+	await expect.poll(() => films.length).toBeGreaterThan(0);
+});
+
 test('every page except Visit ends with the invitation to visit', async ({ page }) => {
 	await page.goto('/estudio/');
 	await expect(page.getByRole('region', { name: 'Visitá la galería' })).toBeVisible();

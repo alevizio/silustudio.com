@@ -5,6 +5,7 @@
 	import HungPair from '#lib/components/hung-pair.svelte';
 	import PhotoColumns from '#lib/components/photo-columns.svelte';
 	import SectionHeading from '#lib/components/section-heading.svelte';
+	import WorkshopReels from '#lib/components/workshop-reels.svelte';
 	import Seo from '#lib/components/seo.svelte';
 	import { AT_WORK_PHOTOS, DRAWING_PHOTO, WORKSHOP_PHOTO } from '#lib/content/images.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
@@ -92,11 +93,15 @@
 	</div>
 </section>
 
-<!-- The rest of the artists and their helpers at work, as their own photographers caught them. -->
+<!--
+	The workshop itself: the artists' own short films of the work, then the rest of the photos
+	of them and their helpers at it.
+-->
 <section aria-labelledby="studio-at-work" class="mx-auto max-w-page px-gutter pb-section">
 	<h2 id="studio-at-work" class="reveal pb-6 text-label text-ink-soft uppercase">
 		{copy.atWork.title}
 	</h2>
+	<WorkshopReels {lang} class="pb-3 md:pb-6" />
 	<PhotoColumns
 		photos={AT_WORK_PHOTOS.slice(HUNG_AT_WORK)}
 		alts={copy.atWork.alts.slice(HUNG_AT_WORK)}

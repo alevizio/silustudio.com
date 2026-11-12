@@ -71,4 +71,16 @@ describe('studio-page.svelte', () => {
 		expect(statement.element().querySelectorAll('img')).toHaveLength(4);
 		expect(container.querySelectorAll('h1')).toHaveLength(1);
 	});
+
+	it("shows the artists' films of the workshop with the photos of it", async () => {
+		const { container } = render(StudioPage, { lang: 'es' });
+		const section = page.getByRole('region', { name: 'En el taller' });
+		await expect.element(section).toBeInTheDocument();
+		const films = section.element().querySelectorAll('video');
+		expect(films).toHaveLength(3);
+		// The films come before the photos, and none starts by itself.
+		const first = section.element().querySelector('video, img');
+		expect(first?.tagName).toBe('VIDEO');
+		expect(container.querySelectorAll('video[autoplay]')).toHaveLength(0);
+	});
 });

@@ -166,6 +166,15 @@ export const en: typeof es = {
 			title: 'Film of the artists, on Vimeo',
 			play: 'Play the film'
 		},
+		reels: {
+			title: 'Films from the workshop',
+			captions: 'Captions',
+			labels: [
+				'A 19 second film: spatula, sandpaper and grinder on a round piece in the workshop.',
+				'A 40 second film: mixing sand, marking and shaping a piece.',
+				'A 50 second film: from sanding in the workshop to the work hung in a home.'
+			]
+		},
 		atWork: {
 			title: 'In the workshop',
 			alts: [
