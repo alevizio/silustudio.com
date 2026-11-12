@@ -18,7 +18,6 @@
 	--color-line: #d9d4ca; /* hairlines */
 	--color-sand: #b79a6d; /* decorative accent taken from the works */
 	--color-sand-deep: #7a5f37; /* accent that is safe for text and focus rings, 5.4:1 on wall */
-	--color-sold: #a5402d; /* the red dot galleries put on a sold work, 5.7:1 on wall */
 
 	/* Type families */
 	--font-sans: 'Lato', ui-sans-serif, system-ui, sans-serif;
@@ -28,6 +27,9 @@
 	--text-label: 0.8125rem;
 	--text-label--line-height: 1.45;
 	--text-label--letter-spacing: 0.14em;
+	--text-tag: 0.6875rem; /* the tag on a work: smaller than a label, so it stays beside the point */
+	--text-tag--line-height: 1.45;
+	--text-tag--letter-spacing: 0.12em;
 	--text-display: clamp(2.125rem, 1.35rem + 3.1vw, 3.5rem);
 	--text-display--line-height: 1.08;
 	--text-display--letter-spacing: -0.015em;
@@ -95,11 +97,6 @@
 		}
 	}
 
-	/*
-	 * The dot of a work that is in the gallery breathes three times as it arrives, then rests.
-	 * It moves for under five seconds, so nobody needs a way to stop it.
-	 */
-	--animate-breathe: breathe 1500ms ease-out 900ms 3 both;
 	--container-page: 76rem;
 	--container-wide: 96rem; /* a work's page: the photos take more room than the rest of the site gives */
 	--container-prose: 40rem;
@@ -147,7 +144,7 @@
 	animation-delay: calc(var(--motion-stagger) * --value(integer));
 }
 
-/* A ring that grows out of a dot and fades: the dot of a tag, and the gallery on the map. */
+/* A ring that grows out of the gallery's dot on the map and fades. */
 @keyframes breathe {
 	from {
 		opacity: 0.6;

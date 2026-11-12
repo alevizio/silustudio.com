@@ -644,28 +644,13 @@ test('a few works carry sample tags while the site is a preview, and the rest ca
 	await expect(wall.getByText('En la galería', { exact: true })).toHaveCount(3);
 	await expect(wall.getByText('Vendida', { exact: true })).toHaveCount(2);
 	await expect(page.getByText(/^(Disponible|Reservada)$/)).toHaveCount(0);
+	// A tag is small and plain: a word in a frame, smaller than the title above it.
+	const tag = wall.getByText('Vendida', { exact: true }).first();
+	await expect(tag).toHaveCSS('font-size', '11px');
+	expect(await tag.evaluate((element) => element.children.length)).toBe(0);
 	// A work's tag is the same on the wall and on its own page.
 	await page.goto('/obras/resplandor-circular/');
 	await expect(page.getByRole('main').getByText('Vendida', { exact: true })).toBeVisible();
-});
-
-test('the dot of a work in the gallery breathes a few times and then rests', async ({ page }) => {
-	await page.goto('/obras/guijarro/');
-	const breathing = () =>
-		page.evaluate(() =>
-			document
-				.getAnimations()
-				.filter(
-					(animation) => animation instanceof CSSAnimation && animation.animationName === 'breathe'
-				)
-				.map((animation) => animation.effect?.getComputedTiming().endTime)
-		);
-	const [ends] = await breathing();
-	// It moves for less than five seconds, so nobody needs a way to stop it.
-	expect(Number(ends)).toBeGreaterThan(0);
-	expect(Number(ends)).toBeLessThan(6000);
-	await page.emulateMedia({ reducedMotion: 'reduce' });
-	expect(await breathing()).toEqual([]);
 });
 
 test('the visit page draws its own map, and asks Google for one only when the visitor wants it', async ({

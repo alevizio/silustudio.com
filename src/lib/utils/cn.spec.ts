@@ -12,6 +12,7 @@ describe('cn', () => {
 
 	it('keeps a custom type size next to a text colour', () => {
 		expect(cn('text-label', 'text-ink')).toBe('text-label text-ink');
+		expect(cn('text-tag', 'text-ink')).toBe('text-tag text-ink');
 	});
 
 	it('treats the custom type sizes as one group', () => {

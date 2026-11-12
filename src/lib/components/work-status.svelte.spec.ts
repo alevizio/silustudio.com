@@ -25,31 +25,24 @@ describe('work-status.svelte', () => {
 		await expect.element(page.getByText('On view at the gallery')).toBeVisible();
 	});
 
-	it('says the status in words, with the dot hidden from screen readers', async () => {
+	it('says the status in words and nothing else: no dot, no icon', async () => {
 		const { container } = render(WorkStatus, { status: 'sold', lang: 'es' });
-		const dot = container.querySelector('span');
-		expect(dot?.getAttribute('aria-hidden')).toBe('true');
 		expect(container.textContent?.trim()).toBe('Vendida');
+		expect(container.firstElementChild?.children).toHaveLength(0);
 	});
 
-	it('draws a different dot for each status', async () => {
-		const dotClass = (status: WorkStatusName) =>
-			render(WorkStatus, { status, lang: 'es' }).container.querySelector('span')?.className;
-		expect(new Set(STATUSES.map(dotClass)).size).toBe(STATUSES.length);
+	it('looks the same whatever it says, so only the word tells the statuses apart', async () => {
+		const classOf = (status: WorkStatusName) =>
+			render(WorkStatus, { status, lang: 'es' }).container.firstElementChild?.className;
+		expect(new Set(STATUSES.map(classOf)).size).toBe(1);
 	});
 
-	it('frames the word and its dot as a tag', async () => {
+	it('frames the word as a small tag, smaller than the labels around it', async () => {
 		const { container } = render(WorkStatus, { status: 'sold', lang: 'es' });
 		const tag = container.firstElementChild;
 		expect(tag?.classList.contains('border')).toBe(true);
-		expect(tag?.classList.contains('inline-flex')).toBe(true);
-	});
-
-	it('lets only the dot of a work in the gallery breathe, and only when motion is welcome', async () => {
-		const breathes = (status: WorkStatusName) =>
-			render(WorkStatus, { status, lang: 'es' }).container.querySelector('span')?.className ?? '';
-		expect(breathes('onView')).toContain('motion-safe:after:animate-breathe');
-		expect(breathes('sold')).not.toContain('animate-breathe');
+		expect(tag?.classList.contains('text-tag')).toBe(true);
+		expect(tag?.classList.contains('text-label')).toBe(false);
 	});
 
 	it('accepts extra classes', async () => {
