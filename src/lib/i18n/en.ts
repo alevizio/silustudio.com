@@ -78,6 +78,21 @@ export const en: typeof es = {
 			title: 'In the room and up close',
 			alt: 'A work by Silu photographed in the gallery.'
 		},
+		homes: {
+			title: 'In homes',
+			alts: [
+				'A relief on a concrete wall beside a lounge chair.',
+				'A white work above a sofa in a living room.',
+				'A wall work above a sofa in a living room.',
+				'A round blue work above a sofa.',
+				'Reliefs on the wall of a staircase.',
+				'A lit work on a dining room wall.',
+				'A work of rings on a dining room wall.',
+				'A vertical relief beside a large window.',
+				'A relief above a sofa.',
+				'A relief in panels above a sofa.'
+			]
+		},
 		catalog: {
 			label: 'Catalog',
 			title: (count: number) => `${count} more works from the catalog`,
@@ -150,6 +165,20 @@ export const en: typeof es = {
 		film: {
 			title: 'Film of the artists, on Vimeo',
 			play: 'Play the film'
+		},
+		atWork: {
+			title: 'In the workshop',
+			alts: [
+				'The two artists working at a table outdoors, among trees.',
+				'Smoothing the sand of a relief on the workshop table.',
+				'Sanding a round piece outdoors.',
+				'Brushing a curved piece.',
+				'On a ladder beside a relief hung on the wall.',
+				'Two people finishing an oval piece in the workshop.',
+				'Cutting stone with a grinder outdoors.',
+				'Coating an oval piece, crouching beside it.',
+				'Welding a steel sculpture, wearing a mask.'
+			]
 		}
 	},
 	visit: {

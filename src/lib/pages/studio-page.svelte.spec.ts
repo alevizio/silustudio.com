@@ -1,7 +1,11 @@
 import { page } from 'vitest/browser';
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
+import { AT_WORK_PHOTOS } from '#lib/content/images.ts';
 import StudioPage from './studio-page.svelte';
+
+/** The film's still and the three photos of the workshop, before the series of the artists at work. */
+const OWN_PHOTOS = 4;
 
 describe('studio-page.svelte', () => {
 	it('presents both artists and their statement', async () => {
@@ -35,7 +39,17 @@ describe('studio-page.svelte', () => {
 		render(StudioPage, { lang: 'es' });
 		await expect.element(page.getByRole('heading', { level: 1 })).toBeVisible();
 		const images = page.getByRole('img').elements();
-		expect(images).toHaveLength(4);
+		expect(images).toHaveLength(OWN_PHOTOS + AT_WORK_PHOTOS.length);
 		for (const image of images) expect(image.getAttribute('alt')).toBeTruthy();
+	});
+
+	it('shows the artists at work, each photo with its own description', async () => {
+		render(StudioPage, { lang: 'es' });
+		const section = page.getByRole('region', { name: 'En el taller' });
+		await expect.element(section).toBeInTheDocument();
+		await expect
+			.element(page.getByRole('img', { name: 'Soldando una escultura de acero, con máscara.' }))
+			.toBeInTheDocument();
+		expect(section.getByRole('img').elements()).toHaveLength(AT_WORK_PHOTOS.length);
 	});
 });

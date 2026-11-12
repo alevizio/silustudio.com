@@ -421,27 +421,50 @@ export const catalogNumber = (n: number): string => String(n).padStart(2, '0');
 
 /*
  * Works photographed in the artists' stock folder that are not in the PDF catalog. The photos
- * and these four titles come from the designer's proposal of November 2026, which followed
- * that folder. The titles still need the artists' confirmation, and none has a technique or
- * size yet.
+ * and the first four titles come from the designer's proposal of November 2026, which followed
+ * that folder. The titles still need the artists' confirmation, and those four have no
+ * technique or size yet.
  */
 const TITLED_STOCK_WORKS: readonly TitledWork[] = [
 	{ slug: 'mar-de-fondo', title: 'Mar de fondo' },
 	{ slug: 'pables', title: 'Pables' },
 	{ slug: 'encuentro-en-un-reflejo', title: 'Encuentro en un reflejo' },
-	{ slug: 'ser-antiguo', title: 'Ser antiguo (díptico)' }
+	{ slug: 'ser-antiguo', title: 'Ser antiguo (díptico)' },
+	/*
+	 * These two were found on the artists' Instagram: a post shows the very same work as our
+	 * photos and gives its title, technique and size in the artists' own words. They still
+	 * need the artists' word, like the four above.
+	 */
+	{
+		slug: 'opuestos-en-tension',
+		title: 'Opuestos en tensión',
+		medium: {
+			es: 'Tela endurecida con resina sobre madera, revestida con arena',
+			en: 'Fabric hardened with resin on wood, coated in sand'
+		},
+		dimensions: cm(225, 90, 18)
+	},
+	{
+		slug: 'azul-profundo',
+		title: 'Azul profundo',
+		medium: {
+			es: 'Escultura endurecida con resina y revestida en cuarzo teñido con planta de índigo color azul',
+			en: 'Resin-hardened sculpture coated in quartz dyed blue with the indigo plant'
+		},
+		dimensions: cm(60, 50, 12)
+	}
 ];
 
 /*
  * Photographed works with no title yet, by the number of their photo set in the proposal.
  * When the artists name one: move it to the list above (or to the catalog list, with its
  * technique and size) and rename its folder in assets/works to the new slug.
- * Set 34 is labelled "Dar es recibir" in the proposal, but its photos show a different work
- * from the catalog's "Dar es recibir", so it stays untitled until the artists say which it is.
+ * Sets 34 and 42 are no longer here: Instagram showed they are "Opuestos en tensión" (the
+ * proposal had called set 34 "Dar es recibir", which is another work) and "Azul profundo".
  */
 const UNTITLED_REFS = [
-	8, 9, 10, 13, 14, 15, 16, 26, 27, 28, 30, 31, 32, 33, 34, 35, 37, 39, 40, 41, 42, 43, 44, 45, 46,
-	47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67
+	8, 9, 10, 13, 14, 15, 16, 26, 27, 28, 30, 31, 32, 33, 35, 37, 39, 40, 41, 43, 44, 45, 46, 47, 48,
+	49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67
 ];
 
 const UNTITLED_STOCK_WORKS: readonly UntitledWork[] = UNTITLED_REFS.map((ref) => ({

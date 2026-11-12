@@ -22,7 +22,7 @@ The layouts follow three references found on Mobbin: KOBU (two large photos per 
 
 ## Where things live
 
-- `src/lib/content/works.ts`: every work. The 34 of the PDF catalog (title, technique, size, in both languages), then the photographed works that are not in the catalog: four with a title, 46 with none yet.
+- `src/lib/content/works.ts`: every work. The 34 of the PDF catalog (title, technique, size, in both languages), then the photographed works that are not in the catalog: six with a title, 44 with none yet.
 - `src/lib/content/site.ts`: address, phone, email, links. Opening hours go here once the artists provide them.
 - `src/lib/i18n/es.ts` and `en.ts`: every piece of text on the site.
 - `src/lib/assets/`: photos. `works/<slug>/` holds the full size photos of a work, `01.jpg` being the one shown on the wall. `catalog/` holds the small photos of each work cropped from the artists' PDF catalog (`07-1.jpg` is the whole view of work 7). `untitled/` holds photos from the old site not yet matched to a work.
@@ -55,7 +55,7 @@ Every work has its own page (`/obras/guijarro/`, `/en/works/guijarro/`) with its
 
 **Photos.** Put them in `src/lib/assets/works/<slug>/`, named in the order they should show (`01.jpg`, `02.jpg`, `03.jpg`, `04.jpg`). The slug is the last part of the work's address and is listed in `src/lib/content/works.ts`. No code change is needed.
 
-**Works with no title yet.** 46 photographed works are waiting for their titles. Their folders are `obra-08`, `obra-09` and so on, and the site calls them "Obra 8", "Obra 9": never as a title on the wall, only as a quiet reference on the work's own page and for screen readers. When the artists name one, in `src/lib/content/works.ts` take its number out of `UNTITLED_REFS`, add the work with its title (and technique and size if they send them), and rename its folder to the new slug.
+**Works with no title yet.** 44 photographed works are waiting for their titles. Their folders are `obra-08`, `obra-09` and so on, and the site calls them "Obra 8", "Obra 9": never as a title on the wall, only as a quiet reference on the work's own page and for screen readers. When the artists name one, in `src/lib/content/works.ts` take its number out of `UNTITLED_REFS`, add the work with its title (and technique and size if they send them), and rename its folder to the new slug.
 
 **Tags.** In `src/lib/content/works.ts`, add `status: 'onView'`, `'sold'`, `'reserved'` or `'available'` to the work. It shows as a small tag, En la galería, Vendida, Reservada or Disponible, under the work on the wall and over its title on its own page. A work with no status shows no tag.
 
@@ -82,6 +82,8 @@ The visit page closes on the site's own drawing of the coast from Punta del Este
 
 - **Full size photos of the works:** the artists' stock folder, taken from a designer's proposal of November 2026 (208 photos in 66 sets). 16 sets are catalog works: each shares at least one photograph with the PDF catalog, so the match is certain. The other 50 sets are not in the catalog.
 - **Three more full size photos** (Desde el centro del ser, Mismo origen, Dar es recibir) and the photos in `untitled/` come from the artists' old site.
+- **Two works named from Instagram.** "Opuestos en tensión" and "Azul profundo" were sets 34 and 42 with no title. A post on the artists' Instagram shows the very same work as our photos and gives its title, technique and size, so they carry them now, still to be confirmed.
+- **Copies from the artists' Instagram**, about 1080 pixels wide, to be replaced by the original files: the nine black and white photos of the artists at work on the studio page (`assets/studio/taller-NN.jpg`) and the ten photos of works in homes on the works page (`assets/homes/`). Their descriptions are in `es.ts` and `en.ts`, one for each photo in file name order. Recent posts credit the photographers @marufolch and @veme.productora: ask the artists whether a credit is due.
 - **The film on the studio page** is the artists' own, "SILU Artistas Loop", on Vimeo, which their old site also embeds. It loads from Vimeo only when a visitor presses play.
 
 ## Launch day
@@ -91,9 +93,9 @@ Set `launched` to `true` in `src/lib/content/site.ts`. Until then every page car
 ## Still needed from the artists
 
 - Opening hours.
-- Titles, technique and size for the 46 photographed works that have none (`obra-08` to `obra-67`).
+- Titles, technique and size for the 44 photographed works that have none (`obra-08` to `obra-67`). Their Instagram captions name many works: the list read from them is kept outside this repository, in `Silu/Instagram survey 2026-11-11/works-from-captions.tsv`.
 - Confirmation of four titles that come from the designer's proposal and are not in the catalog: Mar de fondo, Pables, Encuentro en un reflejo, Ser antiguo (díptico). And their technique and size.
-- Which work photo set 34 is. The proposal calls it "Dar es recibir", but it shows a different work from the catalog's "Dar es recibir" (two equal panels, 165 × 80 cm), so it is shown with no title.
+- Confirmation of the two titles taken from Instagram, Opuestos en tensión and Azul profundo, with their technique and size.
 - Full size photos of the 15 catalog works that only have small catalog photos, or word that they are sold.
 - Which works are in the gallery, sold, reserved or available. The five tags on the site today are samples.
 - Titles for the nine photos in `src/lib/assets/untitled/`.

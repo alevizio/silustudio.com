@@ -45,4 +45,14 @@ describe('works-page.svelte', () => {
 			.element(page.getByRole('link', { name: 'Send an email' }))
 			.toHaveAttribute('href', 'mailto:info@silustudio.com');
 	});
+
+	it('shows works in the homes of the people who bought them', async () => {
+		render(WorksPage, { lang: 'en' });
+		const section = page.getByRole('region', { name: 'In homes' });
+		await expect.element(section).toBeInTheDocument();
+		expect(section.getByRole('img').elements()).toHaveLength(10);
+		await expect
+			.element(page.getByRole('img', { name: 'A round blue work above a sofa.' }))
+			.toBeInTheDocument();
+	});
 });

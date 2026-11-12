@@ -1,9 +1,15 @@
 <script lang="ts">
 	import LinkButton from '#lib/components/link-button.svelte';
+	import PhotoColumns from '#lib/components/photo-columns.svelte';
 	import SectionHeading from '#lib/components/section-heading.svelte';
 	import Seo from '#lib/components/seo.svelte';
 	import WorksWall from '#lib/components/works-wall.svelte';
-	import { LISTED_WORKS, PHOTOGRAPHED_WORKS, UNTITLED_PHOTOS } from '#lib/content/images.ts';
+	import {
+		IN_HOMES_PHOTOS,
+		LISTED_WORKS,
+		PHOTOGRAPHED_WORKS,
+		UNTITLED_PHOTOS
+	} from '#lib/content/images.ts';
 	import { SITE } from '#lib/content/site.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
 
@@ -33,6 +39,14 @@
 	opensPage
 	class="mx-auto max-w-page px-gutter pb-10 md:pb-14"
 />
+
+<!-- What a work looks like once it has a home: on the walls of the people who bought one. -->
+<section aria-labelledby="works-homes" class="mx-auto max-w-page px-gutter pb-section">
+	<h2 id="works-homes" class="reveal pb-6 text-label text-ink-soft uppercase">
+		{copy.homes.title}
+	</h2>
+	<PhotoColumns photos={IN_HOMES_PHOTOS} alts={copy.homes.alts} />
+</section>
 
 <section aria-labelledby="works-details" class="mx-auto max-w-page px-gutter pb-section">
 	<h2 id="works-details" class="reveal pb-6 text-label text-ink-soft uppercase">

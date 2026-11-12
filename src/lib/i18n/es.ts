@@ -77,6 +77,22 @@ export const es = {
 			title: 'En sala y en detalle',
 			alt: 'Obra de Silu fotografiada en la galería.'
 		},
+		homes: {
+			title: 'En casas',
+			/** One for each photo in assets/homes, in file name order. */
+			alts: [
+				'Relieve en una pared de hormigón, junto a un sillón.',
+				'Obra blanca sobre un sofá, en una sala.',
+				'Obra de pared sobre un sofá, en una sala de estar.',
+				'Obra circular azul sobre un sofá.',
+				'Relieves en la pared de una escalera.',
+				'Obra iluminada en la pared de un comedor.',
+				'Obra de aros en la pared de un comedor.',
+				'Relieve vertical junto a un ventanal.',
+				'Relieve sobre un sofá.',
+				'Relieve en paneles sobre un sofá.'
+			]
+		},
 		catalog: {
 			label: 'Catálogo',
 			title: (count: number) => `${count} obras más del catálogo`,
@@ -150,6 +166,21 @@ export const es = {
 		film: {
 			title: 'Video de los artistas, en Vimeo',
 			play: 'Ver el video'
+		},
+		atWork: {
+			title: 'En el taller',
+			/** One for each photo named taller-NN in assets/studio, in file name order. */
+			alts: [
+				'Los dos artistas trabajando en una mesa al aire libre, entre árboles.',
+				'Alisando la arena de un relieve sobre la mesa del taller.',
+				'Lijando una pieza circular al aire libre.',
+				'Con una brocha sobre una pieza curva.',
+				'En una escalera, junto a un relieve colgado en la pared.',
+				'Dos personas terminando una pieza ovalada en el taller.',
+				'Cortando piedra con una amoladora, al aire libre.',
+				'Revistiendo una pieza ovalada, en cuclillas.',
+				'Soldando una escultura de acero, con máscara.'
+			]
 		}
 	},
 	visit: {

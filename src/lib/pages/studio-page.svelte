@@ -4,8 +4,10 @@
 	import drawing from '#lib/assets/studio/artistas-03.jpg?enhanced';
 	import storage from '#lib/assets/gallery/sala-04.jpg?enhanced';
 	import ArtistsFilm from '#lib/components/artists-film.svelte';
+	import PhotoColumns from '#lib/components/photo-columns.svelte';
 	import SectionHeading from '#lib/components/section-heading.svelte';
 	import Seo from '#lib/components/seo.svelte';
+	import { AT_WORK_PHOTOS } from '#lib/content/images.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
 
 	interface Props {
@@ -71,3 +73,11 @@
 		/>
 	{/each}
 </div>
+
+<!-- The artists and their helpers at work, as their own photographers caught them. -->
+<section aria-labelledby="studio-at-work" class="mx-auto max-w-page px-gutter pb-section">
+	<h2 id="studio-at-work" class="reveal pb-6 text-label text-ink-soft uppercase">
+		{copy.atWork.title}
+	</h2>
+	<PhotoColumns photos={AT_WORK_PHOTOS} alts={copy.atWork.alts} />
+</section>

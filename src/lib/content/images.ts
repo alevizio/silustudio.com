@@ -64,6 +64,33 @@ export const LISTED_WORKS: readonly CatalogWork[] = CATALOG_WORKS.filter(
 /** The order a visitor meets the works in: the wall, then the works with small photos. */
 export const ORDERED_WORKS: readonly Work[] = [...PHOTOGRAPHED_WORKS, ...LISTED_WORKS];
 
+/** Pictures from a folder, in file name order. */
+const inOrder = (modules: Record<string, PictureModule>): Picture[] =>
+	Object.keys(modules)
+		.sort()
+		.map((path) => modules[path].default);
+
+/*
+ * The next two sets are copies from the artists' Instagram (about 1080 pixels wide), to be
+ * replaced by the original files when the artists send them.
+ */
+
+/** The artists and their helpers at work: the black and white series from their Instagram. */
+export const AT_WORK_PHOTOS: readonly Picture[] = inOrder(
+	import.meta.glob<PictureModule>('/src/lib/assets/studio/taller-*.jpg', {
+		eager: true,
+		query: { enhanced: true, w: '1080;720;480' }
+	})
+);
+
+/** Works hanging in the homes of the people who bought them. */
+export const IN_HOMES_PHOTOS: readonly Picture[] = inOrder(
+	import.meta.glob<PictureModule>('/src/lib/assets/homes/*.jpg', {
+		eager: true,
+		query: { enhanced: true, w: '1080;720;480' }
+	})
+);
+
 /**
  * Photos from the old site that could not be matched to a work with certainty: whole works
  * first, then details. They are shown without a label until the artists name them.
