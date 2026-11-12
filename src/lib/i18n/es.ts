@@ -91,7 +91,12 @@ export const es = {
 		/** A work with no title yet is called by the number of its folder. */
 		reference: (ref: number) => `Obra ${ref}`,
 		photoAlt: (name: string, medium?: string) => (medium ? `${name}. ${medium}.` : `${name}.`),
-		status: { label: 'Estado', available: 'Disponible', reserved: 'Reservada', sold: 'Vendida' },
+		status: {
+			onView: 'En la galería',
+			available: 'Disponible',
+			reserved: 'Reservada',
+			sold: 'Vendida'
+		},
 		detail: {
 			material: 'Material',
 			dimensions: 'Medidas',
@@ -104,8 +109,13 @@ export const es = {
 			linkSubject: 'Consulta por una obra',
 			pending: 'Consultanos por el título, las medidas y el material de esta obra.',
 			navLabel: 'Otras obras',
+			pagerLabel: 'Recorrer las obras',
 			previous: 'Obra anterior',
 			next: 'Obra siguiente',
+			before: 'Anterior',
+			after: 'Siguiente',
+			/** `place` is the work's position and `total` how many there are: "Obra 7 de 84". */
+			place: (place: number, total: number) => `Obra ${place} de ${total}`,
 			photoAlt: (name: string, n: number, total: number) => `${name}, foto ${n} de ${total}.`,
 			metaTitle: (name: string) => `${name} · Silu`,
 			/** `facts` are the work's name and, when known, its technique and size. */
@@ -154,7 +164,14 @@ export const es = {
 		follow: 'Instagram',
 		directions: 'Cómo llegar',
 		whatsapp: 'Escribir por WhatsApp',
-		mapTitle: 'Mapa: ubicación de la galería Silu en Manantiales'
+		mapTitle: 'Mapa: ubicación de la galería Silu en Manantiales',
+		map: {
+			alt: 'Mapa de la costa entre Punta del Este y José Ignacio. La galería Silu está sobre la Ruta 10, en Manantiales, al este de La Barra.',
+			sea: 'Océano Atlántico',
+			road: 'Ruta 10',
+			interactive: 'Ver mapa interactivo',
+			credit: 'Mapa dibujado con datos de'
+		}
 	},
 	footer: {
 		rights: 'Silu. Todas las obras y fotografías pertenecen a los artistas.'

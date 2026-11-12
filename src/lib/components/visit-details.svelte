@@ -18,9 +18,12 @@
 		'decoration-line hover:decoration-ink underline underline-offset-4 transition-colors';
 </script>
 
-<!-- Where the gallery is and how to reach the artists. Hours appear once they are provided. -->
-<div class={cn('flex flex-col gap-10', className)}>
-	<dl class="grid gap-8 sm:grid-cols-2">
+<!--
+	Where the gallery is and how to reach the artists. Hours appear once they are provided.
+	Given the width of a page, the facts stand side by side in one row.
+-->
+<div class={cn('@container flex flex-col gap-10', className)}>
+	<dl class="grid gap-8 sm:grid-cols-2 @4xl:auto-cols-fr @4xl:grid-flow-col @4xl:grid-cols-none">
 		<div class="flex flex-col gap-2">
 			<dt class={termClass}>{copy.address}</dt>
 			<dd class={valueClass}>

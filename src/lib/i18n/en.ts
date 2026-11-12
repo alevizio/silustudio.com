@@ -91,7 +91,12 @@ export const en: typeof es = {
 		},
 		reference: (ref: number) => `Work ${ref}`,
 		photoAlt: (name: string, medium?: string) => (medium ? `${name}. ${medium}.` : `${name}.`),
-		status: { label: 'Status', available: 'Available', reserved: 'Reserved', sold: 'Sold' },
+		status: {
+			onView: 'On view at the gallery',
+			available: 'Available',
+			reserved: 'Reserved',
+			sold: 'Sold'
+		},
 		detail: {
 			material: 'Material',
 			dimensions: 'Dimensions',
@@ -103,8 +108,12 @@ export const en: typeof es = {
 			linkSubject: 'Enquiry about a work',
 			pending: 'Ask us for the title, size and material of this work.',
 			navLabel: 'Other works',
+			pagerLabel: 'Browse the works',
 			previous: 'Previous work',
 			next: 'Next work',
+			before: 'Previous',
+			after: 'Next',
+			place: (place: number, total: number) => `Work ${place} of ${total}`,
 			photoAlt: (name: string, n: number, total: number) => `${name}, photo ${n} of ${total}.`,
 			metaTitle: (name: string) => `${name} · Silu`,
 			metaDescription: (facts: string[]) =>
@@ -155,7 +164,14 @@ export const en: typeof es = {
 		follow: 'Instagram',
 		directions: 'Get directions',
 		whatsapp: 'Message on WhatsApp',
-		mapTitle: 'Map: location of the Silu gallery in Manantiales'
+		mapTitle: 'Map: location of the Silu gallery in Manantiales',
+		map: {
+			alt: 'Map of the coast between Punta del Este and José Ignacio. The Silu gallery is on Ruta 10 in Manantiales, east of La Barra.',
+			sea: 'Atlantic Ocean',
+			road: 'Ruta 10',
+			interactive: 'Open the interactive map',
+			credit: 'Map drawn with data from'
+		}
 	},
 	footer: {
 		rights: 'Silu. All works and photographs belong to the artists.'

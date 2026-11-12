@@ -6,6 +6,7 @@
 	import SiteHeader from '#lib/components/site-header.svelte';
 	import VisitBand from '#lib/components/visit-band.svelte';
 	import WallLight from '#lib/components/wall-light.svelte';
+	import { transitionPages } from '#lib/motion/page-transition.ts';
 	import { watchReveals } from '#lib/motion/reveal.ts';
 	import { copyFor, langFromPath, pageFromPath } from '#lib/i18n/index.ts';
 	import type { LayoutProps } from './$types';
@@ -24,17 +25,8 @@
 		document.documentElement.lang = lang;
 	});
 
-	// One page fades into the next where the browser can do it. The styles set the pace, and
-	// turn it off for visitors who ask for less motion.
-	onNavigate((navigation) => {
-		if (!document.startViewTransition) return;
-		return new Promise((resolve) => {
-			document.startViewTransition(async () => {
-				resolve();
-				await navigation.complete;
-			});
-		});
-	});
+	// One page gives way to the next, and a work's photo travels between the wall and its page.
+	onNavigate(transitionPages);
 
 	// Each page brings its own content, so what should arrive on scroll is looked up again.
 	let stopWatching = () => {};

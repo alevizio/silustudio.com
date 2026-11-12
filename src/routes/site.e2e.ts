@@ -28,7 +28,30 @@ const CATALOG = 'main ul[aria-label="Catálogo"]';
 
 /** Waits until nothing on the page is still arriving, so it is checked the way a visitor reads it. */
 const settled = (page: Page) =>
-	page.evaluate(() => Promise.all(document.getAnimations().map((animation) => animation.finished)));
+	page.evaluate(async () => {
+		// Something cut short has come to rest too, so that is not an error.
+		const rest = () =>
+			Promise.all(document.getAnimations().map((animation) => animation.finished.catch(() => {})));
+		await rest();
+		// And once more, for whatever the first round set off.
+		await rest();
+	});
+
+/**
+ * Waits until the browser is moving every one of these parts of a page transition, such as
+ * '::view-transition-old(work-photo)'. It looks on every frame, so a short change is not missed.
+ */
+const moving = (page: Page, parts: string[]) =>
+	page.waitForFunction(
+		(wanted) => {
+			const pictured = document
+				.getAnimations()
+				.map(({ effect }) => (effect instanceof KeyframeEffect ? effect.pseudoElement : null));
+			return wanted.every((part) => pictured.includes(part));
+		},
+		parts,
+		{ polling: 'raf' }
+	);
 
 // The map and the film are third-party pages. The tests never call them: they get an empty
 // document instead.
@@ -154,8 +177,141 @@ test('a visitor opens a catalog work, moves to the next one and comes back', asy
 	await page.getByRole('navigation', { name: 'Otras obras' }).locator('a[rel="next"]').click();
 	await expect(page).not.toHaveURL(/duna-banada-en-peltre/);
 	await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
-	await page.getByRole('main').getByRole('link', { name: 'Obras' }).click();
-	await expect(page).toHaveURL(/\/obras\/$/);
+	// The way back leads to the place on the wall of the work just seen.
+	await page.getByRole('main').getByRole('link', { name: 'Obras', exact: true }).click();
+	await expect(page).toHaveURL(/\/obras\/#[a-z0-9-]+$/);
+});
+
+test('the way back from a work opens the wall at that work', async ({ page }) => {
+	await page.goto('/obras/obra-41/');
+	await page.getByRole('main').getByRole('link', { name: 'Obras', exact: true }).click();
+	await expect(page).toHaveURL(/\/obras\/#obra-41$/);
+	await expect(page.locator('#obra-41')).toBeInViewport();
+});
+
+test('the arrows and the arrow keys walk from one work to the next and back', async ({ page }) => {
+	await page.goto('/obras/guijarro/');
+	const pager = page.getByRole('navigation', { name: 'Recorrer las obras' });
+	const next = pager.locator('a[rel="next"]');
+	await expect(pager.getByText(`01 / ${WORKS}`)).toBeVisible();
+	// The first work has nothing before it.
+	await expect(pager.locator('a[rel="prev"]')).toHaveCount(0);
+	const place = await next.boundingBox();
+	await next.click();
+	await expect(pager.getByText(`02 / ${WORKS}`)).toBeVisible();
+	// The arrow has not moved, so it can be pressed again without looking for it.
+	expect(await next.boundingBox()).toEqual(place);
+	// Part way down a work's photos, the arrow key still opens the next work at its top.
+	await page.evaluate(() => scrollTo({ top: 600, behavior: 'instant' }));
+	await page.keyboard.press('ArrowRight');
+	await expect(pager.getByText(`03 / ${WORKS}`)).toBeVisible();
+	await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+	await page.keyboard.press('ArrowLeft');
+	await expect(pager.getByText(`02 / ${WORKS}`)).toBeVisible();
+	// With the keyboard on the arrow itself, Enter walks on and the focus stays on the arrow.
+	await next.focus();
+	await page.keyboard.press('Enter');
+	await expect(pager.getByText(`03 / ${WORKS}`)).toBeVisible();
+	await expect(next).toBeFocused();
+	await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+	// A new work starts at its top, wherever the visitor was on the last one.
+	expect(await page.evaluate(() => scrollY)).toBe(0);
+});
+
+test('the walk ends at the last work', async ({ page }) => {
+	await page.goto('/obras/');
+	await page.locator(`${CATALOG} a`).last().click();
+	const pager = page.getByRole('navigation', { name: 'Recorrer las obras' });
+	await expect(pager.getByText(`${WORKS} / ${WORKS}`)).toBeVisible();
+	await expect(pager.locator('a[rel="next"]')).toHaveCount(0);
+	const address = page.url();
+	await page.keyboard.press('ArrowRight');
+	expect(page.url()).toBe(address);
+});
+
+test("a work's photo travels from the wall into its page, and back to its place", async ({
+	page
+}) => {
+	await page.goto('/obras/');
+	await settled(page);
+	await page.locator(WALL).getByRole('link', { name: 'Reencause' }).click();
+	// Both ends of the trip are pictured: the photo on the wall and the one on the page.
+	await moving(page, ['::view-transition-old(work-photo)', '::view-transition-new(work-photo)']);
+	await expect(page).toHaveURL(/\/obras\/reencause\/$/);
+	await settled(page);
+	// Once it has landed nothing stays marked, and the page is itself again.
+	await expect(page.locator('html')).not.toHaveAttribute('data-walk', /.*/);
+
+	await page.getByRole('main').getByRole('link', { name: 'Obras', exact: true }).click();
+	await moving(page, ['::view-transition-old(work-photo)', '::view-transition-new(work-photo)']);
+	await expect(page).toHaveURL(/\/obras\/#reencause$/);
+	await settled(page);
+	await expect(page.locator('#reencause img')).toBeInViewport();
+	await expect(page.locator('.travelling-photo')).toHaveCount(0);
+});
+
+test('walking to the next work moves the photos sideways, and back the other way', async ({
+	page
+}) => {
+	await page.goto('/obras/reencause/');
+	await settled(page);
+	const pager = page.getByRole('navigation', { name: 'Recorrer las obras' });
+	await pager.locator('a[rel="next"]').click();
+	// The photo on screen leaves and the next one comes in: two photos, not one that changes.
+	await moving(page, ['::view-transition-old(leaving-photo)', '::view-transition-new(work-photo)']);
+	await expect(page.locator('html')).toHaveAttribute('data-walk', 'next');
+	await settled(page);
+	await expect(page.locator('html')).not.toHaveAttribute('data-walk', /.*/);
+
+	await page.keyboard.press('ArrowLeft');
+	await moving(page, ['::view-transition-old(leaving-photo)', '::view-transition-new(work-photo)']);
+	await expect(page.locator('html')).toHaveAttribute('data-walk', 'previous');
+	await expect(page).toHaveURL(/\/obras\/reencause\/$/);
+});
+
+test('the header keeps its place while the page under it changes', async ({ page }) => {
+	await page.goto('/');
+	await settled(page);
+	await page
+		.getByRole('navigation', { name: 'Principal' })
+		.getByRole('link', { name: 'Estudio' })
+		.click();
+	await moving(page, [
+		'::view-transition-old(root)',
+		'::view-transition-new(root)',
+		'::view-transition-group(site-header)'
+	]);
+	await expect(page).toHaveURL(/\/estudio\/$/);
+});
+
+test('pages change at once, with nothing travelling, for visitors who ask for less motion', async ({
+	page
+}) => {
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	await page.goto('/obras/');
+	// Keeps watching for any part of a page transition for as long as the page lives.
+	await page.evaluate(() => {
+		const root = document.documentElement;
+		root.dataset.sawTransition = 'no';
+		const look = (): void => {
+			const pictured = document
+				.getAnimations()
+				.some(
+					({ effect }) =>
+						effect instanceof KeyframeEffect &&
+						effect.pseudoElement?.startsWith('::view-transition')
+				);
+			if (pictured) root.dataset.sawTransition = 'yes';
+			requestAnimationFrame(look);
+		};
+		look();
+	});
+	await page.locator(WALL).getByRole('link', { name: 'Guijarro' }).click();
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Guijarro');
+	await page.keyboard.press('ArrowRight');
+	await expect(page.getByText(`02 / ${WORKS}`)).toBeVisible();
+	await expect(page.locator('html')).toHaveAttribute('data-saw-transition', 'no');
+	await expect(page.locator('html')).not.toHaveAttribute('data-walk', /.*/);
 });
 
 test('every work on the works page has its own page', async ({ page }) => {
@@ -480,9 +636,149 @@ test('a work on the wall comes a hair closer under the pointer', async ({ page }
 	expect((after?.width ?? 0) / (before?.width ?? 1)).toBeLessThan(1.03);
 });
 
-test('no work shows a status until one is confirmed', async ({ page }) => {
+test('a few works carry sample tags while the site is a preview, and the rest carry none', async ({
+	page
+}) => {
 	await page.goto('/obras/');
-	await expect(page.getByText(/^(Disponible|Reservada|Vendida)$/)).toHaveCount(0);
+	const wall = page.locator(WALL);
+	await expect(wall.getByText('En la galería', { exact: true })).toHaveCount(3);
+	await expect(wall.getByText('Vendida', { exact: true })).toHaveCount(2);
+	await expect(page.getByText(/^(Disponible|Reservada)$/)).toHaveCount(0);
+	// A work's tag is the same on the wall and on its own page.
+	await page.goto('/obras/resplandor-circular/');
+	await expect(page.getByRole('main').getByText('Vendida', { exact: true })).toBeVisible();
+});
+
+test('the dot of a work in the gallery breathes a few times and then rests', async ({ page }) => {
+	await page.goto('/obras/guijarro/');
+	const breathing = () =>
+		page.evaluate(() =>
+			document
+				.getAnimations()
+				.filter(
+					(animation) => animation instanceof CSSAnimation && animation.animationName === 'breathe'
+				)
+				.map((animation) => animation.effect?.getComputedTiming().endTime)
+		);
+	const [ends] = await breathing();
+	// It moves for less than five seconds, so nobody needs a way to stop it.
+	expect(Number(ends)).toBeGreaterThan(0);
+	expect(Number(ends)).toBeLessThan(6000);
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	expect(await breathing()).toEqual([]);
+});
+
+test('the visit page draws its own map, and asks Google for one only when the visitor wants it', async ({
+	page
+}) => {
+	const asked: string[] = [];
+	page.on('request', (request) => {
+		if (/google\.com\/maps/.test(request.url())) asked.push(request.url());
+	});
+	await page.goto('/visitar/');
+	const map = page.getByRole('img', { name: /^Mapa de la costa entre Punta del Este/ });
+	await map.scrollIntoViewIfNeeded();
+	await expect(map).toBeVisible();
+	await expect(page.getByRole('link', { name: '© OpenStreetMap' })).toBeVisible();
+	expect(asked).toEqual([]);
+
+	await page.getByRole('button', { name: 'Ver mapa interactivo' }).click();
+	const interactive = page.locator(
+		'iframe[title="Mapa: ubicación de la galería Silu en Manantiales"]'
+	);
+	await expect(interactive).toHaveAttribute('src', /-34\.9051398,-54\.8278289/);
+	await expect(interactive).toBeFocused();
+	await expect(map).toHaveCount(0);
+	await expect.poll(() => asked.length).toBeGreaterThan(0);
+});
+
+for (const [screen, size] of [
+	['a wide screen', { width: 1440, height: 900 }],
+	['a phone', PHONE]
+] as const) {
+	test(`on ${screen} the names on the map sit where the drawing puts their places`, async ({
+		page
+	}) => {
+		await page.setViewportSize(size);
+		await page.goto('/visitar/');
+		const map = page.getByRole('img', { name: /^Mapa de la costa/ });
+		await map.scrollIntoViewIfNeeded();
+		await settled(page);
+		// How far the gallery's dot and La Barra's dot are from their points in the drawing.
+		const drift = await map.evaluate((box) => {
+			const drawing = box.querySelector('svg');
+			const matrix = drawing?.getScreenCTM();
+			if (!drawing || !matrix) return [];
+			const onScreen = (x: number, y: number): DOMPoint =>
+				new DOMPoint(x, y).matrixTransform(matrix);
+			const centreOf = (element: Element): { x: number; y: number } => {
+				const { left, top, width, height } = element.getBoundingClientRect();
+				return { x: left + width / 2, y: top + height / 2 };
+			};
+			const { width, height } = drawing.viewBox.baseVal;
+			return [...box.querySelectorAll<HTMLElement>('.map-point')]
+				.filter((point) => point.querySelector('.rounded-full') && point.offsetParent !== null)
+				.map((point) => {
+					const x = Number(point.style.getPropertyValue('--x'));
+					const y = Number(point.style.getPropertyValue('--y'));
+					const drawn = onScreen(x * width, y * height);
+					const dot = centreOf(point.querySelector('.rounded-full') ?? point);
+					return Math.hypot(dot.x - drawn.x, dot.y - drawn.y);
+				});
+		});
+		// The gallery and La Barra show on every screen. The far towns only on a wide one.
+		expect(drift.length).toBeGreaterThanOrEqual(2);
+		for (const distance of drift) expect(distance).toBeLessThan(1.5);
+		// The gallery is in the middle of the map, and nothing on it spills sideways.
+		const [pin, frame] = await Promise.all([
+			map.locator('.map-pin').boundingBox(),
+			map.boundingBox()
+		]);
+		const pinCentre = (pin?.x ?? 0) + (pin?.width ?? 0) / 2;
+		expect(Math.abs(pinCentre - ((frame?.x ?? 0) + (frame?.width ?? 0) / 2))).toBeLessThan(1.5);
+	});
+}
+
+test('the coast road is drawn as the map arrives, and is simply there without motion or scripts', async ({
+	page,
+	browser
+}) => {
+	await page.goto('/visitar/');
+	const road = page.locator('path.drawn-line');
+	await expect(road).toHaveCSS('stroke-dashoffset', '1px');
+	await road.scrollIntoViewIfNeeded();
+	await expect(road).toHaveCSS('animation-name', 'draw-line');
+	await settled(page);
+	await expect(road).toHaveCSS('stroke-dashoffset', '0px');
+
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	await page.reload();
+	await expect(road).toHaveCSS('animation-name', 'none');
+	await expect(road).toHaveCSS('stroke-dashoffset', '0px');
+
+	const context = await browser.newContext({ javaScriptEnabled: false });
+	const still = await context.newPage();
+	await still.goto('/visitar/');
+	await expect(still.locator('path.drawn-line')).toHaveCSS('stroke-dashoffset', '0px');
+	await expect(still.locator('.map-pin')).toHaveCSS('opacity', '1');
+	await context.close();
+});
+
+test('a button fills with colour under the pointer, and its label stays readable', async ({
+	page
+}) => {
+	await page.goto('/');
+	await settled(page);
+	const button = page.getByRole('link', { name: 'Ver todas las obras' }).first();
+	const fill = () => button.evaluate((link) => getComputedStyle(link, '::before').scale);
+	expect(await fill()).toBe('1 0');
+	await button.hover();
+	await expect.poll(fill).toMatch(/^1( 1)?$/);
+	// Wall coloured words on ink.
+	await expect(button).toHaveCSS('color', 'rgb(246, 244, 239)');
+	await expect
+		.poll(() => button.evaluate((link) => getComputedStyle(link, '::before').backgroundColor))
+		.toBe('rgb(35, 33, 30)');
 });
 
 test('every page except Visit ends with the invitation to visit', async ({ page }) => {

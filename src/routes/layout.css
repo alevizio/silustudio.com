@@ -66,7 +66,16 @@
 	--motion-arrive: 1400ms; /* how long something takes to arrive */
 	--motion-stagger: 220ms; /* the pause between neighbours arriving one after another */
 	--motion-rise: 2rem; /* how far something rises as it arrives */
-	--motion-crossfade: 450ms; /* one page fading into the next */
+
+	/* Moving between pages: the old page fades away, the wall is bare for a moment, the new one fades in. */
+	--motion-leave: 240ms;
+	--motion-between: 170ms;
+	--motion-enter: 640ms;
+	--motion-travel: 760ms; /* a photo flying between its place on the wall and its own page */
+	--motion-step: 6rem; /* how far a photo moves aside when walking from one work to the next */
+	--motion-fill: 500ms; /* a button filling with colour under the pointer */
+	--motion-draw: 2600ms; /* the coast road being drawn on the map */
+	--motion-pin: 1100ms; /* when the line reaches the gallery, and its dot lands */
 
 	/* A page's opening lines and photo arrive as it loads. */
 	--animate-arrive: arrive var(--motion-arrive) var(--ease-settle) both;
@@ -85,12 +94,18 @@
 			scale: 1.07;
 		}
 	}
+
+	/*
+	 * The dot of a work that is in the gallery breathes three times as it arrives, then rests.
+	 * It moves for under five seconds, so nobody needs a way to stop it.
+	 */
+	--animate-breathe: breathe 1500ms ease-out 900ms 3 both;
 	--container-page: 76rem;
 	--container-wide: 96rem; /* a work's page: the photos take more room than the rest of the site gives */
 	--container-prose: 40rem;
 	--aspect-room: 3 / 2;
 	--aspect-facade: 5 / 2;
-	--aspect-map: 16 / 9;
+	--aspect-coast: 11 / 5; /* the coast map: the shape of its drawing in content/coast-map.ts */
 	--aspect-film: 9 / 16;
 }
 
@@ -130,6 +145,99 @@
 /* The same pause for what arrives as the page loads. */
 @utility arrive-after-* {
 	animation-delay: calc(var(--motion-stagger) * --value(integer));
+}
+
+/* A ring that grows out of a dot and fades: the dot of a tag, and the gallery on the map. */
+@keyframes breathe {
+	from {
+		opacity: 0.6;
+		scale: 1;
+	}
+	to {
+		opacity: 0;
+		scale: 3.4;
+	}
+}
+
+/*
+ * The coast map (coast-map.svelte). On a wide screen the whole drawing shows. On a phone the
+ * map is a square cut from the middle of the drawing, so everything on it spreads out from
+ * the centre: --map-spread is the width of the whole drawing, measured against the map's box.
+ */
+@utility coast-map {
+	--map-spread: calc(100% * var(--aspect-coast));
+
+	@variant md {
+		--map-spread: 100%;
+	}
+}
+
+/* A point on the map: --x and --y say how far across and down the drawing it is, from 0 to 1. */
+@utility map-point {
+	position: absolute;
+	top: calc(var(--y) * 100%);
+	left: calc(50% + (var(--x) - 0.5) * var(--map-spread));
+}
+
+/* A length on the map: --length is a fraction of the drawing's width. */
+@utility map-length {
+	width: calc(var(--length) * var(--map-spread));
+}
+
+/* The drawing has no frame: its land fades into the wall at the top and at both sides. */
+@utility fades-into-wall {
+	mask-image:
+		linear-gradient(to bottom, transparent, black 18%),
+		linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+	mask-composite: intersect;
+}
+
+/*
+ * As the map arrives, the coast road is drawn from Punta del Este to José Ignacio, and the
+ * gallery's dot lands as the line passes it, then breathes twice. All of it is over in under
+ * five seconds. Without motion, or without scripts, the finished map is simply there.
+ */
+@utility drawn-line {
+	@media screen and (prefers-reduced-motion: no-preference) {
+		stroke-dasharray: 1;
+
+		[data-reveal='waiting'] & {
+			stroke-dashoffset: 1;
+		}
+
+		[data-reveal='shown'] & {
+			animation: draw-line var(--motion-draw) ease-in-out both;
+		}
+	}
+}
+
+@keyframes draw-line {
+	from {
+		stroke-dashoffset: 1;
+	}
+}
+
+@utility map-pin {
+	@media screen and (prefers-reduced-motion: no-preference) {
+		[data-reveal='waiting'] & {
+			opacity: 0;
+		}
+
+		[data-reveal='shown'] & {
+			animation: land-pin var(--motion-enter) var(--ease-settle) var(--motion-pin) both;
+		}
+
+		[data-reveal='shown'] &::after {
+			animation: breathe 1500ms ease-out calc(var(--motion-pin) + var(--motion-enter)) 2 both;
+		}
+	}
+}
+
+@keyframes land-pin {
+	from {
+		opacity: 0;
+		scale: 0.3;
+	}
 }
 
 /*
@@ -176,11 +284,98 @@
 	}
 }
 
-/* Moving between pages: the old page fades into the new one. Asking for less motion turns it off. */
-::view-transition-old(root),
+/*
+ * Moving between pages (motion/page-transition.ts). The old page fades away, the wall is left
+ * bare for a moment, and the new page fades in. Asking for less motion turns all of it off.
+ */
+::view-transition-old(root) {
+	animation: page-leave var(--motion-leave) ease-out both;
+}
+
 ::view-transition-new(root) {
-	animation-duration: var(--motion-crossfade);
-	animation-timing-function: ease-in-out;
+	animation: page-enter var(--motion-enter) var(--ease-settle) var(--motion-between) both;
+}
+
+@keyframes page-leave {
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes page-enter {
+	from {
+		opacity: 0;
+	}
+}
+
+/* A click during the change reaches the new page, so an arrow can be pressed again at once. */
+::view-transition {
+	pointer-events: none;
+}
+
+/* The header keeps its place while the page under it changes. */
+@utility keeps-its-place {
+	view-transition-name: site-header;
+}
+
+/*
+ * The photo that travels. A work's photo on a wall and the photo that opens its page share
+ * one name, so the browser flies the photo from one place to the other, growing or shrinking
+ * on the way.
+ */
+@utility travelling-photo {
+	view-transition-name: work-photo;
+
+	/* While walking on to another work, the photo on screen is the one that leaves. */
+	:root[data-leaving] & {
+		view-transition-name: leaving-photo;
+	}
+}
+
+::view-transition-group(work-photo) {
+	animation-duration: var(--motion-travel);
+	animation-timing-function: var(--ease-settle);
+}
+
+/* It is the same photo at both ends, so the sharper one takes over quickly. */
+::view-transition-old(work-photo),
+::view-transition-new(work-photo) {
+	animation-duration: var(--motion-leave);
+}
+
+/*
+ * Walking from one work to the next: the photo on screen leaves to one side and the new one
+ * comes in from the other, the way works pass by along a wall. --walk-side is the side the
+ * old photo leaves to: -1 is left, towards the next work, and 1 is right.
+ */
+:root[data-walk='next'] {
+	--walk-side: -1;
+}
+
+:root[data-walk='previous'] {
+	--walk-side: 1;
+}
+
+:root[data-walk]::view-transition-old(leaving-photo) {
+	animation: walk-away var(--motion-leave) ease-in both;
+}
+
+:root[data-walk]::view-transition-new(work-photo) {
+	animation: walk-up var(--motion-enter) var(--ease-settle) var(--motion-between) both;
+}
+
+@keyframes walk-away {
+	to {
+		opacity: 0;
+		translate: calc(var(--walk-side) * var(--motion-step)) 0;
+	}
+}
+
+@keyframes walk-up {
+	from {
+		opacity: 0;
+		translate: calc(var(--walk-side) * var(--motion-step) * -1) 0;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -198,7 +393,6 @@
 		font-family: var(--font-sans);
 		-webkit-font-smoothing: antialiased;
 		text-rendering: optimizeLegibility;
-		scroll-behavior: smooth;
 		scroll-padding-top: var(--spacing-gutter);
 	}
 
@@ -227,11 +421,5 @@
 	::selection {
 		background-color: var(--color-sand);
 		color: var(--color-ink);
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		html {
-			scroll-behavior: auto;
-		}
 	}
 }

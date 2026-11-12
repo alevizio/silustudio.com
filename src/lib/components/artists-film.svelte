@@ -50,7 +50,7 @@
 			class="group absolute inset-0 flex cursor-pointer items-center justify-center"
 		>
 			<span
-				class="inline-flex min-h-12 items-center border border-ink bg-ink px-6 text-label text-wall uppercase transition-colors group-hover:border-ink-soft group-hover:bg-ink-soft"
+				class="relative isolate inline-flex min-h-12 items-center overflow-hidden border border-ink bg-ink px-6 text-label text-wall uppercase transition-colors duration-(--motion-fill) group-hover:border-sand-deep group-focus-visible:border-sand-deep before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:bg-sand-deep before:transition-transform before:duration-(--motion-fill) before:ease-settle group-hover:before:scale-y-100 group-focus-visible:before:scale-y-100 motion-reduce:before:transition-none"
 			>
 				{copy.play}
 			</span>

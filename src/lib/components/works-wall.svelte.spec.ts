@@ -1,8 +1,9 @@
 import { page } from 'vitest/browser';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { PHOTOGRAPHED_WORKS } from '#lib/content/images.ts';
 import { WORKS, type Work } from '#lib/content/works.ts';
+import { transit } from '#lib/motion/transit.svelte.ts';
 import WorksWall from './works-wall.svelte';
 
 const bySlug = (slug: string): Work[] => WORKS.filter((work) => work.slug === slug);
@@ -11,6 +12,10 @@ const guijarro = bySlug('guijarro');
 const untitled = bySlug('obra-41');
 /** A catalog work that only has the small catalog photos. */
 const listed = bySlug('duna-banada-en-peltre');
+
+afterEach(() => {
+	transit.slug = null;
+});
 
 describe('works-wall.svelte', () => {
 	it('hangs a work with its photo, its title and its size, linked to its page', async () => {
@@ -103,6 +108,30 @@ describe('works-wall.svelte', () => {
 			.elements()
 			.map((image) => image.getAttribute('loading'));
 		expect(loading).toEqual(['lazy', 'lazy', 'lazy']);
+	});
+
+	it('lets the photo of the work being opened or left travel, and no other', async () => {
+		transit.slug = PHOTOGRAPHED_WORKS[2].slug;
+		render(WorksWall, { works: PHOTOGRAPHED_WORKS.slice(0, 3), lang: 'es', label: 'Obras' });
+		await expect.element(page.getByRole('list', { name: 'Obras' })).toBeVisible();
+		const photos = page.getByRole('img').elements();
+		expect(photos.map((photo) => photo.classList.contains('travelling-photo'))).toEqual([
+			false,
+			false,
+			true
+		]);
+		// The travelling photo has to be there when the page changes, so it does not wait to load.
+		expect(photos.map((photo) => photo.getAttribute('loading'))).toEqual(['lazy', 'lazy', 'eager']);
+	});
+
+	it('lets no photo travel while the visitor is just looking at the wall', async () => {
+		const { container } = render(WorksWall, {
+			works: PHOTOGRAPHED_WORKS.slice(0, 3),
+			lang: 'es',
+			label: 'Obras'
+		});
+		await expect.element(page.getByRole('list', { name: 'Obras' })).toBeVisible();
+		expect(container.querySelectorAll('.travelling-photo')).toHaveLength(0);
 	});
 
 	it('writes the size and the stand-in name in the page language', async () => {

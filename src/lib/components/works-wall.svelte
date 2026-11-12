@@ -3,6 +3,7 @@
 	import type { Work } from '#lib/content/works.ts';
 	import { workHref } from '#lib/i18n/href.ts';
 	import { copyFor, nameOf, type Lang } from '#lib/i18n/index.ts';
+	import { transit } from '#lib/motion/transit.svelte.ts';
 	import { cn } from '#lib/utils/cn.ts';
 	import WorkStatus from './work-status.svelte';
 
@@ -55,9 +56,12 @@
 	photos of a row share one baseline and their labels start on one line. The whole tile
 	opens the work's page, and its id lets a link point at it (/obras/#simbiosis). A tile
 	arrives softly as the visitor reaches it, and its photo comes a hair closer under the pointer.
+	When the visitor opens a work or comes back from one, that work's photo travels between
+	its place here and its own page.
 -->
 <ul aria-label={label} class={cn('grid gap-x-gutter', layout.grid, className)}>
 	{#each hung as { work, photo, name }, index (work.slug)}
+		{@const travels = transit.slug === work.slug}
 		<li
 			id={work.slug}
 			class={cn(
@@ -69,8 +73,11 @@
 				src={photo}
 				alt={photoAlt(name, work.medium?.[lang])}
 				sizes={layout.sizes}
-				loading={opensPage && index < columns ? 'eager' : 'lazy'}
-				class="max-h-hang max-w-full self-end justify-self-center object-contain transition-transform duration-700 ease-settle motion-safe:group-focus-within:scale-102 motion-safe:group-hover:scale-102"
+				loading={travels || (opensPage && index < columns) ? 'eager' : 'lazy'}
+				class={[
+					'max-h-hang max-w-full self-end justify-self-center object-contain transition-transform duration-700 ease-settle motion-safe:group-focus-within:scale-102 motion-safe:group-hover:scale-102',
+					travels && 'travelling-photo'
+				]}
 			/>
 			<div class="flex flex-col items-center gap-1.5 text-center">
 				<p class="text-label text-ink uppercase">

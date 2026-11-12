@@ -2,8 +2,8 @@
 	import facade from '#lib/assets/gallery/fachada.jpg?enhanced';
 	import SectionHeading from '#lib/components/section-heading.svelte';
 	import Seo from '#lib/components/seo.svelte';
+	import GalleryMap from '#lib/components/gallery-map.svelte';
 	import VisitDetails from '#lib/components/visit-details.svelte';
-	import { SITE } from '#lib/content/site.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
 
 	interface Props {
@@ -33,17 +33,9 @@
 	/>
 </div>
 
-<section
-	aria-label={copy.pageTitle}
-	class="mx-auto grid max-w-page gap-12 px-gutter py-section lg:grid-cols-12 lg:gap-x-16"
->
-	<VisitDetails {lang} class="reveal lg:col-span-5" />
-	<!-- The map is muted to grey so it sits quietly on the page. -->
-	<iframe
-		src={SITE.mapEmbedUrl}
-		title={copy.mapTitle}
-		loading="lazy"
-		referrerpolicy="no-referrer-when-downgrade"
-		class="aspect-map w-full reveal bg-plate grayscale reveal-after-1 lg:col-span-7"
-	></iframe>
+<section aria-label={copy.pageTitle} class="mx-auto max-w-page px-gutter py-section">
+	<VisitDetails {lang} class="reveal" />
 </section>
+
+<!-- The page closes on the map, as wide as the screen. -->
+<GalleryMap {lang} class="pb-section" />

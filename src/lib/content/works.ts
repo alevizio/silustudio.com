@@ -1,8 +1,10 @@
 import type { Lang } from '#lib/i18n/index.ts';
+import { SITE } from './site.ts';
 
 export type Localized = Record<Lang, string>;
 
-export type WorkStatus = 'available' | 'reserved' | 'sold';
+/** `onView` is a work that hangs in the gallery today. The others say whether it can be bought. */
+export type WorkStatus = 'onView' | 'available' | 'reserved' | 'sold';
 
 interface WorkBase {
 	/** Last part of the work's address, and the name of its photo folder in assets/works. */
@@ -85,7 +87,33 @@ const round = (diameter: number, depth?: number): Localized => ({
 	en: `${diameter} cm diameter${depth ? ` × ${depth} cm deep` : ''}`
 });
 
-export const CATALOG_WORKS: readonly CatalogWork[] = [
+/*
+ * SAMPLES, NOT FACTS. Ale asked to see how the tags look, so these works carry a made-up
+ * status while the site is a preview. Nothing here is true of the real works, and none of it
+ * can reach the public site: the list is empty the moment SITE.launched is true.
+ * When the artists confirm the real ones, write each as `status` on its work below and
+ * delete this list.
+ */
+export const SAMPLE_STATUSES: Readonly<Record<string, WorkStatus>> = SITE.launched
+	? {}
+	: {
+			guijarro: 'onView',
+			'impronta-humana': 'sold',
+			supraconciencia: 'onView',
+			'resplandor-circular': 'sold',
+			reencause: 'onView'
+		};
+
+/**
+ * The work as written, or with its sample status while the site is a preview. A status the
+ * artists have confirmed always wins over a sample.
+ */
+const withSampleStatus = <T extends Work>(work: T): T => {
+	const sample = work.status === undefined ? SAMPLE_STATUSES[work.slug] : undefined;
+	return sample === undefined ? work : { ...work, status: sample };
+};
+
+const CATALOG: readonly CatalogWork[] = [
 	{
 		n: 1,
 		slug: 'guijarro',
@@ -420,6 +448,8 @@ const UNTITLED_STOCK_WORKS: readonly UntitledWork[] = UNTITLED_REFS.map((ref) =>
 	slug: `obra-${catalogNumber(ref)}`,
 	ref
 }));
+
+export const CATALOG_WORKS: readonly CatalogWork[] = CATALOG.map(withSampleStatus);
 
 /** Every work on the site: the catalog first, then the photographed works that are not in it. */
 export const WORKS: readonly Work[] = [

@@ -32,8 +32,27 @@ describe('link-button.svelte', () => {
 			children: label('Planificar la visita')
 		});
 		const link = page.getByRole('link', { name: 'Planificar la visita' });
-		await expect.element(link).toHaveClass(/underline/);
+		// A faint rule is always under the label, and a darker one is drawn over it on hover.
+		await expect.element(link).toHaveClass(/before:bg-line/);
+		await expect.element(link).toHaveClass(/hover:after:scale-x-100/);
 		await expect.element(link).not.toHaveClass(/border/);
+	});
+
+	it('fills a button with colour from the bottom, for the pointer and the keyboard alike', async () => {
+		render(LinkButton, { href: '/', children: label('Sólido') });
+		render(LinkButton, { href: '/', variant: 'line', children: label('Línea') });
+		for (const name of ['Sólido', 'Línea']) {
+			const button = page.getByRole('link', { name });
+			await expect.element(button).toHaveClass(/before:origin-bottom/);
+			await expect.element(button).toHaveClass(/hover:before:scale-y-100/);
+			await expect.element(button).toHaveClass(/focus-visible:before:scale-y-100/);
+			// Visitors who ask for less motion get the new colour at once.
+			await expect.element(button).toHaveClass(/motion-reduce:before:transition-none/);
+		}
+		await expect
+			.element(page.getByRole('link', { name: 'Sólido' }))
+			.toHaveClass(/before:bg-sand-deep/);
+		await expect.element(page.getByRole('link', { name: 'Línea' })).toHaveClass(/before:bg-ink/);
 	});
 
 	it('accepts a variant and extra classes', async () => {

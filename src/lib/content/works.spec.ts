@@ -1,10 +1,11 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { CATALOG_WORKS, WORKS, catalogNumber, findWork } from './works.ts';
+import { SITE } from './site.ts';
+import { CATALOG_WORKS, SAMPLE_STATUSES, WORKS, catalogNumber, findWork } from './works.ts';
 
 const CATALOG_SIZE = 34;
 const ASSETS = 'src/lib/assets';
-const STATUSES = ['available', 'reserved', 'sold'];
+const STATUSES = ['onView', 'available', 'reserved', 'sold'];
 
 describe('CATALOG_WORKS', () => {
 	it('lists the whole catalog in order', () => {
@@ -48,11 +49,33 @@ describe('WORKS', () => {
 		}
 	});
 
-	it('only uses the three known statuses, and only where one was confirmed', () => {
+	it('only uses the four known statuses', () => {
 		const unknown = WORKS.filter(
 			(work) => work.status !== undefined && !STATUSES.includes(work.status)
 		);
 		expect(unknown).toEqual([]);
+	});
+});
+
+describe('SAMPLE_STATUSES', () => {
+	it('only ever exists while the site is a preview, so no sample reaches the public site', () => {
+		// The day the site launches this list has to be empty: a sample is not a fact.
+		if (SITE.launched) expect(SAMPLE_STATUSES).toEqual({});
+		else expect(Object.keys(SAMPLE_STATUSES).length).toBeGreaterThan(0);
+	});
+
+	it('names real works, and shows both a work in the gallery and a sold one', () => {
+		for (const [slug, status] of Object.entries(SAMPLE_STATUSES)) {
+			expect(findWork(slug)?.status, slug).toBe(status);
+		}
+		if (!SITE.launched) {
+			expect(Object.values(SAMPLE_STATUSES)).toEqual(expect.arrayContaining(['onView', 'sold']));
+		}
+	});
+
+	it('is the only place a status comes from until the artists confirm the real ones', () => {
+		const withStatus = WORKS.filter((work) => work.status !== undefined).map((work) => work.slug);
+		expect(withStatus.sort()).toEqual(Object.keys(SAMPLE_STATUSES).sort());
 	});
 });
 

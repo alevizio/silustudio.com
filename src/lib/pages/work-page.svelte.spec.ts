@@ -52,13 +52,42 @@ describe('work-page.svelte', () => {
 			.toHaveAttribute('loading', 'lazy');
 	});
 
-	it('leaves the status out until it is confirmed, then shows it', async () => {
-		render(WorkPage, { lang: 'es', work: duna });
+	it('leaves the tag out until a status is known, then shows it', async () => {
+		const { container, unmount } = render(WorkPage, { lang: 'es', work: duna });
 		await expect.element(page.getByRole('heading', { level: 1 })).toBeVisible();
-		await expect.element(page.getByText('Estado')).not.toBeInTheDocument();
+		expect(container.textContent).not.toMatch(/En la galería|Vendida|Reservada|Disponible/);
+		unmount();
 		render(WorkPage, { lang: 'es', work: { ...duna, status: 'reserved' } });
-		await expect.element(page.getByText('Estado')).toBeVisible();
 		await expect.element(page.getByText('Reservada')).toBeVisible();
+	});
+
+	it('lets the photo that opens the page travel, and none of the others', async () => {
+		render(WorkPage, { lang: 'es', work: work('guijarro') });
+		await expect
+			.element(page.getByRole('img', { name: 'Guijarro, foto 1 de 3.' }))
+			.toHaveClass(/travelling-photo/);
+		await expect
+			.element(page.getByRole('img', { name: 'Guijarro, foto 2 de 3.' }))
+			.not.toHaveClass(/travelling-photo/);
+	});
+
+	it('has arrows to the works before and after, by the place of the work', async () => {
+		const second = PHOTOGRAPHED_WORKS[1];
+		render(WorkPage, { lang: 'es', work: second });
+		const pager = page.getByRole('navigation', { name: 'Recorrer las obras' });
+		await expect
+			.element(pager.getByRole('link', { name: /^Obra anterior/ }))
+			.toHaveAttribute(
+				'href',
+				expect.stringMatching(new RegExp(`/obras/${PHOTOGRAPHED_WORKS[0].slug}/?$`))
+			);
+		await expect
+			.element(pager.getByRole('link', { name: /^Obra siguiente/ }))
+			.toHaveAttribute(
+				'href',
+				expect.stringMatching(new RegExp(`/obras/${PHOTOGRAPHED_WORKS[2].slug}/?$`))
+			);
+		await expect.element(pager.getByText(place(second))).toBeVisible();
 	});
 
 	it('lets the visitor ask about a work by its title', async () => {
@@ -108,9 +137,10 @@ describe('work-page.svelte', () => {
 	it('links back to the list and to the works before and after', async () => {
 		const second = PHOTOGRAPHED_WORKS[1];
 		render(WorkPage, { lang: 'es', work: second });
+		// The way back leads to the work's own place on the wall.
 		await expect
-			.element(page.getByRole('link', { name: 'Obras' }))
-			.toHaveAttribute('href', expect.stringMatching(/\/obras\/$/));
+			.element(page.getByRole('link', { name: 'Obras', exact: true }))
+			.toHaveAttribute('href', expect.stringMatching(new RegExp(`/obras/#${second.slug}$`)));
 		const nav = page.getByRole('navigation', { name: 'Otras obras' });
 		expect(
 			nav

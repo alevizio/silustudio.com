@@ -22,7 +22,7 @@
 
 <header
 	class={cn(
-		'mx-auto flex w-full max-w-page flex-wrap items-center justify-between gap-x-10 gap-y-1 px-gutter pt-5 pb-3 md:py-8',
+		'mx-auto flex w-full max-w-page flex-wrap items-center justify-between gap-x-10 gap-y-1 px-gutter pt-5 pb-3 keeps-its-place md:py-8',
 		className
 	)}
 >
@@ -37,7 +37,7 @@
 					<a
 						href={pageHref(lang, key)}
 						aria-current={current === key ? 'page' : undefined}
-						class="inline-flex min-h-11 items-center border-b border-transparent text-label text-ink-soft uppercase transition-colors hover:text-ink aria-[current=page]:border-ink aria-[current=page]:text-ink"
+						class="relative inline-flex min-h-11 items-center text-label text-ink-soft uppercase transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-(--motion-fill) after:ease-settle hover:text-ink hover:after:scale-x-100 aria-[current=page]:text-ink aria-[current=page]:after:scale-x-100"
 					>
 						{copy[key]}
 					</a>

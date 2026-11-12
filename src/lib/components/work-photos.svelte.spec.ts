@@ -45,6 +45,17 @@ describe('work-photos.svelte', () => {
 		await expect.element(first).toHaveAttribute('fetchpriority', 'high');
 	});
 
+	it('marks a photo to travel between pages only when asked to', async () => {
+		render(WorkPhotos, { photos: PHOTOS.slice(0, 1), alt: () => 'Quieta' });
+		await expect
+			.element(page.getByRole('img', { name: 'Quieta' }))
+			.not.toHaveClass(/travelling-photo/);
+		render(WorkPhotos, { photos: PHOTOS.slice(1, 2), alt: () => 'Viajera', travels: true });
+		await expect
+			.element(page.getByRole('img', { name: 'Viajera' }))
+			.toHaveClass(/travelling-photo/);
+	});
+
 	it('renders nothing for a work with no photos, without crashing', async () => {
 		const { container } = render(WorkPhotos, { photos: [], alt });
 		expect(container.querySelectorAll('img')).toHaveLength(0);

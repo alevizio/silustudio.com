@@ -24,6 +24,23 @@ describe('work-neighbours.svelte', () => {
 		await expect.element(after).toHaveAttribute('rel', 'next');
 	});
 
+	it('says which way each neighbour lies, and shows its photo without repeating its name', async () => {
+		const { container } = render(WorkNeighbours, { lang: 'es', previous: guijarro, next: cause });
+		await expect.element(page.getByRole('link', { name: 'Anterior Guijarro' })).toBeVisible();
+		await expect.element(page.getByRole('link', { name: 'Siguiente Cause' })).toBeVisible();
+		const photos = [...container.querySelectorAll('img')];
+		expect(photos).toHaveLength(2);
+		// The link's words already name the work, so the photos are decoration to a screen reader.
+		for (const photo of photos) expect(photo.getAttribute('alt')).toBe('');
+	});
+
+	it("never crops a neighbour's photo", async () => {
+		const { container } = render(WorkNeighbours, { lang: 'es', previous: guijarro, next: cause });
+		for (const photo of container.querySelectorAll('img')) {
+			expect(photo.classList.contains('object-contain')).toBe(true);
+		}
+	});
+
 	it('calls a neighbour with no title yet the previous or the next work', async () => {
 		render(WorkNeighbours, { lang: 'es', previous: untitled, next: untitled });
 		await expect

@@ -6,14 +6,13 @@
  * Nothing is hidden unless this script runs, so without scripts the whole page is simply there.
  */
 
+import { asksForLessMotion } from './preference.ts';
+
 const WAITING = 'waiting';
 const SHOWN = 'shown';
 
 /** An element counts as arrived once its top edge is this far above the bottom of the screen. */
 const ARRIVAL_MARGIN = '0px 0px -8% 0px';
-
-const asksForLessMotion = (): boolean =>
-	window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
  * Watches every `.reveal` element inside `root`. Those below the screen wait, and are shown as

@@ -12,13 +12,13 @@ The layouts follow three references found on Mobbin: KOBU (two large photos per 
 
 ## Pages
 
-| Spanish          | English             | What it is                                               |
-| ---------------- | ------------------- | -------------------------------------------------------- |
-| `/`              | `/en/`              | Home: the gallery, four works, the artists, the visit    |
-| `/obras/`        | `/en/works/`        | Works: the wall of works, then the catalog-only works    |
-| `/estudio/`      | `/en/studio/`       | The artists' film, statement and biographies             |
-| `/visitar/`      | `/en/visit/`        | Address, contact, map                                    |
-| `/obras/<obra>/` | `/en/works/<obra>/` | One page per work: photos, title, size, material, status |
+| Spanish          | English             | What it is                                                  |
+| ---------------- | ------------------- | ----------------------------------------------------------- |
+| `/`              | `/en/`              | Home: the gallery, four works, the artists, the visit       |
+| `/obras/`        | `/en/works/`        | Works: the wall of works, then the catalog-only works       |
+| `/estudio/`      | `/en/studio/`       | The artists' film, statement and biographies                |
+| `/visitar/`      | `/en/visit/`        | Address, contact, and a map of the coast drawn for the site |
+| `/obras/<obra>/` | `/en/works/<obra>/` | One page per work: photos, tag, title, size, material       |
 
 ## Where things live
 
@@ -28,7 +28,11 @@ The layouts follow three references found on Mobbin: KOBU (two large photos per 
 - `src/lib/assets/`: photos. `works/<slug>/` holds the full size photos of a work, `01.jpg` being the one shown on the wall. `catalog/` holds the small photos of each work cropped from the artists' PDF catalog (`07-1.jpg` is the whole view of work 7). `untitled/` holds photos from the old site not yet matched to a work.
 - `src/routes/layout.css`: design tokens (colours, type scale, spacing).
 - `src/lib/components/wall-light.svelte`: the faint daylight on the wall (the shadow of a pergola and a plant). It stays on the screen while a page scrolls and moves slowly as the visitor scrolls: the pergola's shadow slides and turns, the fronds sway. It sits behind everything, so it never falls on a work. Its strength (`--opacity-wall-light`) and its motion (`--wall-light-*`) are tokens in `layout.css`.
-- `src/lib/motion/reveal.ts` and the motion tokens in `layout.css` (`--motion-*`, `--ease-settle`): the quiet motion of text and photos. An element with the class `reveal` arrives softly the first time it is scrolled to (`reveal-after-1`, `reveal-after-2` make neighbours follow one another). `motion-safe:animate-arrive` does the same for what opens a page. Work photos come a hair closer under the pointer, and pages cross-fade. All of it is off for visitors who ask for less motion, in print, and without scripts nothing is ever hidden.
+- `src/lib/motion/reveal.ts` and the motion tokens in `layout.css` (`--motion-*`, `--ease-settle`): the quiet motion of text and photos. An element with the class `reveal` arrives softly the first time it is scrolled to (`reveal-after-1`, `reveal-after-2` make neighbours follow one another). `motion-safe:animate-arrive` does the same for what opens a page. Work photos come a hair closer under the pointer. All of it is off for visitors who ask for less motion, in print, and without scripts nothing is ever hidden.
+- `src/lib/motion/page-transition.ts`, with its styles in `layout.css`: moving between pages. The header keeps its place, the old page fades away and the new one fades in. A work's photo travels: it flies from its place on the wall into its own page and back, and when the visitor walks from one work to the next the photo on screen leaves to one side while the new one comes in from the other. It uses the browser's view transitions, so a browser without them, or a visitor who asks for less motion, simply gets the new page.
+- `src/lib/components/work-pager.svelte` and `work-neighbours.svelte`: the two ways from one work to another. The arrows at the top sit in the same spot on every work's page, and the left and right arrow keys do the same. The end of the page shows the works before and after with their photos. The way back from a work opens the wall at that work.
+- `src/lib/components/coast-map.svelte` and `src/lib/content/coast-map.ts`: the map on the visit page. See "The map" below.
+- `src/lib/components/link-button.svelte`: buttons fill with colour from the bottom under the pointer or the keyboard (`--motion-fill`), and text links draw a darker rule over their faint one.
 - `src/lib/components/` and `src/lib/pages/`: components and the five page layouts, each with its test next to it.
 
 ## Commands
@@ -45,7 +49,7 @@ npm run test:e2e   # builds the site, then runs every page through Playwright an
 
 ## Each work
 
-Every work has its own page (`/obras/guijarro/`, `/en/works/guijarro/`) with its photos, title, size, material and, once confirmed, its status.
+Every work has its own page (`/obras/guijarro/`, `/en/works/guijarro/`) with its photos, title, size, material and, once confirmed, its tag.
 
 **Where a work shows.** A work with at least one full size photo hangs on the wall at the top of the works page, two to a row. A catalog work with only the small catalog photos hangs below it, three to a row, at the real size of its photo (about 300 pixels wide, which is all the PDF catalog gives). Adding full size photos moves it up by itself.
 
@@ -53,7 +57,15 @@ Every work has its own page (`/obras/guijarro/`, `/en/works/guijarro/`) with its
 
 **Works with no title yet.** 46 photographed works are waiting for their titles. Their folders are `obra-08`, `obra-09` and so on, and the site calls them "Obra 8", "Obra 9": never as a title on the wall, only as a quiet reference on the work's own page and for screen readers. When the artists name one, in `src/lib/content/works.ts` take its number out of `UNTITLED_REFS`, add the work with its title (and technique and size if they send them), and rename its folder to the new slug.
 
-**Status.** In `src/lib/content/works.ts`, add `status: 'available'`, `'reserved'` or `'sold'` to the work. It shows as Disponible, Reservada or Vendida on the wall, in the list and on the work's page. A work with no status shows none, so nothing unconfirmed is published.
+**Tags.** In `src/lib/content/works.ts`, add `status: 'onView'`, `'sold'`, `'reserved'` or `'available'` to the work. It shows as a small tag, En la galería, Vendida, Reservada or Disponible, under the work on the wall and over its title on its own page. A work with no status shows no tag.
+
+**The tags showing now are samples, not facts.** Five works carry a made-up tag so the artists can see how one looks: Guijarro, Supraconciencia and Reencause say "En la galería", Impronta humana and Resplandor circular say "Vendida". They live in `SAMPLE_STATUSES` in `works.ts`, and that list empties itself the moment `launched` is `true`, so a sample can never reach the public site. When the artists confirm the real ones, write each on its work and delete the list.
+
+## The map
+
+The visit page closes on the site's own drawing of the coast from Punta del Este to José Ignacio, with the gallery on Ruta 10. It is drawn from OpenStreetMap data (© OpenStreetMap contributors, ODbL, credited under the map), in the colours of the wall, and loads nothing from anyone else. A visitor who wants to move around the map presses "Ver mapa interactivo", and only then does Google's map load in its place.
+
+`src/lib/content/coast-map.ts` is generated. The downloaded data, the queries and the script that draws it (`tools/build_map.py`) are kept outside this repository, in `Silu/Map data 2026-11-11`. To draw it again: run `uv run --with shapely python3 tools/build_map.py` there, copy the `coast-map.ts` it writes over the one here, and run `npm run format`. The names on the map are placed in `coast-map.svelte`.
 
 ## Where the photos come from
 
@@ -63,7 +75,7 @@ Every work has its own page (`/obras/guijarro/`, `/en/works/guijarro/`) with its
 
 ## Launch day
 
-Set `launched` to `true` in `src/lib/content/site.ts`. Until then every page carries `noindex`, so previews stay out of search results.
+Set `launched` to `true` in `src/lib/content/site.ts`. Until then every page carries `noindex`, so previews stay out of search results. The same switch removes the sample tags, so the works that are really in the gallery or sold need their real `status` before that day.
 
 ## Still needed from the artists
 
@@ -72,6 +84,6 @@ Set `launched` to `true` in `src/lib/content/site.ts`. Until then every page car
 - Confirmation of four titles that come from the designer's proposal and are not in the catalog: Mar de fondo, Pables, Encuentro en un reflejo, Ser antiguo (díptico). And their technique and size.
 - Which work photo set 34 is. The proposal calls it "Dar es recibir", but it shows a different work from the catalog's "Dar es recibir" (two equal panels, 165 × 80 cm), so it is shown with no title.
 - Full size photos of the 15 catalog works that only have small catalog photos, or word that they are sold.
-- Which works are available, reserved or sold.
+- Which works are in the gallery, sold, reserved or available. The five tags on the site today are samples.
 - Titles for the nine photos in `src/lib/assets/untitled/`.
 - A review of the English technique lines and of the new short texts on the home page.

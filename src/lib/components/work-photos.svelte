@@ -1,3 +1,9 @@
+<script lang="ts" module>
+	/** The photos fill the column beside a work's label, or the whole screen on a phone. */
+	export const WORK_PHOTO_SIZES =
+		'(min-width: 1536px) 74rem, (min-width: 1024px) calc(100vw - 26rem), 100vw';
+</script>
+
 <script lang="ts">
 	import type { Picture } from 'vite-imagetools';
 	import { cn } from '#lib/utils/cn.ts';
@@ -8,13 +14,15 @@
 		alt: (index: number) => string;
 		/** Loads the photos at once. For the photo a page opens on. */
 		eager?: boolean;
+		/**
+		 * For the one photo that opens a work's page: it travels when the page changes, flying
+		 * in from its place on the wall or stepping aside for the next work.
+		 */
+		travels?: boolean;
 		class?: string;
 	}
 
-	let { photos, alt, eager = false, class: className }: Props = $props();
-
-	/** The photos fill the column beside a work's label, or the whole screen on a phone. */
-	const SIZES = '(min-width: 1536px) 74rem, (min-width: 1024px) calc(100vw - 26rem), 100vw';
+	let { photos, alt, eager = false, travels = false, class: className }: Props = $props();
 </script>
 
 <!--
@@ -27,10 +35,10 @@
 		<enhanced:img
 			src={photo}
 			alt={alt(index)}
-			sizes={SIZES}
+			sizes={WORK_PHOTO_SIZES}
 			loading={eager ? 'eager' : 'lazy'}
 			fetchpriority={eager ? 'high' : 'auto'}
-			class="max-h-photo max-w-full reveal object-contain"
+			class={['max-h-photo max-w-full reveal object-contain', travels && 'travelling-photo']}
 		/>
 	{/each}
 </div>

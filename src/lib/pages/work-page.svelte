@@ -1,15 +1,19 @@
 <script lang="ts">
-	import { browser } from '$app/env';
+	import { goto, onNavigate } from '$app/navigation';
+	import ArrowIcon from '#lib/components/arrow-icon.svelte';
 	import LinkButton from '#lib/components/link-button.svelte';
 	import Seo from '#lib/components/seo.svelte';
+	import WorkLabel from '#lib/components/work-label.svelte';
 	import WorkNeighbours from '#lib/components/work-neighbours.svelte';
-	import WorkPhotos from '#lib/components/work-photos.svelte';
-	import WorkStatus from '#lib/components/work-status.svelte';
+	import WorkPager from '#lib/components/work-pager.svelte';
+	import WorkPhotos, { WORK_PHOTO_SIZES } from '#lib/components/work-photos.svelte';
 	import { ORDERED_WORKS, photosOf } from '#lib/content/images.ts';
-	import { SITE } from '#lib/content/site.ts';
-	import { catalogNumber, type Work } from '#lib/content/works.ts';
-	import { pageHref } from '#lib/i18n/href.ts';
-	import { copyFor, nameOf, workPath, type Lang } from '#lib/i18n/index.ts';
+	import type { Work } from '#lib/content/works.ts';
+	import { pageHref, workHref } from '#lib/i18n/href.ts';
+	import { copyFor, nameOf, workSlugFromPath, type Lang } from '#lib/i18n/index.ts';
+	import { walkTowards } from '#lib/motion/page-transition.ts';
+	import { transit } from '#lib/motion/transit.svelte.ts';
+	import { preloadPicture } from '#lib/utils/preload-picture.ts';
 
 	interface Props {
 		lang: Lang;
@@ -25,102 +29,79 @@
 	const previous = $derived(ORDERED_WORKS[position - 1]);
 	const next = $derived(ORDERED_WORKS[position + 1]);
 
-	// A work with no title yet is asked about by the address of its page: on the site the
-	// visitor is reading, which before launch is a preview. The built page carries the real
-	// site's address until the browser takes over.
-	const origin = browser ? location.origin : SITE.url;
-
-	// Both ways of asking arrive already saying which work it is.
-	const enquiry = $derived.by(() => {
-		if (work.title !== undefined) {
-			return {
-				whatsapp: `text=${encodeURIComponent(copy.detail.whatsappText(work.title))}`,
-				mail: `subject=${encodeURIComponent(copy.detail.emailSubject(work.title))}`
-			};
-		}
-		const text = encodeURIComponent(copy.detail.linkText(`${origin}${workPath(lang, work.slug)}`));
-		return {
-			whatsapp: `text=${text}`,
-			mail: `subject=${encodeURIComponent(copy.detail.linkSubject)}&body=${text}`
-		};
-	});
-
 	const photoAlt = (index: number): string => copy.detail.photoAlt(name, index + 1, photos.length);
 
-	const termClass = 'text-label text-ink-soft uppercase';
-	const rowClass = 'flex flex-col gap-1.5 border-b border-line py-4';
+	// The left and right arrow keys walk to the works before and after.
+	const walkWithArrowKeys = (event: KeyboardEvent): void => {
+		if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
+			return;
+		const neighbour =
+			event.key === 'ArrowLeft' ? previous : event.key === 'ArrowRight' ? next : undefined;
+		if (neighbour) goto(workHref(lang, neighbour.slug));
+	};
+
+	// Going on to another work is a walk along the wall, to one side or the other.
+	onNavigate(({ to }) => {
+		const slug = workSlugFromPath(to?.url.pathname ?? '');
+		const target = ORDERED_WORKS.findIndex((candidate) => candidate.slug === slug);
+		if (target < 0 || target === position) return;
+		return walkTowards(target > position ? 'next' : 'previous');
+	});
+
+	// The neighbours' first photos load quietly, so walking on shows them at once.
+	$effect(() => {
+		for (const neighbour of [previous, next]) {
+			const photo = neighbour && photosOf(neighbour)[0];
+			if (photo) preloadPicture(photo, WORK_PHOTO_SIZES);
+		}
+	});
 </script>
+
+<svelte:window onkeydown={walkWithArrowKeys} />
 
 <Seo {lang} page="works" {work} />
 
+<!-- The way back leads to this work's place on the wall, and the arrows to its neighbours. -->
 <div
-	class="mx-auto flex max-w-page items-center justify-between px-gutter pt-4 pb-6 md:pt-8 md:pb-10"
+	class="mx-auto flex max-w-page items-center justify-between gap-6 px-gutter pt-4 pb-6 md:pt-8 md:pb-10"
 >
-	<LinkButton href={pageHref(lang, 'works')} variant="text">
-		<span aria-hidden="true" class="pr-3">←</span>{copy.title}
+	<LinkButton href={`${pageHref(lang, 'works')}#${work.slug}`} variant="text" class="group gap-3">
+		<ArrowIcon
+			direction="left"
+			class="transition-transform duration-300 group-hover:-translate-x-1"
+		/>
+		{copy.title}
 	</LinkButton>
-	<p class="text-label text-ink-soft tabular-nums">
-		{catalogNumber(position + 1)} / {catalogNumber(ORDERED_WORKS.length)}
-	</p>
+	<WorkPager {lang} place={position + 1} total={ORDERED_WORKS.length} {previous} {next} />
 </div>
 
 <!--
 	The photos are the page, and the words matter less. On a wide screen the photos take
 	everything a slim label leaves, in a wider space than the rest of the site, and the label
 	stays in view beside them. On a phone the first photo comes first, then the label, then
-	the rest.
+	the rest. Everything is made anew for each work, so it arrives again when the visitor walks on.
 -->
 <article
 	class="mx-auto grid max-w-wide gap-x-16 gap-y-10 px-gutter pb-section lg:grid-cols-work lg:gap-y-6"
 >
-	<WorkPhotos photos={photos.slice(0, 1)} alt={photoAlt} eager class="motion-safe:animate-arrive" />
-
-	<div
-		class="flex flex-col gap-8 arrive-after-1 motion-safe:animate-arrive lg:sticky lg:top-gutter lg:row-span-2 lg:self-start"
-	>
-		{#if work.title !== undefined}
-			<h1 lang="es" class="font-serif text-title font-light text-balance">{work.title}</h1>
-		{:else}
-			<div class="flex flex-col gap-3">
-				<h1 class={termClass}>{name}</h1>
-				<p class="font-serif text-prose text-ink-soft">{copy.detail.pending}</p>
-			</div>
+	{#key work.slug}
+		<!-- Once pages change with a transition, it brings this photo in. Until then it arrives by itself. -->
+		<WorkPhotos
+			photos={photos.slice(0, 1)}
+			alt={photoAlt}
+			eager
+			travels
+			class={transit.carries ? undefined : 'motion-safe:animate-arrive'}
+		/>
+		<WorkLabel
+			{lang}
+			{work}
+			class="arrive-after-1 motion-safe:animate-arrive lg:sticky lg:top-gutter lg:row-span-2 lg:self-start"
+		/>
+		{#if photos.length > 1}
+			<WorkPhotos photos={photos.slice(1)} alt={(index) => photoAlt(index + 1)} />
 		{/if}
-		{#if work.dimensions || work.medium || work.status}
-			<dl class="border-t border-line">
-				{#if work.dimensions}
-					<div class={rowClass}>
-						<dt class={termClass}>{copy.detail.dimensions}</dt>
-						<dd class="font-serif text-prose tabular-nums">{work.dimensions[lang]}</dd>
-					</div>
-				{/if}
-				{#if work.medium}
-					<div class={rowClass}>
-						<dt class={termClass}>{copy.detail.material}</dt>
-						<dd class="font-serif text-prose">{work.medium[lang]}</dd>
-					</div>
-				{/if}
-				{#if work.status}
-					<div class={rowClass}>
-						<dt class={termClass}>{copy.status.label}</dt>
-						<dd><WorkStatus status={work.status} {lang} /></dd>
-					</div>
-				{/if}
-			</dl>
-		{/if}
-		<div class="flex flex-wrap items-center gap-x-6 gap-y-3">
-			<LinkButton href={`${SITE.whatsappUrl}?${enquiry.whatsapp}`} external>
-				{copy.detail.enquire}
-			</LinkButton>
-			<LinkButton href={`mailto:${SITE.email}?${enquiry.mail}`} variant="text">
-				{copy.detail.email}
-			</LinkButton>
-		</div>
-	</div>
-
-	{#if photos.length > 1}
-		<WorkPhotos photos={photos.slice(1)} alt={(index) => photoAlt(index + 1)} />
-	{/if}
+	{/key}
 </article>
 
 <WorkNeighbours {lang} {previous} {next} class="mx-auto max-w-page px-gutter pb-section" />
