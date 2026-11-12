@@ -33,7 +33,8 @@
 	/>
 </div>
 
-<section aria-label={copy.pageTitle} class="mx-auto max-w-page px-gutter py-section">
+<!-- Little room is left under the details: the map's land fades in from its top edge by itself. -->
+<section aria-label={copy.pageTitle} class="mx-auto max-w-page px-gutter pt-section pb-6">
 	<VisitDetails {lang} class="reveal" />
 </section>
 
