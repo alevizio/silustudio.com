@@ -41,7 +41,7 @@ const PHOTO = /\.(jpe?g|png|webp)$/i;
 
 /** Longest side of a photo in the PDF, in pixels: sharp on paper, and light enough to send. */
 const MAIN_PHOTO = 1700;
-const DETAIL_PHOTO = 700;
+const DETAIL_PHOTO = 1100;
 const JPEG_QUALITY = 78;
 /** Detail photos shown beside the main one. */
 const DETAILS_PER_WORK = 2;
@@ -115,17 +115,28 @@ html { font-family: 'Lato', sans-serif; color: #23211e; -webkit-print-color-adju
 .cover h1 { font-size: 34pt; line-height: 1.1; text-align: right; }
 .cover .who { font-size: 13pt; text-align: right; color: #5f5a52; padding-top: 3mm; }
 .cover .date { text-align: right; padding-top: 4mm; }
-.work { display: grid; grid-template-columns: 1fr 68mm; gap: 12mm; padding: 30mm 16mm 22mm; }
-.work .photo { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 0; }
-.work .photo img { max-width: 100%; max-height: 158mm; object-fit: contain; }
-.work .side { display: flex; flex-direction: column; justify-content: space-between; min-height: 0; }
+/*
+ * A work's page. The large photo takes only the width its own shape needs, and most are upright,
+ * so the rest of the page goes to the words and, under them, to the details, as large as fit.
+ */
+.work { display: flex; align-items: center; gap: 12mm; padding: 30mm 16mm 22mm; }
+.work > img { flex: none; max-width: 170mm; max-height: 158mm; }
+.work .side { flex: 1; align-self: stretch; display: flex; flex-direction: column; gap: 8mm; min-width: 0; }
+.work .words { max-width: 92mm; }
 .work h2 { font-size: 22pt; line-height: 1.15; padding: 0 0 6mm; }
 .work dl { border-top: 0.25mm solid #d9d4ca; }
 .work dl div { border-bottom: 0.25mm solid #d9d4ca; padding: 3.5mm 0; }
 .work dd { font-family: 'Newsreader', serif; font-size: 11.5pt; line-height: 1.45; padding-top: 1mm; }
-.work .details { display: flex; gap: 3mm; }
-/* A detail keeps its own shape, like every photo of a work: never cropped. */
-.work .details img { height: 34mm; width: auto; max-width: 32.5mm; object-fit: contain; }
+/*
+ * The details share what is left under the words, side by side at one height and standing on
+ * the line the large photo stands on. Each keeps its own shape, like every photo of a work:
+ * when two do not fit the width, both shrink together, never cropped.
+ */
+.work .details { flex: 1; display: flex; align-items: flex-end; gap: 4mm; min-height: 0; }
+.work .details img { min-width: 0; max-height: 100%; }
+/* A work with one photo keeps it in the middle of the page, with the words in a slim column. */
+.work.alone > img { margin: 0 auto; max-width: 185mm; }
+.work.alone .side { flex: none; width: 68mm; }
 .visit { display: grid; grid-template-columns: 1fr 1fr; }
 .visit img { width: 100%; height: 210mm; object-fit: cover; }
 .visit .words { display: flex; flex-direction: column; justify-content: center; gap: 7mm; padding: 0 18mm; }
@@ -197,11 +208,11 @@ export const buildCatalog = async ({ lang, out, only }: CatalogOptions): Promise
 				.join('');
 			pages.push(
 				page(
-					'work',
+					details.length > 0 ? 'work' : 'work alone',
 					`<p class="head"><img src="${logo}" alt="${escape(SITE.name)}"><span class="label">${number}</span></p>
-					<div class="photo"><img src="${photo}" alt=""></div>
+					<img src="${photo}" alt="">
 					<div class="side">
-						<div>
+						<div class="words">
 							${heading}
 							${facts ? `<dl>${facts}</dl>` : ''}
 						</div>
