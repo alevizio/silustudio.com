@@ -132,6 +132,8 @@ export const en: typeof es = {
 			before: 'Previous',
 			after: 'Next',
 			place: (place: number, total: number) => `Work ${place} of ${total}`,
+			/** Names the row of a work's photos, which a phone swipes through. */
+			photos: 'Photos of the work',
 			photoAlt: (name: string, n: number, total: number) => `${name}, photo ${n} of ${total}.`,
 			metaTitle: (name: string) => `${name} · Works · Silu`,
 			metaDescription: (facts: string[]) =>

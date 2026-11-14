@@ -42,6 +42,23 @@ describe('work-page.svelte', () => {
 		expect(page.getByRole('img').elements()).toHaveLength(3);
 	});
 
+	it('keeps every photo in one named row ahead of the label, for a phone to swipe through', async () => {
+		render(WorkPage, { lang: 'es', work: work('guijarro') });
+		const row = page.getByRole('group', { name: 'Fotos de la obra' });
+		await expect.element(row).toBeInTheDocument();
+		expect(row.getByRole('img').elements()).toHaveLength(3);
+		const title = page.getByRole('heading', { level: 1 }).element();
+		const order = row.element().compareDocumentPosition(title);
+		expect(order & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+	});
+
+	it('names the row of photos in English too', async () => {
+		render(WorkPage, { lang: 'en', work: work('guijarro') });
+		await expect
+			.element(page.getByRole('group', { name: 'Photos of the work' }))
+			.toBeInTheDocument();
+	});
+
 	it('loads the first photo at once and the others later', async () => {
 		render(WorkPage, { lang: 'es', work: work('guijarro') });
 		await expect

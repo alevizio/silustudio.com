@@ -136,6 +136,8 @@ export const es = {
 			after: 'Siguiente',
 			/** `place` is the work's position and `total` how many there are: "Obra 7 de 84". */
 			place: (place: number, total: number) => `Obra ${place} de ${total}`,
+			/** Names the row of a work's photos, which a phone swipes through. */
+			photos: 'Fotos de la obra',
 			photoAlt: (name: string, n: number, total: number) => `${name}, foto ${n} de ${total}.`,
 			metaTitle: (name: string) => `${name} · Obras · Silu`,
 			/** `facts` are the work's name and, when known, its technique and size. */

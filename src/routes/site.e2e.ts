@@ -53,6 +53,22 @@ const moving = (page: Page, parts: string[]) =>
 		{ polling: 'raf' }
 	);
 
+/** The row of a work's photos, which a phone swipes through. */
+const PHOTO_ROW = { name: 'Fotos de la obra' };
+
+/** Brings the photo at this place of a row into view, the way a swipe does. */
+const swipeTo = (row: Locator, place: number) =>
+	row
+		.getByRole('img')
+		.nth(place)
+		.evaluate((photo) =>
+			photo.scrollIntoView({ behavior: 'instant', inline: 'start', block: 'nearest' })
+		);
+
+/** How tall each of these photos shows, in pixels. */
+const heightsOf = (photos: Locator) =>
+	photos.evaluateAll((images) => images.map((image) => image.getBoundingClientRect().height));
+
 /** The artists' film at the top of the studio page, which Vimeo plays. */
 const ARTISTS_FILM = 'iframe[title="Video de los artistas, en Vimeo"]';
 
@@ -369,6 +385,99 @@ test("on a work's page every photo has a row of its own and the photos take most
 	// The label is slim beside them and stays readable.
 	const label = await page.getByRole('heading', { level: 1 }).boundingBox();
 	expect(label?.x).toBeGreaterThan(1440 * 0.7);
+	// Nothing here is swiped through, so the photos are not a stop for the keyboard.
+	await expect(page.getByRole('group', PHOTO_ROW)).not.toHaveAttribute('tabindex', /.*/);
+});
+
+test("on a phone a work's photos are one row to swipe through, and the label stays right under the photo in view", async ({
+	page
+}) => {
+	await page.setViewportSize(PHONE);
+	await page.goto('/obras/guijarro/');
+	await settled(page);
+	const row = page.getByRole('group', PHOTO_ROW);
+	const photos = row.getByRole('img');
+	await expect(photos).toHaveCount(3);
+	const sides = await photos.evaluateAll((images) =>
+		images.map((image) => {
+			const { left, right } = image.getBoundingClientRect();
+			return { left, right };
+		})
+	);
+	// Side by side: the first photo is whole on the screen, and the edge of the second shows.
+	expect(sides[0].left).toBeGreaterThan(0);
+	expect(sides[0].right).toBeLessThan(PHONE.width);
+	expect(sides[1].left).toBeGreaterThan(sides[0].right);
+	expect(sides[1].left).toBeLessThan(PHONE.width);
+
+	// The first photo is a wide one and the others are tall. The row is only as tall as the
+	// photo in view, so the label comes right under it and not under the tallest photo.
+	const heights = await heightsOf(photos);
+	expect(heights[1]).toBeGreaterThan(heights[0] * 2);
+	const rowHeight = async () => (await row.boundingBox())?.height ?? 0;
+	const offBy = async (height: number) => Math.abs((await rowHeight()) - height);
+	const title = page.getByRole('heading', { level: 1 });
+	const titleTop = async () => (await title.boundingBox())?.y ?? 0;
+	await expect.poll(() => offBy(heights[0])).toBeLessThanOrEqual(1);
+	const before = await titleTop();
+	const dots = row.locator('xpath=..').locator('[aria-hidden="true"] > span');
+	const marked = () =>
+		dots.evaluateAll((all) => all.map((dot) => dot.classList.contains('bg-ink')));
+	expect(await marked()).toEqual([true, false, false]);
+
+	// Swiped to the second photo, the row grows to it, the label moves down with it and the
+	// dots say where the visitor is.
+	await swipeTo(row, 1);
+	await expect.poll(() => offBy(heights[1])).toBeLessThanOrEqual(1);
+	await expect.poll(marked).toEqual([false, true, false]);
+	await settled(page);
+	expect((await titleTop()) - before).toBeGreaterThan(heights[0]);
+
+	await swipeTo(row, 2);
+	await expect.poll(marked).toEqual([false, false, true]);
+	// Only the row moves sideways, never the page.
+	const overflow = await page.evaluate(
+		() => document.documentElement.scrollWidth - window.innerWidth
+	);
+	expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test('a swiped row of photos takes the keyboard, and its arrow keys do not walk on to the next work', async ({
+	page
+}) => {
+	await page.setViewportSize(PHONE);
+	await page.goto('/obras/guijarro/');
+	await settled(page);
+	const row = page.getByRole('group', PHOTO_ROW);
+	await row.focus();
+	await page.keyboard.press('ArrowRight');
+	await expect.poll(() => row.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+	await expect(page).toHaveURL(/\/obras\/guijarro\/$/);
+	// Anywhere else on the page, the arrow keys still walk from work to work.
+	await row.blur();
+	await page.keyboard.press('ArrowRight');
+	await expect(page).not.toHaveURL(/\/obras\/guijarro\/$/);
+});
+
+test("a work's page has no accessibility violations on a phone, where its photos are swiped through", async ({
+	page
+}) => {
+	await page.setViewportSize(PHONE);
+	await page.goto('/obras/guijarro/');
+	await settled(page);
+	const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+	expect(results.violations).toEqual([]);
+});
+
+test('without scripts no photo of a swiped row is cut short', async ({ browser }) => {
+	const context = await browser.newContext({ javaScriptEnabled: false, viewport: PHONE });
+	const page = await context.newPage();
+	await page.goto('/obras/guijarro/');
+	const row = page.getByRole('group', PHOTO_ROW);
+	// Nothing follows the swipe, so the row is as tall as its tallest photo from the start.
+	const tallest = Math.max(...(await heightsOf(row.getByRole('img'))));
+	expect((await row.boundingBox())?.height).toBeGreaterThanOrEqual(Math.floor(tallest));
+	await context.close();
 });
 
 test('the unlabelled photos on the works page show three to a row', async ({ page }) => {

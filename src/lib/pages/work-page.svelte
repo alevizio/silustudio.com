@@ -78,29 +78,24 @@
 <!--
 	The photos are the page, and the words matter less. On a wide screen the photos take
 	everything a slim label leaves, in a wider space than the rest of the site, and the label
-	stays in view beside them. On a phone the first photo comes first, then the label, then
-	the rest. Everything is made anew for each work, so it arrives again when the visitor walks on.
+	stays in view beside them. On a phone the photos are one row to swipe through, and the
+	label comes right under it. Everything is made anew for each work, so it arrives again
+	when the visitor walks on.
 -->
-<article
-	class="mx-auto grid max-w-wide gap-x-16 gap-y-10 px-gutter pb-section lg:grid-cols-work lg:gap-y-6"
->
+<article class="mx-auto grid max-w-wide gap-x-16 gap-y-8 px-gutter pb-section lg:grid-cols-work">
 	{#key work.slug}
-		<!-- Once pages change with a transition, it brings this photo in. Until then it arrives by itself. -->
+		<!-- Once pages change with a transition, it brings the first photo in. Until then the photos arrive by themselves. -->
 		<WorkPhotos
-			photos={photos.slice(0, 1)}
+			{photos}
 			alt={photoAlt}
-			eager
-			travels
+			label={copy.detail.photos}
 			class={transit.carries ? undefined : 'motion-safe:animate-arrive'}
 		/>
 		<WorkLabel
 			{lang}
 			{work}
-			class="arrive-after-1 motion-safe:animate-arrive lg:sticky lg:top-gutter lg:row-span-2 lg:self-start"
+			class="arrive-after-1 motion-safe:animate-arrive lg:sticky lg:top-gutter lg:self-start"
 		/>
-		{#if photos.length > 1}
-			<WorkPhotos photos={photos.slice(1)} alt={(index) => photoAlt(index + 1)} />
-		{/if}
 	{/key}
 </article>
 

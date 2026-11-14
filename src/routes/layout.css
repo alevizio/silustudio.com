@@ -76,6 +76,7 @@
 	--motion-travel: 760ms; /* a photo flying between its place on the wall and its own page */
 	--motion-step: 6rem; /* how far a photo moves aside when walking from one work to the next */
 	--motion-fill: 500ms; /* a button filling with colour under the pointer */
+	--motion-fit: 500ms; /* the row of a work's photos taking the height of the photo swiped to */
 	--motion-draw: 2600ms; /* the coast road being drawn on the map */
 	--motion-pin: 1100ms; /* when the line reaches the gallery, and its dot lands */
 
@@ -99,6 +100,9 @@
 
 	--container-page: 76rem;
 	--container-wide: 96rem; /* a work's page: the photos take more room than the rest of the site gives */
+	--container-swipe: calc(
+		100% - 1.5rem
+	); /* widest a photo gets in the row a phone swipes through: the edge of the next one stays in view, to say there is more */
 	--container-prose: 40rem;
 	--aspect-room: 3 / 2;
 	--aspect-facade: 5 / 2;
@@ -109,6 +113,11 @@
 /* A work's page: the photos take everything the slim label leaves. */
 @utility grid-cols-work {
 	grid-template-columns: minmax(0, 1fr) var(--spacing-label);
+}
+
+/* A row that is swiped through shows no scroll bar: the edge of the next photo says there is more. */
+@utility scrollbar-none {
+	scrollbar-width: none;
 }
 
 /* Home gallery: the photo column beside the film is one wide photo over two smaller ones. */

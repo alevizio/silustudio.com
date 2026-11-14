@@ -6,7 +6,7 @@ The site is static: SvelteKit builds every page in Spanish and in English into `
 
 ## Design in one paragraph
 
-"La sala". The page is the gallery wall and the works supply the colour. Photos are large and come first: the home page opens on a photo of the room that runs edge to edge, the works hang two to a row at their own shape on a shared baseline, and a work's page is its photos with the label beside them. The first job of the site is to get people to visit the gallery, so the way there (address, directions, WhatsApp) sits right under the opening photo and closes every other page.
+"La sala". The page is the gallery wall and the works supply the colour. Photos are large and come first: the home page opens on a photo of the room that runs edge to edge, the works hang two to a row at their own shape on a shared baseline, and a work's page is its photos with the label beside them, or on a phone one row of photos to swipe through with the label under it. The first job of the site is to get people to visit the gallery, so the way there (address, directions, WhatsApp) sits right under the opening photo and closes every other page.
 
 The layouts follow three references found on Mobbin: KOBU (two large photos per row with a short caption), MOUTHWASH Studio (each image at its own proportions on one baseline) and the FARFETCH and Nike product pages (photos stacked on the left, the details fixed beside them).
 
@@ -51,6 +51,8 @@ npm run test:e2e   # builds the site, then runs every page through Playwright an
 ## Each work
 
 Every work has its own page (`/obras/guijarro/`, `/en/works/guijarro/`) with its photos, title, size, material and, once confirmed, its tag.
+
+**How the photos show.** On a wide screen they are one under another, with the label staying in view beside them. On a phone or a tablet held upright they are one row to swipe through sideways, as on Instagram: the edge of the next photo shows, the dots under the row say how many there are, and the row is as tall as the photo in view, so the title and the button to ask sit right under it. The photos are `src/lib/components/work-photos.svelte`, and `src/lib/motion/swipe-row.ts` follows the swipe. With no scripts the row is simply as tall as its tallest photo.
 
 **Where a work shows.** A work with at least one full size photo hangs on the wall at the top of the works page, two to a row. A catalog work with only the small catalog photos hangs below it, three to a row, at the real size of its photo (about 300 pixels wide, which is all the PDF catalog gives). Adding full size photos moves it up by itself.
 
