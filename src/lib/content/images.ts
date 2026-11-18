@@ -71,17 +71,39 @@ const inOrder = (modules: Record<string, PictureModule>): Picture[] =>
 		.map((path) => modules[path].default);
 
 /**
- * The photo that opens the home page. It runs from edge to edge of the screen, so it is
- * offered at every width up to its own and with less compression than the other photos.
- * Left to the usual two copies, an ordinary screen would get the half-size one, 890 pixels
+ * The photo that opens the home page on a wide screen. It runs from edge to edge of the
+ * screen, so it is offered at every width up to its own and with less compression than the
+ * other photos. Left to the usual two copies, an ordinary screen would get the half-size one
  * stretched across the whole screen.
  */
 export const HERO_PHOTO: Picture = inOrder(
 	import.meta.glob<PictureModule>('/src/lib/assets/gallery/sala-01.jpg', {
 		eager: true,
-		query: { enhanced: true, w: '1779;1280;960;640', quality: '82' }
+		query: { enhanced: true, w: '2560;1920;1280;960;640', quality: '82' }
 	})
 )[0];
+
+/**
+ * The photo that opens the home page on a phone: another view of the same room, upright, so
+ * it fills the screen a phone is held in. Its widths are those of phone screens.
+ */
+export const HERO_PHOTO_TALL: Picture = inOrder(
+	import.meta.glob<PictureModule>('/src/lib/assets/gallery/sala-01-alta.jpg', {
+		eager: true,
+		query: { enhanced: true, w: '1600;1170;780;480', quality: '82' }
+	})
+)[0];
+
+/**
+ * The rooms of the gallery as a phone shows them: upright photos with some of their floor
+ * and ceiling taken off, in file name order. A wide screen shows horizontal photos instead.
+ */
+export const GALLERY_TALL_PHOTOS: readonly Picture[] = inOrder(
+	import.meta.glob<PictureModule>('/src/lib/assets/gallery/alta-*.jpg', {
+		eager: true,
+		query: { enhanced: true, w: '1080;720;480;360' }
+	})
+);
 
 /**
  * The two colour photos of the workshop, for the studio page, where each is shown large:
@@ -90,24 +112,26 @@ export const HERO_PHOTO: Picture = inOrder(
 export const [WORKSHOP_PHOTO, DRAWING_PHOTO]: readonly Picture[] = inOrder(
 	import.meta.glob<PictureModule>('/src/lib/assets/studio/artistas-0{2,3}.jpg', {
 		eager: true,
-		query: { enhanced: true, w: '1280;960;640' }
+		query: { enhanced: true, w: '1600;1280;960;640' }
 	})
 );
 
-/*
- * The next two sets are copies from the artists' Instagram (about 1080 pixels wide), to be
- * replaced by the original files when the artists send them.
+/**
+ * The artists and their helpers at work, in black and white. Photos 01 to 03 and 10 onwards
+ * are the artists' own full size files; 04 to 09 are still copies from their Instagram
+ * (about 1080 pixels wide), to be replaced when the artists send those files.
  */
-
-/** The artists and their helpers at work: the black and white series from their Instagram. */
 export const AT_WORK_PHOTOS: readonly Picture[] = inOrder(
 	import.meta.glob<PictureModule>('/src/lib/assets/studio/taller-*.jpg', {
 		eager: true,
-		query: { enhanced: true, w: '1080;720;480' }
+		query: { enhanced: true, w: '1440;1080;720;480' }
 	})
 );
 
-/** Works hanging in the homes of the people who bought them. */
+/**
+ * Works hanging in the homes of the people who bought them: copies from the artists'
+ * Instagram (about 1080 pixels wide), to be replaced by the original files.
+ */
 export const IN_HOMES_PHOTOS: readonly Picture[] = inOrder(
 	import.meta.glob<PictureModule>('/src/lib/assets/homes/*.jpg', {
 		eager: true,

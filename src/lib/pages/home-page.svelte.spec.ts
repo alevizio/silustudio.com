@@ -42,15 +42,38 @@ describe('home-page.svelte', () => {
 			.toHaveAttribute('href', expect.stringMatching(/\/obras\/guijarro\/?$/));
 	});
 
-	it('describes every photo of the gallery', async () => {
+	it('opens on a photo in two shapes, upright for a phone and horizontal for a wide screen', async () => {
+		const { container } = render(HomePage, { lang: 'es' });
+		await expect.element(page.getByRole('heading', { level: 1 })).toBeVisible();
+		const opening = container.querySelector('picture');
+		const sources = [...(opening?.querySelectorAll('source') ?? [])];
+		expect(sources.some((source) => source.media !== '')).toBe(true);
+		expect(sources.some((source) => source.media === '')).toBe(true);
+		// Its place is upright on a phone and a low band on a wide screen.
+		expect(opening?.parentElement?.classList.contains('aspect-tall')).toBe(true);
+		expect(opening?.parentElement?.classList.contains('md:aspect-facade')).toBe(true);
+	});
+
+	it('says in the artists’ own words who they are, one paragraph after another', async () => {
 		render(HomePage, { lang: 'es' });
+		await expect
+			.element(page.getByText(/^Con más de dos décadas de trayectoria/))
+			.toBeInTheDocument();
+		await expect
+			.element(page.getByText(/^Son creadores de su propia corriente artística/))
+			.toBeInTheDocument();
+		await expect.element(page.getByText(/naturalismo abstracto/)).toBeInTheDocument();
+	});
+
+	it('describes every photo of the gallery', async () => {
+		const { container } = render(HomePage, { lang: 'es' });
 		await expect.element(page.getByRole('heading', { level: 1 })).toBeVisible();
 		await expect
-			.element(page.getByRole('img', { name: /Vista larga de la galería/ }))
+			.element(page.getByRole('img', { name: /Pasillo de la galería con relieves/ }))
 			.toBeInTheDocument();
-		for (const image of page.getByRole('img').elements()) {
-			expect(image.getAttribute('alt')).toBeTruthy();
-		}
+		const images = [...container.querySelectorAll('img')];
+		expect(images.length).toBeGreaterThan(0);
+		for (const image of images) expect(image.getAttribute('alt')).toBeTruthy();
 	});
 
 	it('hangs the film of the gallery beside the photos, silent and without controls', async () => {

@@ -87,15 +87,30 @@ describe('seo.svelte', () => {
 		render(Seo, { lang: 'es', page: 'works', work: WORKS[0] });
 		await expect.poll(() => document.title).toBe('Guijarro · Obras · Silu');
 		const image = head('meta[property="og:image"]');
-		expect(image).toMatch(/^https:\/\/www\.silustudio\.com\/.+/);
+		expect(image?.startsWith(`${SITE.servedFrom}/`)).toBe(true);
 		expect(image).not.toContain('og.jpg');
+		// The card says how large the photo is, and a photo of a work is never 0 by 0.
+		expect(Number(head('meta[property="og:image:width"]'))).toBeGreaterThan(0);
+		expect(Number(head('meta[property="og:image:height"]'))).toBeGreaterThan(0);
 	});
 
-	it('adds a share card with an image', async () => {
+	it('adds a share card with an image and its size', async () => {
 		render(Seo, { lang: 'es', page: 'home' });
-		await expect
-			.poll(() => head('meta[property="og:image"]'))
-			.toBe('https://www.silustudio.com/og.jpg');
+		await expect.poll(() => head('meta[property="og:image"]')).toBe(`${SITE.servedFrom}/og.jpg`);
+		expect(head('meta[property="og:image:width"]')).toBe('1200');
+		expect(head('meta[property="og:image:height"]')).toBe('630');
 		expect(head('meta[property="og:locale"]')).toBe('es_UY');
+	});
+
+	it('builds the share card on the address the pages can be opened at today', async () => {
+		render(Seo, { lang: 'en', page: 'visit' });
+		await expect.poll(() => head('meta[property="og:url"]')).toBe(`${SITE.servedFrom}/en/visit/`);
+		// Before launch day that is the preview, where the picture really is. On the address
+		// of the finished site it would be looked for on the old site, which does not have it.
+		expect(SITE.servedFrom).toBe(
+			SITE.launched ? 'https://www.silustudio.com' : 'https://silustudio.vercel.app'
+		);
+		// Search engines are still told where the page will live for good.
+		expect(head('link[rel="canonical"]')).toBe('https://www.silustudio.com/en/visit/');
 	});
 });

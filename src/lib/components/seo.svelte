@@ -29,7 +29,8 @@
 	let { lang, page, work }: Props = $props();
 
 	const OG_LOCALE: Record<Lang, string> = { es: 'es_UY', en: 'en_US' };
-	const DEFAULT_SHARE_IMAGE = '/og.jpg';
+	/** The picture a shared link shows unless the page has its own: static/og.jpg. */
+	const DEFAULT_SHARE_IMAGE = { src: '/og.jpg', w: 1200, h: 630 };
 
 	const copy = $derived(copyFor(lang));
 	const workMeta = (described: Work) => {
@@ -52,10 +53,12 @@
 		}
 		return page === 'home' || page === 'visit' ? [galleryData(lang)] : [];
 	});
-	// A work is shared with its own photo once it has a full size one.
-	const shareImage = $derived(
-		`${SITE.url}${(work && fullSizePhotosOf(work)[0]?.img.src) || DEFAULT_SHARE_IMAGE}`
-	);
+	// What an app shows for a shared link has to open today, so the card is built on the
+	// address these pages are served from. A work is shared with its own photo once it has a
+	// full size one. The card says how large its picture is, so an app can lay the card out
+	// before the picture has loaded.
+	const shareUrl = $derived(`${SITE.servedFrom}${pathIn(lang)}`);
+	const shareImage = $derived((work && fullSizePhotosOf(work)[0]?.img) || DEFAULT_SHARE_IMAGE);
 </script>
 
 <!-- Title, description, share card and the links that tie the Spanish and English pages. -->
@@ -74,9 +77,11 @@
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content={meta.title} />
 	<meta property="og:description" content={meta.description} />
-	<meta property="og:url" content={canonical} />
+	<meta property="og:url" content={shareUrl} />
 	<meta property="og:locale" content={OG_LOCALE[lang]} />
-	<meta property="og:image" content={shareImage} />
+	<meta property="og:image" content={`${SITE.servedFrom}${shareImage.src}`} />
+	<meta property="og:image:width" content={String(shareImage.w)} />
+	<meta property="og:image:height" content={String(shareImage.h)} />
 	<meta name="twitter:card" content="summary_large_image" />
 	{#each structured as data (data['@type'])}
 		<!-- The data is the site's own, never a visitor's, and it cannot end its script. -->

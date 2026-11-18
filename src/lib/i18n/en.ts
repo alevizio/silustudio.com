@@ -45,19 +45,34 @@ export const en: typeof es = {
 	home: {
 		eyebrow: 'Silu · Silvestre Jacobi and Lucila Dickinson',
 		title: 'Art gallery and studio in Manantiales, Punta del Este.',
-		lead: 'Silvestre Jacobi and Lucila Dickinson work together as Silu. Their reliefs and sculptures, made with sand, stone, wood and mother of pearl, are shown in their own gallery.',
+		/** A translation of Lucila's words in es.ts, still to be approved by the artists. */
+		lead: [
+			'With more than two decades of work behind them, Silvestre Jacobi and Lucila Dickinson, who together are the art collective Silu, invite you to their studio, where you can see their workshop and their new collection of works inspired by the organic forms of nature.',
+			'They are the creators of their own artistic movement, which they call abstract naturalism, and their search is to reawaken our connection with nature.'
+		],
 		heroAlt:
-			'Inside the Silu gallery: sand reliefs on the walls, circular sculptures on the floor and a visitor walking through the room.',
+			'Inside the Silu gallery: sand reliefs on the walls and sculptures on the floor of the room.',
 		gallery: {
 			label: 'The gallery',
 			title: 'The works are shown in their own space, in Manantiales.',
 			link: 'Plan your visit',
 			alts: {
-				plinths: 'Gallery room with sculptures on plinths and a panel made of wood roots.',
-				corridor: 'Gallery corridor with reliefs on both sides.',
-				long: 'A long view through the gallery: white rings on the floor, a round piece made of roots and reliefs on the walls.',
-				garden: 'Gallery room with sculptures on a white platform and a view of the garden.'
+				console:
+					'A room of the gallery: a relief of bands and two round pieces on the wall, a stone console beside a column and more reliefs beyond.',
+				corridor:
+					'Gallery corridor with reliefs on both sides and a stone sculpture running along the floor.',
+				roots: 'Sculptures of roots inside iron frames, beside a stone console.',
+				plinths:
+					'A bluish relief on the wall and stone sculptures on plinths, with the garden beyond.'
 			},
+			tallAlts: [
+				'Stone sculptures on the floor and on a plinth, under a relief of bands.',
+				'Lit reliefs on the wall and a stone sculpture on the floor.',
+				'A carved trunk standing beside a white relief with straight folds.',
+				'A wooden console with a small golden sculpture, under a round piece.',
+				'Carved stones on plinths, with the room and the garden beyond.',
+				'Three reliefs on a gallery wall: one folded, one upright and wavy, one rectangular.'
+			],
 			film: {
 				label: 'Silent film: the artists in the workshop and a walk through the gallery.'
 			}
@@ -189,7 +204,15 @@ export const en: typeof es = {
 				'Two people finishing an oval piece in the workshop.',
 				'Cutting stone with a grinder outdoors.',
 				'Coating an oval piece, crouching beside it.',
-				'Welding a steel sculpture, wearing a mask.'
+				'Welding a steel sculpture, wearing a mask.',
+				'The two artists talking over a paper model, leaning on the workshop table.',
+				'Crouching on the workshop floor, sifting sand.',
+				'Welding a metal ring, in a mask, with sparks flying.',
+				'In a respirator and gloves, preparing a mixture at the workshop table.',
+				'The two artists holding a sculpture of dark rings over the workshop table.',
+				'On a ladder, adjusting a light beside a large folded relief.',
+				'Sitting on the workshop floor, putting together a piece made of rings.',
+				'The workshop: a long table, shelves and buckets, and one of the artists working on a piece.'
 			]
 		}
 	},

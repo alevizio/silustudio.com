@@ -1,16 +1,13 @@
 <script lang="ts">
-	import roomPlinths from '#lib/assets/gallery/sala-02.jpg?enhanced';
-	import roomCorridor from '#lib/assets/gallery/sala-03.jpg?enhanced';
-	import roomGarden from '#lib/assets/gallery/sala-06.jpg?enhanced';
-	import roomLong from '#lib/assets/gallery/sala-07.webp?enhanced';
 	import artists from '#lib/assets/studio/artistas-01.jpg?enhanced';
-	import GalleryFilm from '#lib/components/gallery-film.svelte';
+	import GalleryRooms from '#lib/components/gallery-rooms.svelte';
 	import LinkButton from '#lib/components/link-button.svelte';
+	import OpeningPhoto from '#lib/components/opening-photo.svelte';
 	import SectionHeading from '#lib/components/section-heading.svelte';
 	import Seo from '#lib/components/seo.svelte';
 	import WorksWall from '#lib/components/works-wall.svelte';
 	import { SITE } from '#lib/content/site.ts';
-	import { HERO_PHOTO, PHOTOGRAPHED_WORKS } from '#lib/content/images.ts';
+	import { HERO_PHOTO, HERO_PHOTO_TALL, PHOTOGRAPHED_WORKS } from '#lib/content/images.ts';
 	import { pageHref } from '#lib/i18n/href.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
 
@@ -26,32 +23,23 @@
 		PHOTOGRAPHED_WORKS.filter((work) => work.slug === slug)
 	);
 
-	const ROOM_SIZES = {
-		wide: '(min-width: 768px) 62vw, 100vw',
-		narrow: '(min-width: 768px) 21vw, 100vw'
-	};
-	const rooms = [
-		{ key: 'plinths', picture: roomPlinths, sizes: ROOM_SIZES.wide, place: 'md:col-span-3' },
-		{ key: 'corridor', picture: roomCorridor, sizes: ROOM_SIZES.narrow, place: '' },
-		{ key: 'long', picture: roomLong, sizes: ROOM_SIZES.narrow, place: 'reveal-after-1' },
-		{ key: 'garden', picture: roomGarden, sizes: ROOM_SIZES.narrow, place: 'reveal-after-2' }
-	] as const;
-
 	const copy = $derived(copyFor(lang));
 </script>
 
 <Seo {lang} page="home" />
 
-<!-- The page opens on the room itself, edge to edge. The way there comes right under it. -->
+<!--
+	The page opens on the room itself, edge to edge: an upright photo on a phone, a horizontal
+	one on a wide screen. The way there comes right under it.
+-->
 <section class="pb-section">
 	<!-- The photo starts a touch too close and settles back as the page opens. -->
-	<div class="aspect-room max-h-hero w-full overflow-hidden md:aspect-facade">
-		<enhanced:img
-			src={HERO_PHOTO}
+	<div class="aspect-tall max-h-hero w-full overflow-hidden md:aspect-facade">
+		<OpeningPhoto
+			tall={HERO_PHOTO_TALL}
+			wide={HERO_PHOTO}
 			alt={copy.home.heroAlt}
-			sizes="100vw"
-			fetchpriority="high"
-			class="size-full object-cover motion-safe:animate-settle"
+			class="motion-safe:animate-settle"
 		/>
 	</div>
 	<div class="mx-auto grid max-w-page gap-8 px-gutter pt-8 lg:grid-cols-12 lg:gap-x-16 lg:pt-12">
@@ -70,7 +58,11 @@
 					{copy.home.works.link}
 				</LinkButton>
 			</div>
-			<p class="font-serif text-lead text-ink-soft">{copy.home.lead}</p>
+			<div class="flex flex-col gap-4 font-serif text-lead text-ink-soft">
+				{#each copy.home.lead as paragraph (paragraph)}
+					<p>{paragraph}</p>
+				{/each}
+			</div>
 		</div>
 	</div>
 </section>
@@ -87,23 +79,7 @@
 		/>
 		<LinkButton href={pageHref(lang, 'visit')} variant="text">{copy.home.gallery.link}</LinkButton>
 	</div>
-	<!-- The film sets the height of the row; the photos beside it fill that height. -->
-	<div class="grid gap-4 md:grid-cols-12 md:gap-6">
-		<GalleryFilm {lang} class="reveal md:col-span-4" />
-		<div class="grid gap-4 md:col-span-8 md:grid-cols-3 md:grid-rows-gallery md:gap-6">
-			{#each rooms as room (room.key)}
-				<div class={['relative aspect-room reveal md:aspect-auto', room.place]}>
-					<enhanced:img
-						src={room.picture}
-						alt={copy.home.gallery.alts[room.key]}
-						sizes={room.sizes}
-						loading="lazy"
-						class="absolute inset-0 size-full object-cover"
-					/>
-				</div>
-			{/each}
-		</div>
-	</div>
+	<GalleryRooms {lang} />
 </section>
 
 <section aria-labelledby="home-works" class="mx-auto max-w-page px-gutter pb-10 md:pb-14">

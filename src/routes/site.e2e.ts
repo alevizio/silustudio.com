@@ -583,13 +583,116 @@ test('the home page opens on a photo that runs edge to edge', async ({ page }) =
 	await expect(page.getByRole('link', { name: 'Cómo llegar' }).first()).toBeInViewport();
 });
 
+test('a phone opens the home page on an upright photo, and a wide screen on a horizontal one', async ({
+	page
+}) => {
+	const opening = page.getByRole('img', { name: /Interior de la galería Silu/ });
+	const shown = () =>
+		opening.evaluate((img: HTMLImageElement) => ({
+			file: img.currentSrc,
+			box: img.getBoundingClientRect().toJSON()
+		}));
+
+	await page.setViewportSize(PHONE);
+	await page.goto('/');
+	await settled(page);
+	await expect.poll(async () => (await shown()).file).toContain('sala-01-alta');
+	const onPhone = await shown();
+	// Upright like the screen, edge to edge, and never taller than the screen itself.
+	expect(onPhone.box.x).toBe(0);
+	expect(onPhone.box.width).toBe(PHONE.width);
+	expect(onPhone.box.height).toBeGreaterThan(onPhone.box.width);
+	expect(onPhone.box.height).toBeLessThan(PHONE.height);
+	// What Silu is still starts on the first screen.
+	await expect(page.getByRole('heading', { level: 1 })).toBeInViewport();
+
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await expect.poll(async () => (await shown()).file).not.toContain('alta');
+	const onWide = await shown();
+	expect(onWide.file).toContain('sala-01');
+	expect(onWide.box.width).toBe(1440);
+	expect(onWide.box.width).toBeGreaterThan(onWide.box.height * 2);
+});
+
+test('a phone shows the rooms as upright photos in two columns, a wide screen as horizontal ones', async ({
+	page
+}) => {
+	const tall = page.getByRole('img', { name: /Consola de madera con una pequeña escultura/ });
+	const wide = page.getByRole('img', { name: /Pasillo de la galería con relieves a ambos lados/ });
+	/** How many photos of each shape the browser has fetched so far. */
+	const fetched = () =>
+		page.evaluate(() => {
+			const names = performance.getEntriesByType('resource').map((entry) => entry.name);
+			return {
+				tall: names.filter((name) => /\/alta-\d+\./.test(name)).length,
+				wide: names.filter((name) => /\/sala-0[2367]\./.test(name)).length
+			};
+		});
+
+	await page.setViewportSize(PHONE);
+	await page.goto('/');
+	await tall.scrollIntoViewIfNeeded();
+	await expect(tall).toBeVisible();
+	await expect(wide).toBeHidden();
+	const boxes = await page
+		.locator('main .columns-2 img')
+		.evaluateAll((photos) => photos.map((photo) => photo.getBoundingClientRect().toJSON()));
+	expect(boxes).toHaveLength(6);
+	// Two columns: every photo is a little under half the screen wide, at one of two places.
+	expect(new Set(boxes.map((box) => Math.round(box.x))).size).toBe(2);
+	for (const box of boxes) {
+		expect(box.width).toBeLessThan(PHONE.width / 2);
+		expect(box.width).toBeGreaterThan(PHONE.width / 3);
+		expect(box.height).toBeGreaterThanOrEqual(box.width - 1);
+	}
+	// The horizontal photos are for another screen, so this one never fetches them.
+	await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+	await settled(page);
+	expect((await fetched()).tall).toBeGreaterThan(0);
+	expect((await fetched()).wide).toBe(0);
+
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto('/');
+	await wide.scrollIntoViewIfNeeded();
+	await expect(wide).toBeVisible();
+	await expect(tall).toBeHidden();
+	await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+	await settled(page);
+	expect((await fetched()).wide).toBeGreaterThan(0);
+	expect((await fetched()).tall).toBe(0);
+});
+
+test('a shared link shows a picture that is really on the site', async ({ page, request }) => {
+	for (const path of ['/', '/en/', '/obras/guijarro/', '/obras/obra-40/']) {
+		await page.goto(path);
+		const read = (property: string) =>
+			page.locator(`meta[property="${property}"]`).getAttribute('content');
+		const image = new URL((await read('og:image')) ?? '');
+		// The card points at the address the site is served from. Here that is this server.
+		const answer = await request.get(image.pathname);
+		expect(answer.ok(), `${path}: ${image.pathname}`).toBe(true);
+		expect(answer.headers()['content-type']).toMatch(/^image\//);
+		expect(Number(await read('og:image:width'))).toBeGreaterThan(0);
+		expect(Number(await read('og:image:height'))).toBeGreaterThan(0);
+		expect(new URL((await read('og:url')) ?? '').pathname).toBe(path);
+	}
+	// The picture for the pages with none of their own is the size share cards are made for.
+	await page.goto('/');
+	expect(await page.locator('meta[property="og:image:width"]').getAttribute('content')).toBe(
+		'1200'
+	);
+	expect(await page.locator('meta[property="og:image:height"]').getAttribute('content')).toBe(
+		'630'
+	);
+});
+
 for (const width of [1280, 1440, 1920]) {
 	test(`on a ${width} pixel wide screen the opening photo is never a small copy stretched out`, async ({
 		page
 	}) => {
-		// The photo itself is 1779 pixels wide. An ordinary screen must get as many pixels as
+		// The photo itself is 2560 pixels wide. An ordinary screen must get as many pixels as
 		// it has, up to that, and never the half-size copy it once got.
-		const OWN_WIDTH = 1779;
+		const OWN_WIDTH = 2560;
 		await page.setViewportSize({ width, height: 900 });
 		await page.goto('/');
 		const photo = page.getByRole('img', { name: /Interior de la galería Silu/ });

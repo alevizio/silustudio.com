@@ -105,6 +105,7 @@
 	); /* widest a photo gets in the row a phone swipes through: the edge of the next one stays in view, to say there is more */
 	--container-prose: 40rem;
 	--aspect-room: 3 / 2;
+	--aspect-tall: 4 / 5; /* the photo a phone opens the home page on: upright, like the screen */
 	--aspect-facade: 5 / 2;
 	--aspect-coast: 11 / 5; /* the coast map: the shape of its drawing in content/coast-map.ts */
 	--aspect-film: 9 / 16;

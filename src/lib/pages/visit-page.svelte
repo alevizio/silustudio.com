@@ -23,13 +23,17 @@
 	<SectionHeading level={1} label={copy.label} title={copy.pageTitle} />
 </header>
 
+<!--
+	A phone shows the whole front of the gallery. A wide screen has room for a low band of it
+	only, and takes the bottom one: the entrance, the sign and the sculpture at the door.
+-->
 <div class="mx-auto max-w-page px-gutter arrive-after-1 motion-safe:animate-arrive">
 	<enhanced:img
 		src={facade}
 		alt={copy.facadeAlt}
 		sizes="(min-width: 1280px) 1216px, 100vw"
 		fetchpriority="high"
-		class="aspect-room size-full object-cover md:aspect-facade"
+		class="aspect-room size-full object-cover md:aspect-facade md:object-bottom"
 	/>
 </div>
 

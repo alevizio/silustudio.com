@@ -44,20 +44,37 @@ export const es = {
 	home: {
 		eyebrow: 'Silu · Silvestre Jacobi y Lucila Dickinson',
 		title: 'Galería y estudio de arte en Manantiales, Punta del Este.',
-		lead: 'Silvestre Jacobi y Lucila Dickinson trabajan juntos como Silu. Sus relieves y esculturas, hechos con arenas, piedras, maderas y nácares, se exhiben en su propia galería.',
+		/** Lucila's own words (18 Nov 2026), with only the accents and one spelling put right. */
+		lead: [
+			'Con más de dos décadas de trayectoria, el colectivo artístico de Silvestre Jacobi y Lucila Dickinson que conforman Silu, nos invitan a su studio donde podrán conocer su taller y su nueva colección de obras inspiradas en las formas orgánicas de la naturaleza.',
+			'Son creadores de su propia corriente artística llamada naturalismo abstracto, y su búsqueda está en redespertar la conexión con ella.'
+		],
+		/** True of both photos the page can open on: the upright one and the horizontal one. */
 		heroAlt:
-			'Interior de la galería Silu: relieves de arena en las paredes, esculturas circulares en el piso y una visitante recorriendo la sala.',
+			'Interior de la galería Silu: relieves de arena en las paredes y esculturas en el piso de la sala.',
 		gallery: {
 			label: 'La galería',
 			title: 'Las obras se ven en su propia sala, en Manantiales.',
 			link: 'Planificar la visita',
+			/** The horizontal photos a wide screen shows. */
 			alts: {
+				console:
+					'Sala de la galería: un relieve de bandas y dos piezas circulares en la pared, una consola de piedra junto a una columna y más relieves al fondo.',
+				corridor:
+					'Pasillo de la galería con relieves a ambos lados y una escultura de piedra a lo largo del piso.',
+				roots: 'Esculturas de raíces dentro de marcos de hierro, junto a una consola de piedra.',
 				plinths:
-					'Sala de la galería con esculturas sobre pedestales y un panel de raíces de madera.',
-				corridor: 'Pasillo de la galería con relieves a ambos lados.',
-				long: 'Vista larga de la galería: aros blancos en el piso, una pieza circular de raíces y relieves en las paredes.',
-				garden: 'Sala de la galería con esculturas sobre una tarima blanca y vista al jardín.'
+					'Relieve azulado en la pared y esculturas de piedra sobre pedestales, con el jardín al fondo.'
 			},
+			/** The upright photos a phone shows: one for each alta-NN in assets/gallery, in file name order. */
+			tallAlts: [
+				'Esculturas de piedra en el piso y sobre un pedestal, bajo un relieve de bandas.',
+				'Relieves iluminados en la pared y una escultura de piedra en el piso.',
+				'Un tronco tallado de pie junto a un relieve blanco de pliegues rectos.',
+				'Consola de madera con una pequeña escultura dorada, bajo una pieza circular.',
+				'Piedras talladas sobre pedestales, con la sala y el jardín al fondo.',
+				'Tres relieves en una pared de la galería: uno plegado, uno vertical y ondulado, y uno rectangular.'
+			],
 			film: {
 				label: 'Película sin sonido: los artistas en el taller y un recorrido por la galería.'
 			}
@@ -193,7 +210,15 @@ export const es = {
 				'Dos personas terminando una pieza ovalada en el taller.',
 				'Cortando piedra con una amoladora, al aire libre.',
 				'Revistiendo una pieza ovalada, en cuclillas.',
-				'Soldando una escultura de acero, con máscara.'
+				'Soldando una escultura de acero, con máscara.',
+				'Los dos artistas conversando sobre una maqueta de papel, apoyados en la mesa del taller.',
+				'En cuclillas sobre el piso del taller, tamizando arena.',
+				'Soldando un aro de metal, con máscara y entre chispas.',
+				'Con máscara y guantes, preparando una mezcla en la mesa del taller.',
+				'Los dos artistas sosteniendo una escultura de aros oscuros sobre la mesa del taller.',
+				'Sobre una escalera, ajustando una luz junto a un gran relieve de pliegues.',
+				'Sentados en el piso del taller, armando una pieza de aros.',
+				'El taller: una mesa larga, estantes y baldes, y uno de los artistas trabajando una pieza.'
 			]
 		}
 	},
