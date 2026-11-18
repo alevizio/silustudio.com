@@ -5,7 +5,24 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
 		<meta name="theme-color" content="#f6f4ef" />
-		<link rel="icon" type="image/png" href="/favicon.png" />
+		<!--
+			The logo on no background: dark ink for a light tab, light for a dark one. The ink one
+			comes first, as a browser that ignores the light and dark switch is likeliest to take it.
+		-->
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="192x192"
+			href="/favicon.png"
+			media="(prefers-color-scheme: light)"
+		/>
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="192x192"
+			href="/favicon-dark.png"
+			media="(prefers-color-scheme: dark)"
+		/>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

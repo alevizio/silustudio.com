@@ -664,6 +664,31 @@ test('a phone shows the rooms as upright photos in two columns, a wide screen as
 	expect((await fetched()).tall).toBe(0);
 });
 
+test('the tab shows the logo on no background, dark on a light tab and light on a dark one', async ({
+	page,
+	request
+}) => {
+	await page.goto('/');
+	const icons = await page.locator('link[rel="icon"]').evaluateAll((links) =>
+		links.map((link) => ({
+			href: new URL(link.getAttribute('href') ?? '', location.href).pathname,
+			media: link.getAttribute('media')
+		}))
+	);
+	expect(icons).toEqual([
+		{ href: '/favicon.png', media: '(prefers-color-scheme: light)' },
+		{ href: '/favicon-dark.png', media: '(prefers-color-scheme: dark)' }
+	]);
+	for (const { href } of icons) {
+		const answer = await request.get(href);
+		expect(answer.ok(), `${href}`).toBe(true);
+		// A PNG with an alpha channel (colour type 6), so its corners can be see-through.
+		const bytes = await answer.body();
+		expect(bytes.subarray(1, 4).toString()).toBe('PNG');
+		expect(bytes[25]).toBe(6);
+	}
+});
+
 test('a shared link shows a picture that is really on the site', async ({ page, request }) => {
 	for (const path of ['/', '/en/', '/obras/guijarro/', '/obras/obra-40/']) {
 		await page.goto(path);
