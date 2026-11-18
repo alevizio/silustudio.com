@@ -45,7 +45,7 @@ export const en: typeof es = {
 	home: {
 		eyebrow: 'Silu · Silvestre Jacobi and Lucila Dickinson',
 		title: 'Art gallery and studio in Manantiales, Punta del Este.',
-		/** A translation of Lucila's words in es.ts, still to be approved by the artists. */
+		/** A translation of Lucila's words in es.ts, kept as it is by Ale for the artists (18 Nov 2026). */
 		lead: [
 			'With more than two decades of work behind them, Silvestre Jacobi and Lucila Dickinson, who together are the art collective Silu, invite you to their studio, where you can see their workshop and their new collection of works inspired by the organic forms of nature.',
 			'They are the creators of their own artistic movement, which they call abstract naturalism, and their search is to reawaken our connection with nature.'
@@ -159,7 +159,7 @@ export const en: typeof es = {
 		label: 'Studio',
 		title: 'Silvestre Jacobi and Lucila Dickinson',
 		statement: [
-			'The artists Silvestre Jacobi and Lucila Dickinson have worked together in an artistic union, called SILU, for the last fifteen years.',
+			'The artists Silvestre Jacobi and Lucila Dickinson have worked together in an artistic union, called SILU, for more than two decades.',
 			'Their creative process emerges from the subtle dialogue that they maintain with nature at its purest. Their work represents a small fragment of this dialogue, which reaches fulfilment through the encounter with the senses of those who observe them.',
 			'The inspiration comes from the language of the macro and microcosmos, portrayed in the fractal growth, the spiral patterns, the elliptical movements, as well as the fluid forms that come from the erosion that the passing of time provides. Such sources of inspiration have accompanied the artists in their search to understand the wisdom of nature and helped them to awaken that fragment of the soul which still maintains a close association with it.',
 			'They perform their works with materials which have been directly obtained from their natural surroundings: sand, rocks, petrified wood, mother of pearl and fossils. Such materials convey a deep and significant meaning which transcends the intellect, because at the root of their art there is an act of surrender to that moment of creation when intuition opens the way to discovery.',

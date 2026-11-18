@@ -901,5 +901,45 @@ export const SHEET_ROWS: readonly SheetRow[] = [
 		status: '',
 		onSite: true,
 		inPdf: false
+	},
+	{
+		code: 'obra-68',
+		title: '',
+		medium: '',
+		mediumEn: '',
+		dimensions: '',
+		status: '',
+		onSite: true,
+		inPdf: true
+	},
+	{
+		code: 'obra-69',
+		title: '',
+		medium: '',
+		mediumEn: '',
+		dimensions: '',
+		status: '',
+		onSite: true,
+		inPdf: true
+	},
+	{
+		code: 'obra-70',
+		title: '',
+		medium: '',
+		mediumEn: '',
+		dimensions: '',
+		status: '',
+		onSite: true,
+		inPdf: true
+	},
+	{
+		code: 'obra-71',
+		title: '',
+		medium: '',
+		mediumEn: '',
+		dimensions: '',
+		status: '',
+		onSite: true,
+		inPdf: true
 	}
 ];

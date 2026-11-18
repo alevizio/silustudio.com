@@ -1,6 +1,8 @@
 /*
  * Spanish copy. The artists' statement and biographies are their own text from the current
- * site, unchanged except for one typo ("Actualmete"). Headings, buttons and the short
+ * site, unchanged except for one typo ("Actualmete") and one date: "desde hace quince años"
+ * became "desde hace más de dos décadas" (18 Nov 2026, Ale), to agree with Lucila's new text
+ * on the home page. Headings, buttons and the short
  * home page lines are new and still need the artists' approval.
  */
 export const es = {
@@ -166,7 +168,7 @@ export const es = {
 		label: 'Estudio',
 		title: 'Silvestre Jacobi y Lucila Dickinson',
 		statement: [
-			'Los artistas Silvestre Jacobi y Lucila Dickinson trabajan juntos conformando un colectivo artístico Silu desde hace quince años.',
+			'Los artistas Silvestre Jacobi y Lucila Dickinson trabajan juntos conformando un colectivo artístico Silu desde hace más de dos décadas.',
 			'Su proceso creativo surge del sutil diálogo que tienen con la naturaleza en su estado puro. Sus obras son un pequeño fragmento de este diálogo, que alcanza su plenitud en el encuentro con los sentidos de quienes se detienen a observarlas.',
 			'Una inspiración basada en el lenguaje del macro y microcosmos, como el crecimiento fractal, los patrones en espiral, el movimiento elíptico y las formas fluidas de la erosión que produce el paso del tiempo, los ha acompañado en su incansable búsqueda por comprender parte de su sabiduría y los ha ayudado a hacer despertar ese fragmento del ser que aún sigue completamente vinculado con la naturaleza.',
 			'Realizan sus obras con materiales directamente recolectados de su natural entorno: como arenas, piedras, maderas petrificadas, nácares y fósiles. Ellas logran transmitir un significado profundo que trasciende el intelecto, porque en la raíz de su arte existe un acto de entrega absoluta a ese instante creador, dado que ese es el momento en que la intuición les abre el camino hacia un constante descubrir.',

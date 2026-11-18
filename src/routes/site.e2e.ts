@@ -20,8 +20,8 @@ const PAGES = [
 
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 const PHONE = { width: 390, height: 844 };
-/** Every work on the site: the 34 of the catalog and the 50 photographed works not in it. */
-const WORKS = 84;
+/** Every work on the site: the 34 of the catalog and the 54 photographed works not in it. */
+const WORKS = 88;
 const WALL = 'main ul[aria-label="Obras"]';
 /** The catalog works that only have small photos hang in their own, smaller wall. */
 const CATALOG = 'main ul[aria-label="Catálogo"]';
