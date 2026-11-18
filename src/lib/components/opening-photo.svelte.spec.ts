@@ -19,7 +19,7 @@ describe('opening-photo.svelte', () => {
 		expect(page.getByRole('img').elements()).toHaveLength(1);
 	});
 
-	it('offers the horizontal photo to a wide screen first, and the upright one to every other', async () => {
+	it('offers the horizontal photo to a wide screen first, and the phone one to every other', async () => {
 		const { container } = render(OpeningPhoto, props);
 		await expect.element(page.getByRole('img', { name: alt })).toBeInTheDocument();
 		const sources = sourcesIn(container);

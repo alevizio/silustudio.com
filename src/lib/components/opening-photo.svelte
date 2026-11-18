@@ -8,7 +8,7 @@
 	import { cn } from '#lib/utils/cn.ts';
 
 	interface Props {
-		/** The upright photo, for a phone. */
+		/** The photo framed for a phone: square or upright. */
 		tall: Picture;
 		/** The horizontal photo, for a wide screen. */
 		wide: Picture;
@@ -23,8 +23,8 @@
 </script>
 
 <!--
-	The photo a page opens on, in two shapes: upright for a phone and horizontal for a wide
-	screen, so each screen gets a photo framed for it. The browser picks one and loads only
+	The photo a page opens on, in two shapes: one framed for a phone and a horizontal one for a
+	wide screen, so each screen gets a photo framed for it. The browser picks one and loads only
 	that one, at once and ahead of everything else. The photo fills its place and is cut to
 	it, so the place decides how much of the photo shows.
 -->

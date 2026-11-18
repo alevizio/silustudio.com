@@ -84,8 +84,9 @@ export const HERO_PHOTO: Picture = inOrder(
 )[0];
 
 /**
- * The photo that opens the home page on a phone: another view of the same room, upright, so
- * it fills the screen a phone is held in. Its widths are those of phone screens.
+ * The photo that opens the home page on a phone: another view of the same room, square, so it
+ * is taller than a horizontal one and still leaves the way there on the first screen. Its
+ * widths are those of phone screens.
  */
 export const HERO_PHOTO_TALL: Picture = inOrder(
 	import.meta.glob<PictureModule>('/src/lib/assets/gallery/sala-01-alta.jpg', {

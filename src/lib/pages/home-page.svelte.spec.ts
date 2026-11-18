@@ -42,15 +42,15 @@ describe('home-page.svelte', () => {
 			.toHaveAttribute('href', expect.stringMatching(/\/obras\/guijarro\/?$/));
 	});
 
-	it('opens on a photo in two shapes, upright for a phone and horizontal for a wide screen', async () => {
+	it('opens on a photo in two shapes, square for a phone and horizontal for a wide screen', async () => {
 		const { container } = render(HomePage, { lang: 'es' });
 		await expect.element(page.getByRole('heading', { level: 1 })).toBeVisible();
 		const opening = container.querySelector('picture');
 		const sources = [...(opening?.querySelectorAll('source') ?? [])];
 		expect(sources.some((source) => source.media !== '')).toBe(true);
 		expect(sources.some((source) => source.media === '')).toBe(true);
-		// Its place is upright on a phone and a low band on a wide screen.
-		expect(opening?.parentElement?.classList.contains('aspect-tall')).toBe(true);
+		// Its place is square on a phone and a low band on a wide screen.
+		expect(opening?.parentElement?.classList.contains('aspect-square')).toBe(true);
 		expect(opening?.parentElement?.classList.contains('md:aspect-facade')).toBe(true);
 	});
 

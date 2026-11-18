@@ -583,7 +583,7 @@ test('the home page opens on a photo that runs edge to edge', async ({ page }) =
 	await expect(page.getByRole('link', { name: 'Cómo llegar' }).first()).toBeInViewport();
 });
 
-test('a phone opens the home page on an upright photo, and a wide screen on a horizontal one', async ({
+test('a phone opens the home page on a square photo with the way there in view, and a wide screen on a horizontal one', async ({
 	page
 }) => {
 	const opening = page.getByRole('img', { name: /Interior de la galería Silu/ });
@@ -598,13 +598,15 @@ test('a phone opens the home page on an upright photo, and a wide screen on a ho
 	await settled(page);
 	await expect.poll(async () => (await shown()).file).toContain('sala-01-alta');
 	const onPhone = await shown();
-	// Upright like the screen, edge to edge, and never taller than the screen itself.
+	// Square and edge to edge: half as tall again as the horizontal photo a phone once got.
 	expect(onPhone.box.x).toBe(0);
 	expect(onPhone.box.width).toBe(PHONE.width);
-	expect(onPhone.box.height).toBeGreaterThan(onPhone.box.width);
-	expect(onPhone.box.height).toBeLessThan(PHONE.height);
-	// What Silu is still starts on the first screen.
-	await expect(page.getByRole('heading', { level: 1 })).toBeInViewport();
+	expect(Math.round(onPhone.box.height)).toBe(PHONE.width);
+	// And the way there is still whole on the first screen, under what Silu is.
+	await expect(page.getByRole('heading', { level: 1 })).toBeInViewport({ ratio: 1 });
+	await expect(page.getByRole('link', { name: 'Cómo llegar' }).first()).toBeInViewport({
+		ratio: 1
+	});
 
 	await page.setViewportSize({ width: 1440, height: 900 });
 	await expect.poll(async () => (await shown()).file).not.toContain('alta');

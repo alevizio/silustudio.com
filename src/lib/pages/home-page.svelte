@@ -29,12 +29,14 @@
 <Seo {lang} page="home" />
 
 <!--
-	The page opens on the room itself, edge to edge: an upright photo on a phone, a horizontal
-	one on a wide screen. The way there comes right under it.
+	The page opens on the room itself, edge to edge: a square photo on a phone and a horizontal
+	one on a wide screen. The way there comes right under it. On a phone the space under the
+	photo is a little tighter, so that the square photo, what Silu is and "Cómo llegar" all fit
+	on the first screen of a phone such as an iPhone 14.
 -->
 <section class="pb-section">
 	<!-- The photo starts a touch too close and settles back as the page opens. -->
-	<div class="aspect-tall max-h-hero w-full overflow-hidden md:aspect-facade">
+	<div class="aspect-square max-h-hero w-full overflow-hidden md:aspect-facade">
 		<OpeningPhoto
 			tall={HERO_PHOTO_TALL}
 			wide={HERO_PHOTO}
@@ -42,13 +44,17 @@
 			class="motion-safe:animate-settle"
 		/>
 	</div>
-	<div class="mx-auto grid max-w-page gap-8 px-gutter pt-8 lg:grid-cols-12 lg:gap-x-16 lg:pt-12">
+	<div
+		class="mx-auto grid max-w-page gap-5 px-gutter pt-6 md:gap-8 md:pt-8 lg:grid-cols-12 lg:gap-x-16 lg:pt-12"
+	>
 		<div class="flex flex-col gap-4 motion-safe:animate-arrive lg:col-span-7">
 			<p class="text-label text-ink-soft uppercase">{copy.home.eyebrow}</p>
 			<h1 class="font-serif text-display font-light text-balance">{copy.home.title}</h1>
 		</div>
 		<!-- The address and the way there come first, so they are in view when the page opens. -->
-		<div class="flex flex-col gap-6 arrive-after-1 motion-safe:animate-arrive lg:col-span-5">
+		<div
+			class="flex flex-col gap-4 arrive-after-1 motion-safe:animate-arrive md:gap-6 lg:col-span-5"
+		>
 			<p class="text-label text-ink-soft uppercase">
 				{SITE.address.street} · {SITE.address.locality}, {SITE.address.country}
 			</p>
