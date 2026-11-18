@@ -1,5 +1,7 @@
 <script lang="ts">
 	import facade from '#lib/assets/gallery/fachada.jpg?enhanced';
+	import garden from '#lib/assets/gallery/jardin.jpg?enhanced';
+	import patio from '#lib/assets/gallery/patio.jpg?enhanced';
 	import SectionHeading from '#lib/components/section-heading.svelte';
 	import Seo from '#lib/components/seo.svelte';
 	import GalleryMap from '#lib/components/gallery-map.svelte';
@@ -13,6 +15,10 @@
 	let { lang }: Props = $props();
 
 	const copy = $derived(copyFor(lang).visit);
+	const places = $derived([
+		{ key: 'patio', picture: patio, alt: copy.placeAlts.patio },
+		{ key: 'garden', picture: garden, alt: copy.placeAlts.garden }
+	]);
 </script>
 
 <Seo {lang} page="visit" />
@@ -35,6 +41,19 @@
 		fetchpriority="high"
 		class="aspect-room size-full object-cover md:aspect-facade md:object-bottom"
 	/>
+</div>
+
+<!-- Past the front: a patio of the gallery, and the workshop at the back, opening onto the garden. -->
+<div class="mx-auto grid max-w-page gap-4 px-gutter pt-4 md:grid-cols-2 md:gap-6 md:pt-6">
+	{#each places as place, index (place.key)}
+		<enhanced:img
+			src={place.picture}
+			alt={place.alt}
+			sizes="(min-width: 1280px) 37rem, (min-width: 768px) 48vw, 100vw"
+			loading="lazy"
+			class={['h-auto w-full reveal', index > 0 && 'reveal-after-1']}
+		/>
+	{/each}
 </div>
 
 <!--

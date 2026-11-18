@@ -212,7 +212,15 @@ export const en: typeof es = {
 				'The two artists holding a sculpture of dark rings over the workshop table.',
 				'On a ladder, adjusting a light beside a large folded relief.',
 				'Sitting on the workshop floor, putting together a piece made of rings.',
-				'The workshop: a long table, shelves and buckets, and one of the artists working on a piece.'
+				'The workshop: a long table, shelves and buckets, and one of the artists working on a piece.',
+				'Painting a large steel ring in the patio, a bucket in hand.',
+				'On a ladder, turning a light towards a long relief on the wall.',
+				'Crouching in a respirator, shaping a tall, thin piece.',
+				'Putting on goggles and a respirator before work.',
+				'The two artists raising a tall panel against the workshop wall.',
+				'The two artists on their knees on the floor, marking a long piece in pencil.',
+				'Crouching on the workshop floor, the two artists study some dark curved pieces.',
+				'The two artists smoothing the surface of a piece with a brush and a spatula.'
 			]
 		}
 	},
@@ -222,6 +230,12 @@ export const en: typeof es = {
 		pageTitle: 'Visit the gallery',
 		facadeAlt:
 			'Front of the Silu gallery on Ruta 10, with a weathering steel sculpture at the entrance.',
+		placeAlts: {
+			patio:
+				'A patio of the gallery: a large relief of roots on the white wall, a green sofa, a petrified wood table and palms.',
+			garden:
+				'The back of the building: the workshop on the ground floor, opening onto the garden, among trees.'
+		},
 		address: 'Address',
 		contact: 'Contact',
 		hours: 'Opening hours',

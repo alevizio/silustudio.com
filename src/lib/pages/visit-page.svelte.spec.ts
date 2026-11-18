@@ -27,6 +27,20 @@ describe('visit-page.svelte', () => {
 		expect(container.querySelector('iframe')).toBeNull();
 	});
 
+	it('shows, past the front, a patio of the gallery and the workshop by the garden', async () => {
+		render(VisitPage, { lang: 'es' });
+		await expect
+			.element(page.getByRole('img', { name: /^Patio de la galería/ }))
+			.toBeInTheDocument();
+		await expect
+			.element(page.getByRole('img', { name: /^La parte de atrás del edificio/ }))
+			.toBeInTheDocument();
+		// Below the first screen, so they wait until the visitor nears them.
+		for (const name of [/^Patio de la galería/, /^La parte de atrás del edificio/]) {
+			await expect.element(page.getByRole('img', { name })).toHaveAttribute('loading', 'lazy');
+		}
+	});
+
 	it('renders in English', async () => {
 		render(VisitPage, { lang: 'en' });
 		await expect

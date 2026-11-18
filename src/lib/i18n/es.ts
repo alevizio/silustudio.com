@@ -220,7 +220,15 @@ export const es = {
 				'Los dos artistas sosteniendo una escultura de aros oscuros sobre la mesa del taller.',
 				'Sobre una escalera, ajustando una luz junto a un gran relieve de pliegues.',
 				'Sentados en el piso del taller, armando una pieza de aros.',
-				'El taller: una mesa larga, estantes y baldes, y uno de los artistas trabajando una pieza.'
+				'El taller: una mesa larga, estantes y baldes, y uno de los artistas trabajando una pieza.',
+				'Pintando un gran aro de acero en el patio, con un balde en la mano.',
+				'Sobre una escalera, dirigiendo una luz hacia un relieve largo en la pared.',
+				'En cuclillas y con máscara, dando forma a una pieza alta y delgada.',
+				'Poniéndose las antiparras y la máscara antes de trabajar.',
+				'Los dos artistas levantando un panel alto contra la pared del taller.',
+				'Los dos artistas de rodillas en el piso, marcando con lápiz una pieza larga.',
+				'En cuclillas en el piso del taller, los dos artistas estudian unas piezas curvas oscuras.',
+				'Los dos artistas alisando con brocha y espátula la superficie de una pieza.'
 			]
 		}
 	},
@@ -230,6 +238,13 @@ export const es = {
 		pageTitle: 'Visitar la galería',
 		facadeAlt:
 			'Frente de la galería Silu sobre la Ruta 10, con una escultura de acero corten en la entrada.',
+		/** The two photos under the front: inside the gallery and behind it. */
+		placeAlts: {
+			patio:
+				'Patio de la galería: un gran relieve de raíces en la pared blanca, un sillón verde, una mesa de madera petrificada y palmeras.',
+			garden:
+				'La parte de atrás del edificio: el taller en la planta baja, abierto al jardín, entre árboles.'
+		},
 		address: 'Dirección',
 		contact: 'Contacto',
 		hours: 'Horario',
