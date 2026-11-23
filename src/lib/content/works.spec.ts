@@ -74,9 +74,8 @@ describe('SAMPLE_STATUSES', () => {
 	});
 
 	it('names real works, and shows both a work in the gallery and a sold one', () => {
-		for (const [slug, status] of Object.entries(SAMPLE_STATUSES)) {
-			expect(findWork(slug)?.status, slug).toBe(status);
-		}
+		const samples = Object.entries(SAMPLE_STATUSES);
+		expect(samples.filter(([slug, status]) => findWork(slug)?.status === status)).toEqual(samples);
 		if (!SITE.launched) {
 			expect(Object.values(SAMPLE_STATUSES)).toEqual(expect.arrayContaining(['onView', 'sold']));
 		}

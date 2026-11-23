@@ -942,21 +942,25 @@ test('a work on the wall comes a hair closer under the pointer', async ({ page }
 	expect((after?.width ?? 0) / (before?.width ?? 1)).toBeLessThan(1.03);
 });
 
-test('a few works carry sample tags while the site is a preview, and the rest carry none', async ({
+test('now the site is live, no work carries a tag: the samples left with the preview', async ({
 	page
 }) => {
+	const TAG = /^(En la galería|Disponible|Reservada|Vendida)$/;
 	await page.goto('/obras/');
-	const wall = page.locator(WALL);
-	await expect(wall.getByText('En la galería', { exact: true })).toHaveCount(3);
-	await expect(wall.getByText('Vendida', { exact: true })).toHaveCount(2);
-	await expect(page.getByText(/^(Disponible|Reservada)$/)).toHaveCount(0);
-	// A tag is small and plain: a word in a frame, smaller than the title above it.
-	const tag = wall.getByText('Vendida', { exact: true }).first();
-	await expect(tag).toHaveCSS('font-size', '11px');
-	expect(await tag.evaluate((element) => element.children.length)).toBe(0);
-	// A work's tag is the same on the wall and on its own page.
+	await expect(page.getByRole('main').getByText(TAG)).toHaveCount(0);
+	// Resplandor circular carried the sample "Vendida".
 	await page.goto('/obras/resplandor-circular/');
-	await expect(page.getByRole('main').getByText('Vendida', { exact: true })).toBeVisible();
+	await expect(page.getByRole('main').getByText(TAG)).toHaveCount(0);
+});
+
+test('an address of the old site opens its page on this one', async ({ page }) => {
+	await page.goto('/artistas');
+	await expect(page).toHaveURL(/\/estudio\/$/);
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+		'Silvestre Jacobi y Lucila Dickinson'
+	);
+	await page.goto('/contact/');
+	await expect(page).toHaveURL(/\/en\/visit\/$/);
 });
 
 test('the visit page draws its own map, and asks Google for one only when the visitor wants it', async ({

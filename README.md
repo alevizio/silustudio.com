@@ -50,6 +50,11 @@ npm run test:unit -- --run   # unit and component tests
 npm run test:e2e   # builds the site, then runs every page through Playwright and axe
 ```
 
+## Where the site is served from
+
+- **GitHub Pages.** Every push to `main` builds the site and publishes it at https://www.silustudio.com (`.github/workflows/deploy.yml`). Run the checks and tests before pushing: the workflow only builds.
+- **The domain** silustudio.com is registered at Squarespace Domains, in the artists' Squarespace account, which also holds its DNS: four A and four AAAA records for GitHub Pages at the root, `www` pointing to `alevizio.github.io`, and Google Workspace's MX records for the email, which nothing here touches.
+
 ## Each work
 
 Every work has its own page (`/obras/guijarro/`, `/en/works/guijarro/`) with its photos, title, size, material and, once confirmed, its tag.
@@ -64,7 +69,7 @@ Every work has its own page (`/obras/guijarro/`, `/en/works/guijarro/`) with its
 
 **Tags.** In `src/lib/content/works.ts`, add `status: 'onView'`, `'sold'`, `'reserved'` or `'available'` to the work. It shows as a small tag, En la galería, Vendida, Reservada or Disponible, under the work on the wall and over its title on its own page. A work with no status shows no tag.
 
-**The tags showing now are samples, not facts.** Five works carry a made-up tag so the artists can see how one looks: Guijarro, Supraconciencia and Reencause say "En la galería", Impronta humana and Resplandor circular say "Vendida". They live in `SAMPLE_STATUSES` in `works.ts`, and that list empties itself the moment `launched` is `true`, so a sample can never reach the public site. When the artists confirm the real ones, write each on its work and delete the list.
+**No work carries a tag today.** While the site was a preview, five works carried a made-up tag so the artists could see how one looks (`SAMPLE_STATUSES` in `works.ts`). That list empties itself while `launched` is `true`, so a sample never reaches the public site. When the artists confirm the real ones, write each in the sheet's Estado column and delete the list.
 
 ## The map
 
@@ -92,7 +97,7 @@ Every fact about a work (title, technique, size, tag, whether it shows on the si
 - **The share card** is what WhatsApp and other apps show for a link: the page's title and description and a picture. A work's page uses the work's own first photo. Every other page uses `static/og.jpg` (1200 by 630: the gallery, a work up close and the artists at work). The card is built on the address the pages are served from (`SITE.servedFrom` in `src/lib/content/site.ts`): the preview's until launch day, the gallery's own after. Built on the gallery's address before launch, the picture would be looked for on the old site, which does not have it, and a shared link would show no picture.
 - **`/sitemap.xml`** lists every page in both languages with the works' photos (`src/routes/sitemap.xml/+server.ts`), and `robots.txt` points to it.
 - **Structured data** (`src/lib/content/structured-data.ts`): the home and visit pages say Silu is an art gallery, with its address, place on the map, phone and Instagram. Each titled work's page says it is an artwork by the two artists, with its photos, technique and size. Opening hours join it once they are confirmed. Nothing says whether a work is for sale.
-- **Old addresses.** `vercel.json` sends the ten addresses of the Squarespace site (`/inicio`, `/artistas`, `/contacto`, `/work` and so on) to their new pages for good, and makes every address end in a slash. It has not been through a deploy yet: check a few on the first one.
+- **Old addresses.** The nine addresses of the Squarespace site (`/inicio`, `/artistas`, `/contacto`, `/work` and so on) each keep a small page in `static/` that opens their new page at once and names it as the page's real address, which search engines take as a permanent move. GitHub Pages cannot send a visitor on by itself.
 
 ## Where the photos come from
 
@@ -106,9 +111,9 @@ Every fact about a work (title, technique, size, tag, whether it shows on the si
 - **The film on the home page** (`static/video/silu-galeria.mp4`, the old site's home film at 720 pixels wide, with its sound removed) runs the same way, through the same `silent-film.svelte`.
 - **The large film on the studio page** is the artists' own, "SILU Artistas Loop", on Vimeo, which their old site also embeds. It starts by itself too, silent and in a loop, with Vimeo's own controls off and the same button to stop it (`artists-film.svelte`). The page tells the player to wait while it is out of sight. A visitor who asks for less motion gets the still, and nothing loads from Vimeo until they press play. Vimeo does not hand out this film's file, so it cannot be hosted with the others until the artists send it.
 
-## Launch day
+## Launch
 
-Set `launched` to `true` in `src/lib/content/site.ts`. Until then every page carries `noindex`, so previews stay out of search results. Then, the same day: check that the old addresses redirect, add the site to Google Search Console and hand it `/sitemap.xml`, and put the new address of each page in the gallery's Google Maps listing and Instagram bio. The same switch removes the sample tags, so the works that are really in the gallery or sold need their real `status` before that day.
+The site went live on 23 November 2026: `launched` is `true` in `src/lib/content/site.ts`, so pages may be indexed and the sample tags are gone. A work shows a tag again once the artists give it a real one in the sheet. Still to do: add the site to Google Search Console and hand it `/sitemap.xml`, and put the new address of each page in the gallery's Google Maps listing and Instagram bio.
 
 ## Still needed from the artists
 
@@ -119,6 +124,6 @@ Set `launched` to `true` in `src/lib/content/site.ts`. Until then every page car
 - Titles, technique and size for the four works first seen in the selection of 18 November (`obra-68` to `obra-71`, its folders 13, 14, 15 and 17): a sculpture of golden rods, a folded band, a rectangle in two tones and a light rectangle with rust coloured marks.
 - The camera files of the three photos still taken from the old site (`gallery/sala-04.jpg`, `studio/artistas-01.jpg`, `studio/artistas-03.jpg`).
 - Full size photos of the 15 catalog works that only have small catalog photos, or word that they are sold.
-- Which works are in the gallery, sold, reserved or available. The five tags on the site today are samples.
+- Which works are in the gallery, sold, reserved or available.
 - Titles for the nine photos in `src/lib/assets/untitled/`.
 - A review of the English technique lines and of the new short texts on the home page.

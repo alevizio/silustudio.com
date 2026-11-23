@@ -109,13 +109,16 @@ describe('serialise', () => {
 });
 
 describe('redirects from the old site', () => {
-	interface Redirect {
-		source: string;
-		destination: string;
-		permanent: boolean;
-	}
-	const config: { redirects: Redirect[] } = JSON.parse(readFileSync('vercel.json', 'utf8'));
-	const { redirects } = config;
+	/**
+	 * Where the page left at an old address sends the visitor (`static/<old>/index.html`), or
+	 * undefined if there is no such page or it does not send them on at once.
+	 */
+	const to = (old: string): string | undefined => {
+		const html = readFileSync(`static${old}/index.html`, 'utf8');
+		const refresh = /<meta http-equiv="refresh" content="0; url=([^"]+)"/.exec(html)?.[1];
+		const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
+		return canonical === `${SITE.url}${refresh}` ? refresh : undefined;
+	};
 	/** The addresses the Squarespace site had, from its own sitemap. */
 	const OLD_ADDRESSES = [
 		'/inicio',
@@ -129,20 +132,12 @@ describe('redirects from the old site', () => {
 		'/contact'
 	];
 
-	it('sends every address of the old site to a page of this one, for good', () => {
+	it('sends every address of the old site to a page of this one, at once and for good', () => {
 		const pages: string[] = PAGES.flatMap((page) => [ROUTES.es[page], ROUTES.en[page]]);
-		for (const old of OLD_ADDRESSES) {
-			for (const source of [old, `${old}/`]) {
-				const redirect = redirects.find((candidate) => candidate.source === source);
-				expect(redirect, source).toBeDefined();
-				expect(pages, source).toContain(redirect?.destination);
-				expect(redirect?.permanent, source).toBe(true);
-			}
-		}
+		for (const old of OLD_ADDRESSES) expect(pages, old).toContain(to(old));
 	});
 
 	it('keeps old Spanish pages in Spanish and old English pages in English', () => {
-		const to = (source: string) => redirects.find((r) => r.source === source)?.destination;
 		expect(to('/artistas')).toBe('/estudio/');
 		expect(to('/artists')).toBe('/en/studio/');
 		expect(to('/contacto')).toBe('/visitar/');

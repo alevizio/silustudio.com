@@ -10,7 +10,7 @@ const HOURS: string | null = null;
 /** The gallery's own address on the web, and the address the preview of the redesign is at. */
 const LIVE_URL = 'https://www.silustudio.com';
 const PREVIEW_URL = 'https://silustudio.vercel.app';
-const LAUNCHED: boolean = false;
+const LAUNCHED: boolean = true;
 
 export const SITE = {
 	name: 'Silu',
