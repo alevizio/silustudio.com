@@ -44,7 +44,6 @@ export const en: typeof es = {
 	},
 	/** A translation of the artists' words in es.ts (23 Nov 2026), not yet seen by them. */
 	home: {
-		eyebrow: 'Silu · Silvestre Jacobi and Lucila Dickinson',
 		title: 'Studio and permanent exhibition of the creative duo SILU.',
 		place: 'Punta del Este · Uruguay',
 		lead: [
@@ -87,7 +86,13 @@ export const en: typeof es = {
 				'A relief of waves in three panels above a white sofa, in a living room with tree trunk columns.',
 				'A white sculpture shaped like a shell in the foreground, in front of a study.',
 				'A white relief of rings above a white sofa, in a bright living room.',
-				'A sculpture of steel rings on the grass, in front of a building with curved roofs.'
+				'A sculpture of steel rings on the grass, in front of a building with curved roofs.',
+				'A round blue relief above a blue sofa, beside a plant.',
+				'A pale wavy relief on the wall, above a console with two white lamps.',
+				'A blue grey relief above a pale sofa, on a wooden wall in warm light.',
+				'Reliefs of organic shapes on a dining room wall, above a table with cane chairs.',
+				'A pale relief in a niche in the wall, beside a cane armchair.',
+				'A tall relief of curved forms beside a staircase, among tree trunk columns and plants.'
 			]
 		},
 		artists: {

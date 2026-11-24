@@ -39,6 +39,28 @@ describe('spaces-mosaic.svelte', () => {
 		expect(wide.classList.contains('aspect-room')).toBe(true);
 	});
 
+	it('starts each row of two threes the other way from the row above on a wider screen', async () => {
+		const alts = Array.from({ length: 12 }, (_, index) => `Foto ${index + 1}`);
+		const photos = alts.map((_, index) => SPACES_PHOTOS[index % 3]);
+		const { container } = render(SpacesMosaic, { photos, alts });
+		await expect
+			.element(page.getByRole('img', { name: 'Foto 12', exact: true }))
+			.toBeInTheDocument();
+		const turns = [...container.querySelectorAll(':scope > div > div > div:first-child')].map(
+			(column) => [
+				column.classList.contains('order-last'),
+				column.classList.contains('md:order-last')
+			]
+		);
+		// [turned on a phone, turned on a wider screen] for each three.
+		expect(turns).toEqual([
+			[false, false],
+			[true, true],
+			[false, true],
+			[true, false]
+		]);
+	});
+
 	it('leaves out a last three that is not complete, and waits to load the photos', async () => {
 		const { container } = render(SpacesMosaic, {
 			photos: PHOTOS.slice(0, 4),

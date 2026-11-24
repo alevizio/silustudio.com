@@ -1119,6 +1119,14 @@ for (const size of [
 		// On a wide screen the two threes sit side by side; on a phone one under the other.
 		if (size.width >= 768) expect(Math.abs(tallTwo.y - tall.y)).toBeLessThanOrEqual(1);
 		else expect(tallTwo.y).toBeGreaterThan(tall.y + tall.height);
+		// The third three follows the turns on a phone; on a wide screen it starts the second row
+		// the other way from the first, so its tall photo is on the left, under a square one.
+		const tallThree = await box(/^Relieve claro y ondulado/);
+		const squareThree = await box(/^Relieve circular azul/);
+		if (size.width >= 768) {
+			expect(tallThree.x + tallThree.width).toBeLessThan(squareThree.x);
+			expect(Math.abs(tallThree.x - square.x)).toBeLessThanOrEqual(1);
+		} else expect(tallThree.x).toBeGreaterThan(squareThree.x + squareThree.width);
 		const overflow = await page.evaluate(
 			() => document.documentElement.scrollWidth - document.documentElement.clientWidth
 		);

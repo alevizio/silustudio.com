@@ -13,10 +13,8 @@ describe('home-page.svelte', () => {
 			.element(page.getByRole('link', { name: 'Cómo llegar' }))
 			.toHaveAttribute('href', expect.stringContaining('google.com/maps/dir/'));
 		await expect.element(page.getByText('Punta del Este · Uruguay', { exact: true })).toBeVisible();
-		// The line over the headline says whose gallery it is.
-		await expect
-			.element(page.getByText('Silu · Silvestre Jacobi y Lucila Dickinson', { exact: true }))
-			.toBeVisible();
+		// Nothing stands over the headline: the artists' names are in the paragraph beside it.
+		expect(page.getByText('Silu · Silvestre Jacobi y Lucila Dickinson').elements()).toHaveLength(0);
 		// The photo comes before any text.
 		expect(container.querySelector('img')?.getAttribute('alt')).toContain(
 			'Interior de la galería Silu'
@@ -39,6 +37,9 @@ describe('home-page.svelte', () => {
 		await expect
 			.element(page.getByRole('img', { name: /^Escultura de anillos de acero/ }))
 			.toBeInTheDocument();
+		await expect
+			.element(page.getByRole('img', { name: /^Relieve vertical de formas curvas/ }))
+			.toBeInTheDocument();
 	});
 
 	it('opens on a photo in two shapes, square for a phone and horizontal for a wide screen', async () => {
@@ -59,6 +60,17 @@ describe('home-page.svelte', () => {
 			.element(page.getByText(/^Con más de dos décadas de trayectoria.*entre ambos mundos\.$/))
 			.toBeInTheDocument();
 		await expect.element(page.getByText(/“naturalismo abstracto”/)).toBeInTheDocument();
+	});
+
+	it('leaves the artists’ statement to the studio page and links to it', async () => {
+		render(HomePage, { lang: 'es' });
+		await expect
+			.element(page.getByRole('link', { name: 'Conocer el estudio' }))
+			.toHaveAttribute('href', expect.stringMatching(/\/estudio\/$/));
+		expect(
+			page.getByText(/^Los artistas Silvestre Jacobi y Lucila Dickinson trabajan/).elements()
+		).toHaveLength(0);
+		expect(page.getByText(/^Su proceso creativo surge/).elements()).toHaveLength(0);
 	});
 
 	it('takes a visitor to the catalog of the works from the opening and from the works', async () => {
@@ -97,9 +109,6 @@ describe('home-page.svelte', () => {
 		await expect
 			.element(page.getByRole('heading', { level: 1 }))
 			.toHaveTextContent('Studio and permanent exhibition of the creative duo SILU.');
-		await expect
-			.element(page.getByText('Silu · Silvestre Jacobi and Lucila Dickinson', { exact: true }))
-			.toBeVisible();
 		await expect
 			.element(page.getByRole('link', { name: 'About the studio' }))
 			.toHaveAttribute('href', expect.stringMatching(/\/en\/studio\/$/));

@@ -42,7 +42,6 @@
 		class="mx-auto grid max-w-page gap-5 px-gutter pt-6 md:gap-8 md:pt-8 lg:grid-cols-12 lg:gap-x-16 lg:pt-12"
 	>
 		<div class="flex flex-col gap-4 motion-safe:animate-arrive lg:col-span-7">
-			<p class="text-label text-ink-soft uppercase">{copy.home.eyebrow}</p>
 			<h1 class="font-serif text-display font-light text-balance">{copy.home.title}</h1>
 		</div>
 		<!-- Where it is and the way there come first, so they are in view when the page opens. -->
@@ -112,9 +111,7 @@
 			label={copy.home.artists.label}
 			title={copy.home.artists.title}
 		/>
-		{#each copy.studio.statement.slice(0, 2) as paragraph (paragraph)}
-			<p class="font-serif text-prose text-ink-soft">{paragraph}</p>
-		{/each}
+		<!-- Their statement is on the studio page; the home page is for photos (Ale, 23 Nov 2026). -->
 		<LinkButton href={pageHref(lang, 'studio')} variant="text">{copy.home.artists.link}</LinkButton>
 	</div>
 </section>

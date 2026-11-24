@@ -49,7 +49,6 @@ export const es = {
 	 * Silvestre (23 Nov 2026). Only the "·" between Punta del Este and Uruguay is the site's.
 	 */
 	home: {
-		eyebrow: 'Silu · Silvestre Jacobi y Lucila Dickinson',
 		title: 'Estudio y exposición permanente de la dupla creativa SILU.',
 		/** The small line under the headline: where the gallery is. The street is on Visitar. */
 		place: 'Punta del Este · Uruguay',
@@ -97,7 +96,13 @@ export const es = {
 				'Relieve de ondas en tres paneles sobre un sofá blanco, en una sala con columnas de troncos.',
 				'Escultura blanca en forma de concha en primer plano, delante de un escritorio.',
 				'Relieve blanco de anillos sobre un sofá blanco, en una sala luminosa.',
-				'Escultura de anillos de acero sobre el pasto, frente a un edificio de techos curvos.'
+				'Escultura de anillos de acero sobre el pasto, frente a un edificio de techos curvos.',
+				'Relieve circular azul sobre un sofá azul, junto a una planta.',
+				'Relieve claro y ondulado en la pared, sobre una consola con dos lámparas blancas.',
+				'Relieve azul grisáceo sobre un sofá claro, en una pared de madera con luz cálida.',
+				'Relieves de formas orgánicas en la pared de un comedor, sobre una mesa con sillas de esterilla.',
+				'Relieve claro en un nicho de la pared, junto a un sillón de esterilla.',
+				'Relieve vertical de formas curvas junto a una escalera, entre columnas de troncos y plantas.'
 			]
 		},
 		artists: {
