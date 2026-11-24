@@ -5,9 +5,9 @@
 	import OpeningPhoto from '#lib/components/opening-photo.svelte';
 	import SectionHeading from '#lib/components/section-heading.svelte';
 	import Seo from '#lib/components/seo.svelte';
-	import WorksWall from '#lib/components/works-wall.svelte';
+	import SpacesMosaic from '#lib/components/spaces-mosaic.svelte';
 	import { SITE } from '#lib/content/site.ts';
-	import { HERO_PHOTO, HERO_PHOTO_TALL, PHOTOGRAPHED_WORKS } from '#lib/content/images.ts';
+	import { HERO_PHOTO, HERO_PHOTO_TALL, SPACES_PHOTOS } from '#lib/content/images.ts';
 	import { pageHref } from '#lib/i18n/href.ts';
 	import { copyFor, type Lang } from '#lib/i18n/index.ts';
 
@@ -16,12 +16,6 @@
 	}
 
 	let { lang }: Props = $props();
-
-	/** The four works shown on the home page, by slug: two landscape, one portrait, one square. */
-	const FEATURED = ['guijarro', 'resplandor-circular', 'reencause', 'cause'];
-	const featured = FEATURED.flatMap((slug) =>
-		PHOTOGRAPHED_WORKS.filter((work) => work.slug === slug)
-	);
 
 	const copy = $derived(copyFor(lang));
 </script>
@@ -51,13 +45,11 @@
 			<p class="text-label text-ink-soft uppercase">{copy.home.eyebrow}</p>
 			<h1 class="font-serif text-display font-light text-balance">{copy.home.title}</h1>
 		</div>
-		<!-- The address and the way there come first, so they are in view when the page opens. -->
+		<!-- Where it is and the way there come first, so they are in view when the page opens. -->
 		<div
 			class="flex flex-col gap-4 arrive-after-1 motion-safe:animate-arrive md:gap-6 lg:col-span-5"
 		>
-			<p class="text-label text-ink-soft uppercase">
-				{SITE.address.street} · {SITE.address.locality}, {SITE.address.country}
-			</p>
+			<p class="text-label text-ink-soft uppercase">{copy.home.place}</p>
 			<div class="flex flex-wrap gap-3">
 				<LinkButton href={SITE.directionsUrl} external>{copy.visit.directions}</LinkButton>
 				<LinkButton href={pageHref(lang, 'works')} variant="line">
@@ -100,7 +92,7 @@
 		/>
 		<LinkButton href={pageHref(lang, 'works')} variant="text">{copy.home.works.link}</LinkButton>
 	</div>
-	<WorksWall works={featured} {lang} label={copy.home.works.label} />
+	<SpacesMosaic photos={SPACES_PHOTOS} alts={copy.home.works.spaces} />
 </section>
 
 <section

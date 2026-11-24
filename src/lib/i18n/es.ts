@@ -43,20 +43,25 @@ export const es = {
 		pause: 'Pausar el video',
 		play: 'Reproducir el video'
 	},
+	/**
+	 * The headings, the small line under the first one, the opening paragraph and the "Catálogo"
+	 * link are the artists' own words, as Lucila sent them after going through the page with
+	 * Silvestre (23 Nov 2026). Only the "·" between Punta del Este and Uruguay is the site's.
+	 */
 	home: {
 		eyebrow: 'Silu · Silvestre Jacobi y Lucila Dickinson',
-		title: 'Galería y estudio de arte en Manantiales, Punta del Este.',
-		/** Lucila's own words (18 Nov 2026), with only the accents and one spelling put right. */
+		title: 'Estudio y exposición permanente de la dupla creativa SILU.',
+		/** The small line under the headline: where the gallery is. The street is on Visitar. */
+		place: 'Punta del Este · Uruguay',
 		lead: [
-			'Con más de dos décadas de trayectoria, el colectivo artístico de Silvestre Jacobi y Lucila Dickinson que conforman Silu, nos invitan a su studio donde podrán conocer su taller y su nueva colección de obras inspiradas en las formas orgánicas de la naturaleza.',
-			'Son creadores de su propia corriente artística llamada naturalismo abstracto, y su búsqueda está en redespertar la conexión con ella.'
+			'Con más de dos décadas de trayectoria, Silvestre Jacobi y Lucila Dickinson —el colectivo artístico SILU— abren las puertas de su estudio-taller para exhibir su obra. Su propuesta nace del “naturalismo abstracto”, una filosofía propia que busca reconectar al ser humano con la naturaleza. A través del encuentro entre lo orgánico y lo creado por el hombre, su arte despierta ese vínculo esencial que permanece latente entre ambos mundos.'
 		],
 		/** True of both photos the page can open on: the upright one and the horizontal one. */
 		heroAlt:
 			'Interior de la galería Silu: relieves de arena en las paredes y esculturas en el piso de la sala.',
 		gallery: {
-			label: 'La galería',
-			title: 'Las obras se ven en su propia sala, en Manantiales.',
+			label: 'Galería',
+			title: 'Exposición permanente.',
 			link: 'Planificar la visita',
 			/** The horizontal photos a wide screen shows. */
 			alts: {
@@ -83,8 +88,17 @@ export const es = {
 		},
 		works: {
 			label: 'Obras',
-			title: 'Obras en arena, cuarzo, piedra caliza, madera y nácar.',
-			link: 'Ver todas las obras'
+			title: 'Obras esculturales realizadas con materiales naturales.',
+			link: 'Catálogo',
+			/** One for each photo in assets/spaces, in file name order. */
+			spaces: [
+				'Relieve claro y plegado en una pared de hormigón, junto a un sillón gris y un ventanal.',
+				'Una mujer camina por un pasillo blanco junto a relieves ovalados en la pared.',
+				'Relieve de ondas en tres paneles sobre un sofá blanco, en una sala con columnas de troncos.',
+				'Escultura blanca en forma de concha en primer plano, delante de un escritorio.',
+				'Relieve blanco de anillos sobre un sofá blanco, en una sala luminosa.',
+				'Escultura de anillos de acero sobre el pasto, frente a un edificio de techos curvos.'
+			]
 		},
 		artists: {
 			label: 'Los artistas',

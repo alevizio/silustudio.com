@@ -2,11 +2,11 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const PAGES = [
-	{ path: '/', lang: 'es', h1: 'Galería y estudio de arte en Manantiales, Punta del Este.' },
+	{ path: '/', lang: 'es', h1: 'Estudio y exposición permanente de la dupla creativa SILU.' },
 	{ path: '/obras/', lang: 'es', h1: 'Obras' },
 	{ path: '/estudio/', lang: 'es', h1: 'Silvestre Jacobi y Lucila Dickinson' },
 	{ path: '/visitar/', lang: 'es', h1: 'Visitar la galería' },
-	{ path: '/en/', lang: 'en', h1: 'Art gallery and studio in Manantiales, Punta del Este.' },
+	{ path: '/en/', lang: 'en', h1: 'Studio and permanent exhibition of the creative duo SILU.' },
 	{ path: '/en/works/', lang: 'en', h1: 'Works' },
 	{ path: '/en/studio/', lang: 'en', h1: 'Silvestre Jacobi and Lucila Dickinson' },
 	{ path: '/en/visit/', lang: 'en', h1: 'Visit the gallery' },
@@ -1084,12 +1084,54 @@ test('the coast road is drawn as the map arrives, and is simply there without mo
 	await context.close();
 });
 
+for (const size of [
+	{ name: 'on a phone', width: 390, height: 844 },
+	{ name: 'on a wide screen', width: 1440, height: 900 }
+]) {
+	test(`${size.name} the home page shows the works in rooms as a mosaic, edges lined up`, async ({
+		page
+	}) => {
+		await page.setViewportSize(size);
+		await page.goto('/');
+		const works = page.locator('section[aria-labelledby="home-works"]');
+		await works.scrollIntoViewIfNeeded();
+		await settled(page);
+		const box = async (name: RegExp) => {
+			const photo = works.getByRole('img', { name });
+			await photo.scrollIntoViewIfNeeded();
+			const found = await photo.boundingBox();
+			if (!found) throw new Error(`No box for ${name}`);
+			return found;
+		};
+		// The first three as Lucila drew it: square over wide on the left, the tall one on the right.
+		const square = await box(/^Relieve claro y plegado/);
+		const wide = await box(/^Relieve de ondas en tres paneles/);
+		const tall = await box(/^Una mujer camina/);
+		expect(Math.abs(square.width - square.height)).toBeLessThanOrEqual(1);
+		expect(Math.abs(wide.width / wide.height - 3 / 2)).toBeLessThan(0.02);
+		expect(tall.x).toBeGreaterThan(square.x + square.width);
+		expect(Math.abs(tall.y - square.y)).toBeLessThanOrEqual(1);
+		expect(Math.abs(tall.y + tall.height - (wide.y + wide.height))).toBeLessThanOrEqual(1);
+		// The second three turns the other way: its tall photo is on the left.
+		const tallTwo = await box(/^Relieve blanco de anillos/);
+		const squareTwo = await box(/^Escultura blanca en forma de concha/);
+		expect(tallTwo.x + tallTwo.width).toBeLessThan(squareTwo.x);
+		// On a wide screen the two threes sit side by side; on a phone one under the other.
+		if (size.width >= 768) expect(Math.abs(tallTwo.y - tall.y)).toBeLessThanOrEqual(1);
+		else expect(tallTwo.y).toBeGreaterThan(tall.y + tall.height);
+		const overflow = await page.evaluate(
+			() => document.documentElement.scrollWidth - document.documentElement.clientWidth
+		);
+		expect(overflow).toBeLessThanOrEqual(0);
+	});
+}
+
 test('a button fills with colour under the pointer, and its label stays readable', async ({
 	page
 }) => {
 	await page.goto('/');
 	await settled(page);
-	const button = page.getByRole('link', { name: 'Ver todas las obras' }).first();
+	const button = page.getByRole('link', { name: 'Catálogo' }).first();
 	const fill = () => button.evaluate((link) => getComputedStyle(link, '::before').scale);
 	expect(await fill()).toBe('1 0');
 	await button.hover();

@@ -141,6 +141,18 @@ export const IN_HOMES_PHOTOS: readonly Picture[] = inOrder(
 );
 
 /**
+ * Works in the rooms they hang in, from the artists' folder ESPACIOS (23 Nov 2026), for the
+ * mosaic on the home page. They go in threes, in file name order: a square photo, a tall one
+ * and a wide one (see spaces-mosaic.svelte).
+ */
+export const SPACES_PHOTOS: readonly Picture[] = inOrder(
+	import.meta.glob<PictureModule>('/src/lib/assets/spaces/espacio-*.jpg', {
+		eager: true,
+		query: { enhanced: true, w: '1200;900;600;400' }
+	})
+);
+
+/**
  * Photos from the old site that could not be matched to a work with certainty: whole works
  * first, then details. They are shown without a label until the artists name them.
  */

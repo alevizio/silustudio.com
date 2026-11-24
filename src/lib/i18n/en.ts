@@ -42,19 +42,19 @@ export const en: typeof es = {
 		pause: 'Pause the film',
 		play: 'Play the film'
 	},
+	/** A translation of the artists' words in es.ts (23 Nov 2026), not yet seen by them. */
 	home: {
 		eyebrow: 'Silu · Silvestre Jacobi and Lucila Dickinson',
-		title: 'Art gallery and studio in Manantiales, Punta del Este.',
-		/** A translation of Lucila's words in es.ts, kept as it is by Ale for the artists (18 Nov 2026). */
+		title: 'Studio and permanent exhibition of the creative duo SILU.',
+		place: 'Punta del Este · Uruguay',
 		lead: [
-			'With more than two decades of work behind them, Silvestre Jacobi and Lucila Dickinson, who together are the art collective Silu, invite you to their studio, where you can see their workshop and their new collection of works inspired by the organic forms of nature.',
-			'They are the creators of their own artistic movement, which they call abstract naturalism, and their search is to reawaken our connection with nature.'
+			'With more than two decades of work behind them, Silvestre Jacobi and Lucila Dickinson, the art collective SILU, open the doors of their studio and workshop to show their work. Their approach grows out of “abstract naturalism”, a philosophy of their own that seeks to reconnect people with nature. Through the meeting of the organic and the man made, their art awakens the essential bond that lies dormant between both worlds.'
 		],
 		heroAlt:
 			'Inside the Silu gallery: sand reliefs on the walls and sculptures on the floor of the room.',
 		gallery: {
-			label: 'The gallery',
-			title: 'The works are shown in their own space, in Manantiales.',
+			label: 'Gallery',
+			title: 'Permanent exhibition.',
 			link: 'Plan your visit',
 			alts: {
 				console:
@@ -79,8 +79,16 @@ export const en: typeof es = {
 		},
 		works: {
 			label: 'Works',
-			title: 'Works in sand, quartz, limestone, wood and mother of pearl.',
-			link: 'See all works'
+			title: 'Sculptural works made with natural materials.',
+			link: 'Catalog',
+			spaces: [
+				'A pale folded relief on a concrete wall, beside a grey lounge chair and a tall window.',
+				'A woman walks down a white corridor past oval reliefs on the wall.',
+				'A relief of waves in three panels above a white sofa, in a living room with tree trunk columns.',
+				'A white sculpture shaped like a shell in the foreground, in front of a study.',
+				'A white relief of rings above a white sofa, in a bright living room.',
+				'A sculpture of steel rings on the grass, in front of a building with curved roofs.'
+			]
 		},
 		artists: {
 			label: 'The artists',
